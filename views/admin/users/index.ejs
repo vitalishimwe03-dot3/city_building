@@ -1,0 +1,77 @@
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h4 style="margin:0;font-weight:700;"><i class="bi bi-shield-lock"></i> Admin Users</h4>
+        <small style="color:var(--text-muted);">Manage administrator accounts</small>
+    </div>
+    <a href="/admin/users/create" class="btn btn-sm-custom btn-edit-custom">
+        <i class="bi bi-plus-circle"></i> Add Admin
+    </a>
+</div>
+
+<div class="admin-card-modern">
+    <% if (users.length === 0) { %>
+        <div class="empty-state"><i class="bi bi-shield-lock"></i><h5>No admin users found</h5></div>
+    <% } else { %>
+        <div class="table-responsive">
+            <table class="table-custom">
+                <thead>
+                    <tr>
+                        <th>Username</th>
+                        <th>Email</th>
+                        <th>Full Name</th>
+                        <th>Role</th>
+                        <th>Status</th>
+                        <th>Last Login</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% users.forEach(user => { %>
+                        <tr>
+                            <td>
+                                <strong><%= user.username %></strong>
+                                <% if (currentAdmin && currentAdmin.id === user.id) { %>
+                                    <span class="badge badge-custom primary" style="font-size:10px;">You</span>
+                                <% } %>
+                            </td>
+                            <td><%= user.email %></td>
+                            <td><%= user.full_name %></td>
+                            <td>
+                                <span class="badge badge-custom <%= user.role === 'super_admin' || user.role === 'superadmin' ? 'warning' : 'info' %>">
+                                    <%= user.role === 'superadmin' ? 'super_admin' : user.role %>
+                                </span>
+                            </td>
+                            <td>
+                                <% if (user.username === 'CityB') { %>
+                                    <span class="badge badge-custom primary">Protected</span>
+                                <% } else if (user.is_active) { %>
+                                    <span class="badge badge-custom success">Active</span>
+                                <% } else { %>
+                                    <span class="badge badge-custom danger">Inactive</span>
+                                <% } %>
+                            </td>
+                            <td><small><%= user.last_login ? new Date(user.last_login).toLocaleDateString() : 'Never' %></small></td>
+                            <td>
+                                <div class="action-btns">
+                                    <a href="/admin/users/<%= user.id %>/edit" class="btn btn-sm-custom btn-edit-custom">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+                                    <% if (user.username !== 'CityB') { %>
+                                        <form action="/admin/users/<%= user.id %>/delete" method="POST" style="display:inline;" onsubmit="return confirm('Delete this admin user? This cannot be undone.');">
+                                            <button type="submit" class="btn btn-sm-custom btn-delete-custom">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+                                        </form>
+                                    <% } %>
+                                </div>
+                            </td>
+                        </tr>
+                    <% }) %>
+                </tbody>
+            </table>
+        </div>
+        <div style="margin-top:16px;padding:12px 16px;background:rgba(8,145,178,0.05);border-radius:8px;border:1px solid rgba(8,145,178,0.15);">
+            <small style="color:var(--text-muted);"><i class="bi bi-shield-check"></i> The <strong>CityB</strong> super admin account is protected and cannot be deleted or deactivated.</small>
+        </div>
+    <% } %>
+</div>

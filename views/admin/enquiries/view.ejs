@@ -1,0 +1,61 @@
+<div class="mb-4">
+    <a href="/admin/enquiries" class="btn btn-sm-custom btn-edit-custom"><i class="bi bi-arrow-left"></i> Back to Enquiries</a>
+</div>
+
+<div class="row g-4">
+    <div class="col-lg-8">
+        <div class="admin-card-modern">
+            <div class="card-header-custom">
+                <h5><i class="bi bi-person" style="color:#0891b2;"></i> <%= enquiry.name %></h5>
+            </div>
+            <div class="user-info-grid">
+                <div class="user-info-item">
+                    <label>Email</label>
+                    <div class="value"><a href="mailto:<%= enquiry.email %>"><%= enquiry.email %></a></div>
+                </div>
+                <div class="user-info-item">
+                    <label>Phone</label>
+                    <div class="value"><a href="tel:<%= enquiry.phone %>"><%= enquiry.phone %></a></div>
+                </div>
+                <div class="user-info-item">
+                    <label>Status</label>
+                    <div class="value">
+                        <span class="badge badge-custom <%= enquiry.status === 'new' ? 'warning' : (enquiry.status === 'contacted' ? 'info' : 'secondary') %>">
+                            <%= enquiry.status %>
+                        </span>
+                    </div>
+                </div>
+                <div class="user-info-item">
+                    <label>Received</label>
+                    <div class="value"><%= new Date(enquiry.created_at).toLocaleString() %></div>
+                </div>
+            </div>
+            <div style="margin-top:20px;padding:16px;background:var(--bg-surface);border-radius:8px;border:1px solid var(--border-primary);">
+                <label style="display:block;font-size:11px;font-weight:600;text-transform:uppercase;color:var(--text-muted);margin-bottom:8px;">Message</label>
+                <p style="margin:0;color:var(--text-primary);"><%= enquiry.message || '(No message provided)' %></p>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-4">
+        <div class="admin-card-modern">
+            <div class="card-header-custom">
+                <h5><i class="bi bi-gear" style="color:#0891b2;"></i> Actions</h5>
+            </div>
+            <form method="POST" action="/admin/enquiries/<%= enquiry.id %>/status" class="mb-3">
+                <label class="form-label">Update Status</label>
+                <div class="d-flex gap-2 mb-3">
+                    <select class="form-select" name="status" style="flex:1;">
+                        <option value="new" <%= enquiry.status === 'new' ? 'selected' : '' %>>New</option>
+                        <option value="contacted" <%= enquiry.status === 'contacted' ? 'selected' : '' %>>Contacted</option>
+                        <option value="closed" <%= enquiry.status === 'closed' ? 'selected' : '' %>>Closed</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-sm-custom btn-edit-custom" style="width:100%;justify-content:center;"><i class="bi bi-check-circle"></i> Update Status</button>
+            </form>
+            <hr style="border-color:var(--border-primary);">
+            <form action="/admin/enquiries/<%= enquiry.id %>/delete" method="POST" onsubmit="return confirm('Delete this enquiry?')">
+                <button type="submit" class="btn btn-sm-custom btn-delete-custom" style="width:100%;justify-content:center;"><i class="bi bi-trash"></i> Delete Enquiry</button>
+            </form>
+        </div>
+    </div>
+</div>

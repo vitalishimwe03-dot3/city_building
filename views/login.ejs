@@ -1,0 +1,68 @@
+<section class="auth-page">
+  <div class="auth-card">
+    <div class="auth-brand">
+      <div class="auth-icon"><i class="bi bi-person-lock"></i></div>
+      <div class="logo-text">City Building</div>
+      <div class="logo-sub">Engineering Company Ltd</div>
+    </div>
+    <h2>Welcome back</h2>
+    <p class="auth-subtitle">Sign in to your student account</p>
+
+    <% if (typeof error !== 'undefined' && error) { %>
+      <div class="auth-error"><i class="bi bi-exclamation-triangle-fill"></i> <%= error %></div>
+    <% } %>
+    <% if (typeof success !== 'undefined' && success) { %>
+      <div class="auth-success"><i class="bi bi-check-circle-fill"></i> <%= success %></div>
+    <% } %>
+
+    <form method="post" action="/login" id="loginForm" novalidate>
+      <div class="form-floating-group">
+        <input type="email" name="email" class="form-control" id="loginEmail" placeholder="your@email.com" required autocomplete="email" pattern="^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$">
+        <label for="loginEmail">Email address</label>
+        <div class="invalid-feedback">Please enter a valid email address.</div>
+      </div>
+      <div class="form-floating-group">
+        <input type="password" name="password" class="form-control" id="loginPassword" placeholder="Your password" required autocomplete="current-password">
+        <label for="loginPassword">Password</label>
+        <button type="button" class="password-toggle" id="pwToggle" tabindex="-1" aria-label="Toggle password visibility"><i class="bi bi-eye-slash"></i></button>
+        <div class="invalid-feedback">Please enter your password.</div>
+      </div>
+      <div class="auth-options">
+        <div class="form-check">
+          <input class="form-check-input" type="checkbox" id="rememberMe" name="rememberMe">
+          <label class="form-check-label" for="rememberMe">Remember me</label>
+        </div>
+        <a href="/forgot-password">Forgot password?</a>
+      </div>
+      <button class="btn btn-primary w-100" type="submit" id="loginSubmitBtn"><i class="bi bi-box-arrow-in-right"></i> Sign In</button>
+    </form>
+
+    <div class="auth-footer" style="border-top:none;margin-top:12px;padding-top:0;">
+      No account? <a href="/signup">Create one</a>
+    </div>
+  </div>
+</section>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  var pwInput = document.getElementById('loginPassword');
+  var pwBtn = document.getElementById('pwToggle');
+  if (pwBtn) {
+    pwBtn.addEventListener('click', function() {
+      var type = pwInput.type === 'password' ? 'text' : 'password';
+      pwInput.type = type;
+      pwBtn.querySelector('i').className = type === 'password' ? 'bi bi-eye-slash' : 'bi bi-eye';
+    });
+  }
+  var form = document.getElementById('loginForm');
+  var submitBtn = document.getElementById('loginSubmitBtn');
+  form.addEventListener('submit', function(e) {
+    if (!form.checkValidity()) { e.preventDefault(); e.stopPropagation(); }
+    form.classList.add('was-validated');
+    if (form.checkValidity() && submitBtn) {
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Signing in...';
+    }
+  });
+});
+</script>

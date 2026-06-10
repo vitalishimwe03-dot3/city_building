@@ -1,0 +1,76 @@
+<section class="pb-4">
+  <div class="container">
+    <% 
+      const toolImages = {
+        revit: 'https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=1200&q=80',
+        archicad: 'https://images.unsplash.com/photo-1581093588401-5e2f05423024?auto=format&fit=crop&w=1200&q=80',
+        sketchup: 'https://images.unsplash.com/photo-1494526585095-c41746248156?auto=format&fit=crop&w=1200&q=80',
+        autocad: 'https://images.unsplash.com/photo-1601582582450-cc87d9f0e648?auto=format&fit=crop&w=1200&q=80',
+        rhino: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?auto=format&fit=crop&w=1200&q=80',
+        grasshopper: 'https://images.unsplash.com/photo-1561070791-2526d30994b5?auto=format&fit=crop&w=1200&q=80',
+        lumion: 'https://images.unsplash.com/photo-1550355291-bbee04a92027?auto=format&fit=crop&w=1200&q=80',
+        vray: 'https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&w=1200&q=80',
+        enscape: 'https://images.unsplash.com/photo-1586717167541-33ac42f3666c?auto=format&fit=crop&w=1200&q=80',
+        dynamo: 'https://images.unsplash.com/photo-1581092163562-40460ef784b2?auto=format&fit=crop&w=1200&q=80',
+        cad: 'https://images.unsplash.com/photo-1511918170649-c86f6f1588e7?auto=format&fit=crop&w=1200&q=80',
+        architectural: 'https://images.unsplash.com/photo-1503387762519-52582b8ba3f0?auto=format&fit=crop&w=1200&q=80',
+        design: 'https://images.unsplash.com/photo-1561070791-2526d30994b5?auto=format&fit=crop&w=1200&q=80',
+        modeling: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?auto=format&fit=crop&w=1200&q=80',
+        rendering: 'https://images.unsplash.com/photo-1550355291-bbee04a92027?auto=format&fit=crop&w=1200&q=80'
+      };
+      function getToolImage(name) {
+        const lower = (name || '').toLowerCase();
+        for (const key in toolImages) {
+          if (lower.includes(key)) return toolImages[key];
+        }
+        return null;
+      }
+    %>
+    <div class="row align-items-start mb-5 pb-2" style="border-bottom: 1px solid var(--border-primary);">
+      <div class="col-md-8">
+        <p class="text-uppercase small fw-semibold mb-2" style="color: var(--accent-primary-light);">Category</p>
+        <h1 class="display-6 fw-bold"><%= category.name %></h1>
+        <p class="text-muted" style="max-width: 600px;"><%= category.description %></p>
+      </div>
+      <div class="col-md-4 text-md-end mt-3 mt-md-0">
+        <a href="#courses" class="btn btn-primary">Browse Softwares</a>
+      </div>
+    </div>
+
+    <!-- Header images removed to simplify layout above subcourses -->
+
+    <div class="mb-4">
+      <label class="form-label">Search Softwares</label>
+      <input id="courseFilter" type="text" class="form-control" placeholder="Type a software name to filter...">
+    </div>
+
+    <div id="courses" class="row g-4">
+      <% if (subcourses.length === 0) { %>
+        <div class="col-12"><div class="alert alert-warning">No softwares are available for this category yet.</div></div>
+      <% } %>
+      <% subcourses.forEach(course => { %>
+        <div class="col-md-6 col-xl-4 course-card" data-title="<%= course.name.toLowerCase() %>" data-description="<%= (course.description || '').toLowerCase() %>">
+          <div class="card shadow-sm border-0 h-100 overflow-hidden">
+            <div class="course-image position-relative" style="height: 200px; overflow: hidden;">
+              <% if (course.image && (course.image.startsWith('http://') || course.image.startsWith('https://'))) { %>
+                <img src="<%= course.image %>" alt="<%= course.name %> software training course at City Building Engineering" class="w-100 h-100" style="object-fit: cover;">
+              <% } else if (course.image) { %>
+                <img src="/images/<%= course.image %>" alt="<%= course.name %> training course" class="w-100 h-100" style="object-fit: cover;">
+              <% } else { %>
+                <% const defaultCourseImage = getToolImage(course.name) || 'https://images.pexels.com/photos/1487014679447-9f8336841d58?auto=compress&cs=tinysrgb&w=1200'; %>
+                <img src="<%= defaultCourseImage %>" alt="<%= course.name %> training" class="w-100 h-100" style="object-fit: cover;">
+              <% } %>
+            </div>
+            <div class="card-body d-flex flex-column">
+              <h3 class="h5"><%= course.name %></h3>
+              <p class="text-muted mb-4"><%= course.description || 'Practical software course with workspace simulation.' %></p>
+              <div class="mt-auto">
+                <a href="/course/<%= course.id %>" class="btn btn-primary">View Software</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      <% }) %>
+    </div>
+  </div>
+</section>

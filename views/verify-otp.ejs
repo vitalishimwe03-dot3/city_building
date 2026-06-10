@@ -1,0 +1,70 @@
+<section class="auth-page">
+  <div class="auth-card">
+    <div class="auth-brand">
+      <div class="auth-icon" style="background: linear-gradient(135deg, #0891b2, #06b6d4);"><i class="bi bi-shield-check"></i></div>
+      <div class="logo-text">Verify your email</div>
+      <div class="logo-sub">Step 2 of 2</div>
+    </div>
+
+    <p class="auth-subtitle">We sent a 6-digit code to <strong style="color: var(--accent);"><%= email %></strong></p>
+
+    <% if (typeof error !== 'undefined' && error) { %>
+      <div class="auth-error"><i class="bi bi-exclamation-triangle-fill"></i> <%= error %></div>
+    <% } %>
+
+    <form method="post" action="/verify-otp" id="otpForm">
+      <input type="hidden" name="email" value="<%= email %>">
+      <div class="otp-inputs" id="otpInputs">
+        <% for (var i = 0; i < 6; i++) { %>
+          <input type="text" class="otp-box" maxlength="1" inputmode="numeric" pattern="[0-9]" autocomplete="one-time-code" required>
+        <% } %>
+      </div>
+      <input type="hidden" name="otp" id="otpHidden">
+      <small class="text-muted" style="display:block;text-align:center;margin-bottom:20px;">Code expires in 10 minutes</small>
+
+      <button class="btn btn-primary w-100" type="submit" id="verifyBtn">
+        <i class="bi bi-check-circle"></i> Verify &amp; Create Account
+      </button>
+    </form>
+
+    <div class="auth-footer">
+      <p class="mb-2 small" style="color: var(--text-muted);">Didn't receive the code?</p>
+      <a href="/signup" class="btn btn-sm" style="background: var(--bg-surface); border: 1px solid var(--border); color: var(--text-secondary); border-radius: var(--radius); padding: 8px 20px; text-decoration: none;">
+        <i class="bi bi-arrow-left"></i> Go back &amp; try again
+      </a>
+    </div>
+  </div>
+</section>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  var inputs = document.querySelectorAll('.otp-box');
+  var hidden = document.getElementById('otpHidden');
+  var form = document.getElementById('otpForm');
+
+  inputs.forEach(function(input, index) {
+    input.addEventListener('input', function() {
+      this.value = this.value.replace(/[^0-9]/g, '');
+      this.classList.toggle('filled', !!this.value);
+      if (this.value && index < inputs.length - 1) inputs[index + 1].focus();
+      var code = ''; inputs.forEach(function(inp) { code += inp.value; }); hidden.value = code;
+    });
+    input.addEventListener('keydown', function(e) {
+      if (e.key === 'Backspace' && !this.value && index > 0) { inputs[index - 1].focus(); inputs[index - 1].value = ''; inputs[index - 1].classList.remove('filled'); }
+    });
+    input.addEventListener('paste', function(e) {
+      e.preventDefault();
+      var paste = (e.clipboardData || window.clipboardData).getData('text').replace(/[^0-9]/g, '').slice(0, 6);
+      paste.split('').forEach(function(char, i) { if (inputs[i]) { inputs[i].value = char; inputs[i].classList.toggle('filled', !!char); } });
+      var code = ''; inputs.forEach(function(inp) { code += inp.value; }); hidden.value = code;
+      var nextEmpty = 6; for (var i = 0; i < inputs.length; i++) { if (!inputs[i].value) { nextEmpty = i; break; } }
+      if (nextEmpty < inputs.length) inputs[nextEmpty].focus();
+    });
+  });
+
+  form.addEventListener('submit', function(e) {
+    var code = ''; inputs.forEach(function(inp) { code += inp.value; }); hidden.value = code;
+    if (code.length < 6) { e.preventDefault(); alert('Please enter the complete 6-digit code.'); }
+  });
+});
+</script>

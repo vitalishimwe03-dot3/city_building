@@ -1,0 +1,73 @@
+<% if (success) { %>
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <i class="bi bi-check-circle"></i> <%= success %>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+<% } %>
+<% if (error) { %>
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <i class="bi bi-exclamation-circle"></i> <%= error %>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+<% } %>
+
+<div class="row g-4">
+    <div class="col-lg-8">
+        <div class="admin-card-modern">
+            <div class="card-header-custom">
+                <h5><i class="bi bi-person-badge" style="color:#0891b2;"></i> Admin Profile</h5>
+            </div>
+            <div class="user-info-grid">
+                <div class="user-info-item">
+                    <label>Username</label>
+                    <div class="value"><%= user.username %></div>
+                </div>
+                <div class="user-info-item">
+                    <label>Full Name</label>
+                    <div class="value"><%= user.full_name %></div>
+                </div>
+                <div class="user-info-item">
+                    <label>Email</label>
+                    <div class="value"><%= user.email %></div>
+                </div>
+                <div class="user-info-item">
+                    <label>Role</label>
+                    <div class="value"><span class="badge badge-custom info"><%= user.role %></span></div>
+                </div>
+                <div class="user-info-item">
+                    <label>Status</label>
+                    <div class="value"><span class="badge badge-custom <%= user.is_active ? 'success' : 'danger' %>"><%= user.is_active ? 'Active' : 'Inactive' %></span></div>
+                </div>
+                <div class="user-info-item">
+                    <label>Last Login</label>
+                    <div class="value"><%= user.last_login ? new Date(user.last_login).toLocaleString() : 'Never' %></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-4">
+        <div class="admin-card-modern">
+            <div class="card-header-custom">
+                <h5><i class="bi bi-key" style="color:#ef4444;"></i> Change Password</h5>
+            </div>
+            <form method="POST" action="/admin/settings/change-password">
+                <div class="mb-3">
+                    <label class="form-label">Current Password</label>
+                    <input type="password" class="form-control" name="currentPassword" required placeholder="Enter current password">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">New Password</label>
+                    <input type="password" class="form-control" name="newPassword" required placeholder="Enter new password">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Confirm New Password</label>
+                    <input type="password" class="form-control" name="confirmPassword" required placeholder="Confirm new password">
+                </div>
+                <button type="submit" class="btn btn-sm-custom btn-edit-custom" style="width:100%;padding:10px;justify-content:center;">
+                    <i class="bi bi-check-circle"></i> Update Password
+                </button>
+            </form>
+        </div>
+    </div>
+</div>

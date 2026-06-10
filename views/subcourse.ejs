@@ -1,0 +1,188 @@
+<section class="subcourse-hero py-5">
+  <div class="container">
+    <% 
+      const toolImages = {
+        revit: 'https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=1200&q=80',
+        archicad: 'https://images.unsplash.com/photo-1581093588401-5e2f05423024?auto=format&fit=crop&w=1200&q=80',
+        sketchup: 'https://images.unsplash.com/photo-1494526585095-c41746248156?auto=format&fit=crop&w=1200&q=80',
+        autocad: 'https://images.unsplash.com/photo-1601582582450-cc87d9f0e648?auto=format&fit=crop&w=1200&q=80',
+        rhino: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?auto=format&fit=crop&w=1200&q=80',
+        grasshopper: 'https://images.unsplash.com/photo-1561070791-2526d30994b5?auto=format&fit=crop&w=1200&q=80',
+        lumion: 'https://images.unsplash.com/photo-1550355291-bbee04a92027?auto=format&fit=crop&w=1200&q=80',
+        vray: 'https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&w=1200&q=80',
+        enscape: 'https://images.unsplash.com/photo-1586717167541-33ac42f3666c?auto=format&fit=crop&w=1200&q=80',
+        dynamo: 'https://images.unsplash.com/photo-1581092163562-40460ef784b2?auto=format&fit=crop&w=1200&q=80',
+        cad: 'https://images.unsplash.com/photo-1511918170649-c86f6f1588e7?auto=format&fit=crop&w=1200&q=80',
+        architectural: 'https://images.unsplash.com/photo-1503387762519-52582b8ba3f0?auto=format&fit=crop&w=1200&q=80',
+        design: 'https://images.unsplash.com/photo-1561070791-2526d30994b5?auto=format&fit=crop&w=1200&q=80',
+        modeling: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?auto=format&fit=crop&w=1200&q=80',
+        rendering: 'https://images.unsplash.com/photo-1550355291-bbee04a92027?auto=format&fit=crop&w=1200&q=80'
+      };
+      function getToolImage(name) {
+        const lower = (name || '').toLowerCase();
+        for (const key in toolImages) {
+          if (lower.includes(key)) return toolImages[key];
+        }
+        return null;
+      }
+    %>
+    <!-- Back Navigation -->
+    <div class="mb-4">
+      <a href="/category/<%= course.category_slug %>" class="btn btn-sm btn-outline-secondary">
+        <i class="bi bi-arrow-left"></i> Back to <%= course.category_name %>
+      </a>
+    </div>
+
+    <!-- Hero Section -->
+    <div class="row g-4 g-lg-5 align-items-center mb-5">
+      <div class="col-12 col-lg-5">
+        <div class="hero-image-wrapper">
+          <div class="card border-0 overflow-hidden shadow-lg" style="height: 350px;">
+            <% if (course.image && (course.image.startsWith('http://') || course.image.startsWith('https://'))) { %>
+              <img src="<%= course.image %>" alt="<%= course.name %> software training at City Building Engineering" class="w-100 h-100" style="object-fit: cover;">
+            <% } else if (course.image) { %>
+              <img src="/images/<%= course.image %>" alt="<%= course.name %> training" class="w-100 h-100" style="object-fit: cover;">
+            <% } else { %>
+              <% const defaultCourseImage = getToolImage(course.name) || 'https://images.pexels.com/photos/1487014679447-9f8336841d58?auto=compress&cs=tinysrgb&w=1200'; %>
+              <img src="<%= defaultCourseImage %>" alt="<%= course.name %> training" class="w-100 h-100" style="object-fit: cover;">
+            <% } %>
+          </div>
+        </div>
+      </div>
+
+      <!-- Content Column -->
+      <div class="col-12 col-lg-7">
+        <div class="hero-content">
+          <div class="mb-3">
+            <span class="badge bg-info text-white"><%= course.category_name %></span>
+          </div>
+          <h1 class="display-5 fw-bold mb-3">
+            <%= course.name %>
+          </h1>
+          <p class="lead text-muted mb-4">
+            <%= course.description || 'Project-focused training in software used by building professionals.' %>
+          </p>
+
+          <!-- Key Benefits -->
+          <div class="benefits-section mb-4">
+            <h3 class="h5 fw-bold mb-3">What you will learn</h3>
+            <ul class="list-unstyled course-benefits">
+              <li class="mb-2">
+                <i class="bi bi-check-circle-fill text-success"></i>
+                <span class="ms-2">Practical tool workflows used in the profession</span>
+              </li>
+              <li class="mb-2">
+                <i class="bi bi-check-circle-fill text-success"></i>
+                <span class="ms-2">Real workspace scenarios for quick skill application</span>
+              </li>
+              <li class="mb-2">
+                <i class="bi bi-check-circle-fill text-success"></i>
+                <span class="ms-2">Internship preparation and portfolio-ready projects</span>
+              </li>
+              <li class="mb-2">
+                <i class="bi bi-check-circle-fill text-success"></i>
+                <span class="ms-2">Industry standards and best practices</span>
+              </li>
+            </ul>
+          </div>
+
+          <!-- CTA Buttons -->
+          <div class="d-flex flex-column flex-sm-row gap-3 mb-3">
+            <a href="#enquiry" class="btn btn-primary btn-lg px-4">
+              <i class="bi bi-envelope"></i> Enquire about this course
+            </a>
+            <a href="/contact" class="btn btn-outline-secondary btn-lg px-4">
+              <i class="bi bi-question-circle"></i> Ask a question
+            </a>
+          </div>
+          <div id="registerMessage"></div>
+          <button class="btn btn-success btn-lg px-4 register-course-btn" data-course-id="<%= course.id %>">
+            <i class="bi bi-journal-plus"></i> Register for this Course
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Course Overview -->
+    <div class="row g-4 mb-5">
+      <div class="col-md-3 col-sm-6">
+        <div class="info-card">
+          <i class="bi bi-gear-fill fs-3 mb-2" style="color: var(--accent-primary-light);"></i>
+          <h4 class="h6 fw-bold">Practical Skills</h4>
+          <p class="small text-muted mb-0">Professional-grade tools</p>
+        </div>
+      </div>
+      <div class="col-md-3 col-sm-6">
+        <div class="info-card">
+          <i class="bi bi-briefcase-fill fs-3 mb-2" style="color: var(--accent-primary-light);"></i>
+          <h4 class="h6 fw-bold">Career Focused</h4>
+          <p class="small text-muted mb-0">Job-ready training</p>
+        </div>
+      </div>
+      <div class="col-md-3 col-sm-6">
+        <div class="info-card">
+          <i class="bi bi-person-fill fs-3 mb-2" style="color: var(--accent-primary-light);"></i>
+          <h4 class="h6 fw-bold">Expert Support</h4>
+          <p class="small text-muted mb-0">Industry mentors</p>
+        </div>
+      </div>
+      <div class="col-md-3 col-sm-6">
+        <div class="info-card">
+          <i class="bi bi-award-fill fs-3 mb-2" style="color: var(--accent-primary-light);"></i>
+          <h4 class="h6 fw-bold">Certification</h4>
+          <p class="small text-muted mb-0">Recognized credential</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Enquiry Form Section -->
+<section class="py-5">
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-12 col-lg-8">
+        <div id="enquiry" class="enquiry-card p-5">
+          <h2 class="h3 fw-bold mb-2">Ready to apply?</h2>
+          <p class="text-muted mb-4">Send your details and we will guide you through registration and placement.</p>
+
+          <form id="enquiry-form" action="https://formspree.io/f/xnjyzgjr" method="POST" class="row g-3">
+            <input type="hidden" name="_subject" value="Course enquiry from <%= course.name %>">
+            <div data-fs-success class="alert alert-success d-none" role="alert"></div>
+            <div data-fs-error class="alert alert-danger d-none" role="alert"></div>
+            <div class="col-md-6">
+              <label for="name" class="form-label">Full name *</label>
+              <input type="text" name="name" id="name" class="form-control form-control-lg" placeholder="Enter your full name" data-fs-field required>
+            </div>
+            <div class="col-md-6">
+              <label for="email" class="form-label">Email *</label>
+              <input type="email" name="email" id="email" class="form-control form-control-lg" placeholder="your.email@example.com" data-fs-field required>
+            </div>
+            <div class="col-md-6">
+              <label for="phone" class="form-label">Phone *</label>
+              <input type="tel" name="phone" id="phone" class="form-control form-control-lg" placeholder="Phone number" data-fs-field required>
+            </div>
+            <div class="col-md-6">
+              <label for="course" class="form-label">Course</label>
+              <input type="text" id="course" class="form-control form-control-lg" value="<%= course.name %>" disabled>
+              <input type="hidden" name="course" value="<%= course.name %>">
+            </div>
+            <div class="col-12">
+              <label for="message" class="form-label">Additional questions (optional)</label>
+              <textarea name="message" id="message" rows="5" class="form-control" placeholder="Tell us more about your background or any questions..." data-fs-field></textarea>
+            </div>
+            <div class="col-12">
+              <button type="submit" class="btn btn-primary btn-lg w-100 w-md-auto" data-fs-submit-btn>
+                <i class="bi bi-send"></i> Submit enquiry
+              </button>
+            </div>
+          </form>
+          <script>
+            window.formspree = window.formspree || function () { (formspree.q = formspree.q || []).push(arguments); };
+            formspree('initForm', { formElement: '#enquiry-form', formId: 'xnjyzgjr' });
+          </script>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

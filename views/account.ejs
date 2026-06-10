@@ -1,0 +1,166 @@
+<section class="py-5">
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-xl-10">
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-start gap-3 mb-4">
+          <div>
+            <h2 class="h3 mb-1">Account Dashboard</h2>
+            <p class="text-muted mb-0">Welcome back, <strong><%= user.full_name %></strong>. Manage your profile, security settings, and keep up with the latest account news.</p>
+          </div>
+          <div class="text-md-end">
+            <span class="badge bg-primary">Member since <%= new Date(user.created_at).toLocaleDateString() %></span>
+          </div>
+        </div>
+
+        <div class="card shadow-sm">
+          <div class="card-body p-4">
+            <% if (error) { %>
+              <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                <%= error %>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+              </div>
+            <% } %>
+
+            <% if (success) { %>
+              <div class="alert alert-success alert-dismissible fade show" role="alert">
+                ✅ <%= success %>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+              </div>
+            <% } %>
+
+            <ul class="nav nav-tabs mb-4" id="settingsTabs" role="tablist">
+              <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="dashboard-tab" data-bs-toggle="tab" data-bs-target="#dashboard" type="button" role="tab">Dashboard</button>
+              </li>
+              <li class="nav-item" role="presentation">
+                <button class="nav-link" id="profile-tab" data-bs-toggle="tab" data-bs-target="#profile" type="button" role="tab">Profile</button>
+              </li>
+              <li class="nav-item" role="presentation">
+                <button class="nav-link" id="password-tab" data-bs-toggle="tab" data-bs-target="#password" type="button" role="tab">Password</button>
+              </li>
+              <li class="nav-item" role="presentation">
+                <button class="nav-link" id="language-tab" data-bs-toggle="tab" data-bs-target="#language" type="button" role="tab">Language</button>
+              </li>
+            </ul>
+
+            <div class="tab-content" id="settingsTabsContent">
+              <div class="tab-pane fade show active" id="dashboard" role="tabpanel" aria-labelledby="dashboard-tab">
+                <div class="row g-3 mb-4">
+                  <div class="col-lg-6">
+                    <div class="card h-100 border-primary">
+                      <div class="card-body">
+                        <h5 class="card-title">Welcome back!</h5>
+                        <p class="card-text">Your account is active and ready. Use the tabs below to update your profile information, secure your password, or choose your preferred language.</p>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-lg-6">
+                    <div class="card h-100 border-secondary">
+                      <div class="card-body">
+                        <h5 class="card-title">Account summary</h5>
+                        <p class="mb-1"><strong>Email:</strong> <%= user.email %></p>
+                        <p class="mb-1"><strong>Phone:</strong> <%= user.phone || 'Not set' %></p>
+                        <p class="mb-0"><strong>Language:</strong> <%= user.language || 'en' %></p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="row g-3">
+                  <% if (dashboardNews && dashboardNews.length) { %>
+                    <% dashboardNews.forEach(item => { %>
+                      <div class="col-md-6">
+                        <div class="card h-100">
+                          <div class="card-body">
+                            <h5 class="card-title"><%= item.title %></h5>
+                            <p class="card-text"><%= item.summary %></p>
+                            <p class="text-muted small mb-0"><%= item.date %></p>
+                          </div>
+                        </div>
+                      </div>
+                    <% }) %>
+                  <% } else { %>
+                    <div class="col-12">
+                      <div class="card">
+                        <div class="card-body">
+                          <p class="mb-0">No dashboard news is available right now. Check back later for updates.</p>
+                        </div>
+                      </div>
+                    </div>
+                  <% } %>
+                </div>
+              </div>
+
+              <div class="tab-pane fade" id="profile" role="tabpanel" aria-labelledby="profile-tab">
+                <form method="post" action="/account/profile" class="row g-3">
+                  <div class="col-md-6">
+                    <label class="form-label">Full Name</label>
+                    <input type="text" name="fullName" class="form-control" value="<%= user.full_name %>" required>
+                  </div>
+                  <div class="col-md-6">
+                    <label class="form-label">Email</label>
+                    <input type="email" name="email" class="form-control" value="<%= user.email %>" required readonly>
+                  </div>
+                  <div class="col-md-6">
+                    <label class="form-label">Phone</label>
+                    <input type="text" name="phone" class="form-control" value="<%= user.phone %>">
+                  </div>
+                  <div class="col-12">
+                    <button type="submit" class="btn btn-primary">Update Profile</button>
+                  </div>
+                </form>
+              </div>
+
+              <div class="tab-pane fade" id="password" role="tabpanel" aria-labelledby="password-tab">
+                <form method="post" action="/account/change-password" class="row g-3">
+                  <div class="col-12">
+                    <label class="form-label">Current Password</label>
+                    <input type="password" name="currentPassword" class="form-control" required>
+                  </div>
+                  <div class="col-12">
+                    <label class="form-label">New Password</label>
+                    <input type="password" name="newPassword" class="form-control" required>
+                  </div>
+                  <div class="col-12">
+                    <label class="form-label">Confirm New Password</label>
+                    <input type="password" name="confirmPassword" class="form-control" required>
+                  </div>
+                  <div class="col-12">
+                    <button type="submit" class="btn btn-primary">Change Password</button>
+                  </div>
+                </form>
+              </div>
+
+              <div class="tab-pane fade" id="language" role="tabpanel" aria-labelledby="language-tab">
+                <form method="post" action="/account/language" class="row g-3">
+                  <div class="col-md-6">
+                    <label class="form-label">Preferred language</label>
+                    <select name="language" class="form-select">
+                      <option value="en" <%= user.language === 'en' ? 'selected' : '' %>>English</option>
+                      <option value="fr" <%= user.language === 'fr' ? 'selected' : '' %>>Français</option>
+                      <option value="es" <%= user.language === 'es' ? 'selected' : '' %>>Español</option>
+                      <option value="pt" <%= user.language === 'pt' ? 'selected' : '' %>>Português</option>
+                      <option value="ar" <%= user.language === 'ar' ? 'selected' : '' %>>العربية</option>
+                      <option value="sw" <%= user.language === 'sw' ? 'selected' : '' %>>Kiswahili</option>
+                      <option value="de" <%= user.language === 'de' ? 'selected' : '' %>>Deutsch</option>
+                      <option value="zh" <%= user.language === 'zh' ? 'selected' : '' %>>中文</option>
+                      <option value="ru" <%= user.language === 'ru' ? 'selected' : '' %>>Русский</option>
+                      <option value="it" <%= user.language === 'it' ? 'selected' : '' %>>Italiano</option>
+                      <option value="tr" <%= user.language === 'tr' ? 'selected' : '' %>>Türkçe</option>
+                      <option value="am" <%= user.language === 'am' ? 'selected' : '' %>>አማርኛ</option>
+                      <option value="th" <%= user.language === 'th' ? 'selected' : '' %>>ไทย</option>
+                      <option value="fa" <%= user.language === 'fa' ? 'selected' : '' %>>فارسی</option>
+                    </select>
+                  </div>
+                  <div class="col-12">
+                    <button type="submit" class="btn btn-primary">Save Language</button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

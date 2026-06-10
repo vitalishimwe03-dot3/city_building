@@ -1,0 +1,210 @@
+﻿<div class="row g-4 mb-4">
+  <div class="col-xl-3 col-md-6">
+    <div class="stat-card-modern" style="border-left: 4px solid #0891b2;">
+      <div class="stat-icon" style="background:rgba(8,145,178,0.1);color:#0891b2;"><i class="bi bi-people"></i></div>
+      <div class="stat-label">Site Users</div>
+      <div class="stat-value"><%= stats.siteUsers.total %></div>
+      <div class="stat-change" style="color:#10b981;"><%= stats.siteUsers.active %> active</div>
+    </div>
+  </div>
+  <div class="col-xl-3 col-md-6">
+    <div class="stat-card-modern" style="border-left: 4px solid #10b981;">
+      <div class="stat-icon" style="background:rgba(16,185,129,0.1);color:#10b981;"><i class="bi bi-journal-bookmark-fill"></i></div>
+      <div class="stat-label">Registrations</div>
+      <div class="stat-value"><%= stats.registrations.total %></div>
+      <div class="stat-change" style="color:#f59e0b;"><%= stats.pendingRegistrations.count %> pending</div>
+    </div>
+  </div>
+  <div class="col-xl-3 col-md-6">
+    <div class="stat-card-modern" style="border-left: 4px solid #f59e0b;">
+      <div class="stat-icon" style="background:rgba(245,158,11,0.1);color:#f59e0b;"><i class="bi bi-envelope"></i></div>
+      <div class="stat-label">Enquiries</div>
+      <div class="stat-value"><%= stats.enquiries.total %></div>
+      <div class="stat-change" style="color:#0891b2;"><%= stats.enquiries.new %> new</div>
+    </div>
+  </div>
+  <div class="col-xl-3 col-md-6">
+    <div class="stat-card-modern" style="border-left: 4px solid #6366f1;">
+      <div class="stat-icon" style="background:rgba(99,102,241,0.1);color:#6366f1;"><i class="bi bi-mortarboard"></i></div>
+      <div class="stat-label">Courses / Categories</div>
+      <div class="stat-value"><%= stats.courses.total %> / <%= stats.categories.total %></div>
+      <div class="stat-change" style="color:#6366f1;"><%= stats.users.total %> admins</div>
+    </div>
+  </div>
+</div>
+
+<div class="row g-4 mb-4">
+  <div class="col-xl-4">
+    <div class="admin-card-modern">
+      <div class="card-header-custom">
+        <h5><i class="bi bi-shield-check" style="color:#0891b2;"></i> Security & Session</h5>
+      </div>
+      <div style="padding:8px 0;">
+        <div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border);font-size:13px;">
+          <span style="color:var(--text-muted);">Admin</span>
+          <span style="font-weight:600;"><%= admin ? (admin.full_name || admin.username) : 'N/A' %></span>
+        </div>
+        <div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border);font-size:13px;">
+          <span style="color:var(--text-muted);">Role</span>
+          <span style="font-weight:600;text-transform:capitalize;"><%= admin ? admin.role : 'N/A' %></span>
+        </div>
+        <div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border);font-size:13px;">
+          <span style="color:var(--text-muted);">Your IP</span>
+          <span style="font-weight:600;font-family:monospace;font-size:12px;"><%= typeof clientIp !== 'undefined' ? clientIp : (typeof req !== 'undefined' && req.ip ? req.ip : 'N/A') %></span>
+        </div>
+        <div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border);font-size:13px;">
+          <span style="color:var(--text-muted);">Session start</span>
+          <span style="font-weight:600;"><%= sessionCreatedAt ? new Date(sessionCreatedAt).toLocaleString() : 'N/A' %></span>
+        </div>
+        <div style="display:flex;justify-content:space-between;padding:6px 0;font-size:13px;">
+          <span style="color:var(--text-muted);">CSRF protected</span>
+          <span style="font-weight:600;color:#10b981;"><i class="bi bi-check-circle-fill"></i> Active</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-xl-8">
+    <div class="admin-card-modern">
+      <div class="card-header-custom">
+        <h5><i class="bi bi-graph-up" style="color:#0891b2;"></i> Monthly Enquiries</h5>
+        <a href="/admin/enquiries" class="btn btn-sm-custom btn-edit-custom">View All</a>
+      </div>
+      <% if (monthlyEnquiries && monthlyEnquiries.length > 0) { %>
+        <canvas id="enquiriesChart" height="200"></canvas>
+      <% } else { %>
+        <div class="empty-state"><i class="bi bi-inbox"></i><h5>No data yet</h5><p>Enquiries will appear here once received.</p></div>
+      <% } %>
+    </div>
+  </div>
+  <div class="col-xl-4">
+    <div class="admin-card-modern">
+      <div class="card-header-custom">
+        <h5><i class="bi bi-people" style="color:#10b981;"></i> New Users</h5>
+        <a href="/admin/site-users" class="btn btn-sm-custom btn-edit-custom">View All</a>
+      </div>
+      <% if (monthlyUsers && monthlyUsers.length > 0) { %>
+        <canvas id="usersChart" height="200"></canvas>
+      <% } else { %>
+        <div class="empty-state"><i class="bi bi-people"></i><h5>No users yet</h5><p>User signups will appear here.</p></div>
+      <% } %>
+    </div>
+  </div>
+</div>
+
+<div class="row g-4">
+  <div class="col-xl-6">
+    <div class="admin-card-modern">
+      <div class="card-header-custom">
+        <h5><i class="bi bi-activity" style="color:#0891b2;"></i> Recent Activity</h5>
+        <a href="/admin/activity" class="btn btn-sm-custom btn-edit-custom">View All</a>
+      </div>
+      <% if (recentActivity && recentActivity.length > 0) { %>
+        <ul class="activity-feed">
+          <% recentActivity.forEach(function(log) { %>
+            <li>
+              <div class="activity-icon" style="background:rgba(8,145,178,0.1);color:#0891b2;"><i class="bi bi-arrow-right-circle"></i></div>
+              <div class="activity-content">
+                <div class="activity-text"><strong><%= log.admin_name %></strong> <%= log.action %></div>
+                <div class="activity-time"><%= new Date(log.created_at).toLocaleString() %></div>
+              </div>
+            </li>
+          <% }); %>
+        </ul>
+      <% } else { %>
+        <div class="empty-state"><i class="bi bi-clock-history"></i><h5>No recent activity</h5></div>
+      <% } %>
+    </div>
+  </div>
+  <div class="col-xl-6">
+    <div class="admin-card-modern">
+      <div class="card-header-custom">
+        <h5><i class="bi bi-envelope" style="color:#f59e0b;"></i> Latest Enquiries</h5>
+        <a href="/admin/enquiries" class="btn btn-sm-custom btn-edit-custom">View All</a>
+      </div>
+      <% if (recentEnquiries && recentEnquiries.length > 0) { %>
+        <div class="table-responsive">
+          <table class="table-custom">
+            <thead><tr><th>Name</th><th>Email</th><th>Date</th><th></th></tr></thead>
+            <tbody>
+              <% recentEnquiries.forEach(function(eq) { %>
+                <tr>
+                  <td><strong><%= eq.name %></strong></td>
+                  <td><%= eq.email %></td>
+                  <td><small><%= new Date(eq.created_at).toLocaleDateString() %></small></td>
+                  <td><a href="/admin/enquiries/<%= eq.id %>" class="btn btn-sm-custom btn-view-custom"><i class="bi bi-eye"></i></a></td>
+                </tr>
+              <% }); %>
+            </tbody>
+          </table>
+        </div>
+      <% } else { %>
+        <div class="empty-state"><i class="bi bi-inbox"></i><h5>No enquiries yet</h5></div>
+      <% } %>
+    </div>
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  <% if (monthlyEnquiries && monthlyEnquiries.length > 0) { %>
+    var ctx1 = document.getElementById('enquiriesChart');
+    if (ctx1) {
+      var data1 = <%- JSON.stringify(monthlyEnquiries.reverse()) %>;
+      new Chart(ctx1, {
+        type: 'bar',
+        data: {
+          labels: data1.map(function(d) { return d.month; }),
+          datasets: [{
+            label: 'Enquiries',
+            data: data1.map(function(d) { return d.count; }),
+            backgroundColor: 'rgba(8,145,178,0.6)',
+            borderColor: '#0891b2',
+            borderWidth: 2,
+            borderRadius: 6
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { display: false } },
+          scales: {
+            y: { beginAtZero: true, grid: { color: 'rgba(148,163,184,0.1)' }, ticks: { color: '#94a3b8' } },
+            x: { grid: { display: false }, ticks: { color: '#94a3b8' } }
+          }
+        }
+      });
+    }
+  <% } %>
+  <% if (monthlyUsers && monthlyUsers.length > 0) { %>
+    var ctx2 = document.getElementById('usersChart');
+    if (ctx2) {
+      var data2 = <%- JSON.stringify(monthlyUsers) %>;
+      new Chart(ctx2, {
+        type: 'line',
+        data: {
+          labels: data2.map(function(d) { return d.month; }),
+          datasets: [{
+            label: 'New Users',
+            data: data2.map(function(d) { return d.count; }),
+            backgroundColor: 'rgba(16,185,129,0.1)',
+            borderColor: '#10b981',
+            borderWidth: 2,
+            fill: true,
+            tension: 0.4,
+            pointBackgroundColor: '#10b981'
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { display: false } },
+          scales: {
+            y: { beginAtZero: true, grid: { color: 'rgba(148,163,184,0.1)' }, ticks: { color: '#94a3b8' } },
+            x: { grid: { display: false }, ticks: { color: '#94a3b8' } }
+          }
+        }
+      });
+    }
+  <% } %>
+});
+</script>

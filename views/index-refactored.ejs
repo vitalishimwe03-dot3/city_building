@@ -1,0 +1,376 @@
+<!-- Hero Section -->
+<section class="hero">
+  <div class="container">
+    <div class="grid grid-2">
+      <div class="hero-content">
+        <h1 class="hero-title">Become an Expert in Engineering Software</h1>
+        <p class="hero-subtitle">Master industry-standard tools like AutoCAD, Revit, ArchiCAD, and SketchUp with hands-on training from experienced professionals</p>
+        <div class="hero-cta">
+          <button class="btn btn-primary btn-lg" onclick="document.getElementById('apply-form').scrollIntoView({behavior: 'smooth'})">
+            <i class="bi bi-rocket-takeoff"></i> Apply Now
+          </button>
+          <a href="#features" class="btn btn-outline-primary btn-lg">
+            <i class="bi bi-arrow-down"></i> Learn More
+          </a>
+        </div>
+      </div>
+      <div class="hidden-mobile">
+        <img 
+          src="https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&w=600&q=80" 
+          alt="Engineering professionals working" 
+          class="hero-image"
+          loading="lazy"
+        >
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Features Section -->
+<section id="features">
+  <div class="container">
+    <div style="text-align: center; margin-bottom: var(--spacing-3xl);">
+      <h2>Why Choose City Building?</h2>
+      <p class="lead">Comprehensive training tailored for professionals</p>
+    </div>
+
+    <div class="grid grid-auto">
+      <!-- Feature 1 -->
+      <div class="card-feature">
+        <div class="card-feature-icon">
+          <i class="bi bi-laptop"></i>
+        </div>
+        <h3>Industry Software</h3>
+        <p>Learn tools used by leading engineering firms worldwide. Get hands-on experience with Revit, AutoCAD, ArchiCAD, and more.</p>
+      </div>
+
+      <!-- Feature 2 -->
+      <div class="card-feature">
+        <div class="card-feature-icon">
+          <i class="bi bi-people"></i>
+        </div>
+        <h3>Expert Instructors</h3>
+        <p>Learn from experienced professionals with years of practical experience in the engineering industry.</p>
+      </div>
+
+      <!-- Feature 3 -->
+      <div class="card-feature">
+        <div class="card-feature-icon">
+          <i class="bi bi-award"></i>
+        </div>
+        <h3>Certified Courses</h3>
+        <p>Complete recognized courses and earn certificates that boost your professional credentials.</p>
+      </div>
+
+      <!-- Feature 4 -->
+      <div class="card-feature">
+        <div class="card-feature-icon">
+          <i class="bi bi-lightning"></i>
+        </div>
+        <h3>Flexible Schedule</h3>
+        <p>Study at your own pace with online courses and in-person workshops that fit your schedule.</p>
+      </div>
+
+      <!-- Feature 5 -->
+      <div class="card-feature">
+        <div class="card-feature-icon">
+          <i class="bi bi-graph-up"></i>
+        </div>
+        <h3>Career Growth</h3>
+        <p>Advance your career with in-demand skills. Access job placement support and industry connections.</p>
+      </div>
+
+      <!-- Feature 6 -->
+      <div class="card-feature">
+        <div class="card-feature-icon">
+          <i class="bi bi-shield-check"></i>
+        </div>
+        <h3>Quality Assurance</h3>
+        <p>Our training meets global standards and is recognized by industry professionals worldwide.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Categories Showcase Section -->
+<section style="background-color: var(--bg-secondary);">
+  <div class="container">
+    <div style="text-align: center; margin-bottom: var(--spacing-3xl);">
+      <h2>Our Specializations</h2>
+      <p class="lead">Choose your area of expertise</p>
+    </div>
+
+    <div class="grid grid-auto">
+      <% if (typeof categories !== 'undefined' && categories.length > 0) { %>
+        <% categories.slice(0, 6).forEach(category => { %>
+          <div class="card">
+            <div class="card-body">
+              <div style="text-align: center; margin-bottom: var(--spacing-md);">
+                <div style="font-size: 3rem; margin-bottom: var(--spacing-sm);">
+                  <% 
+                    const categoryIcons = {
+                      'architectural': '🏛️',
+                      'structural': '🏗️',
+                      'geotechnical': '🗻',
+                      'rendering': '🎨',
+                      'water': '💧',
+                      'road': '🛣️'
+                    };
+                    const icon = categoryIcons[(category.name || '').toLowerCase()] || '📚';
+                  %>
+                  <%= icon %>
+                </div>
+              </div>
+              <h3 class="h5 text-center" style="margin-bottom: var(--spacing-sm);"><%= category.name %></h3>
+              <p style="font-size: var(--font-size-sm); color: var(--text-secondary); text-align: center; margin-bottom: var(--spacing-md);">
+                <%= category.description || 'Professional training courses' %>
+              </p>
+              <a href="/category/<%= category.id %>" class="btn btn-primary btn-sm" style="display: flex; width: 100%; justify-content: center;">
+                View Courses
+              </a>
+            </div>
+          </div>
+        <% }); %>
+      <% } else { %>
+        <div class="alert alert-info">No categories available yet.</div>
+      <% } %>
+    </div>
+  </div>
+</section>
+
+<!-- Apply Now Form Section -->
+<section id="apply-form">
+  <div class="container">
+    <div class="grid grid-2">
+      <!-- Form Column -->
+      <div>
+        <div class="form-wrapper">
+          <h2 style="margin-bottom: var(--spacing-lg);">Start Your Journey</h2>
+          
+          <form action="https://formspree.io/f/xpqeabob" method="POST">
+            <!-- Name Field -->
+            <div class="form-group">
+              <label class="form-label" for="apply-name">Full Name *</label>
+              <input 
+                type="text" 
+                id="apply-name" 
+                name="name" 
+                class="form-control" 
+                placeholder="Your full name"
+                required
+                aria-required="true"
+              >
+            </div>
+
+            <!-- Email Field -->
+            <div class="form-group">
+              <label class="form-label" for="apply-email">Email Address *</label>
+              <input 
+                type="email" 
+                id="apply-email" 
+                name="email" 
+                class="form-control" 
+                placeholder="your@email.com"
+                required
+                aria-required="true"
+              >
+            </div>
+
+            <!-- Phone Field -->
+            <div class="form-group">
+              <label class="form-label" for="apply-phone">Phone Number *</label>
+              <input 
+                type="tel" 
+                id="apply-phone" 
+                name="phone" 
+                class="form-control" 
+                placeholder="+1 (000) 000-0000"
+                required
+                aria-required="true"
+              >
+            </div>
+
+            <!-- Course Type Dropdown -->
+            <div class="form-group">
+              <label class="form-label" for="apply-course">Interested Course *</label>
+              <select 
+                id="apply-course" 
+                name="course_type" 
+                class="form-select" 
+                required
+                aria-required="true"
+              >
+                <option value="">Select a course type</option>
+                <% if (typeof categories !== 'undefined' && categories.length > 0) { %>
+                  <% categories.forEach(category => { %>
+                    <option value="<%= category.name %>"><%= category.name %></option>
+                  <% }); %>
+                <% } %>
+              </select>
+            </div>
+
+            <!-- Message Field -->
+            <div class="form-group">
+              <label class="form-label" for="apply-message">Message (Optional)</label>
+              <textarea 
+                id="apply-message" 
+                name="message" 
+                class="form-control" 
+                placeholder="Tell us about your goals and experience..."
+                rows="4"
+              ></textarea>
+              <div class="form-help">Share your learning goals or any questions you have</div>
+            </div>
+
+            <!-- Hidden Formspree Subject -->
+            <input type="hidden" name="_subject" value="New application from City Building website">
+
+            <!-- Submit Button -->
+            <button type="submit" class="btn btn-primary btn-lg" style="width: 100%;">
+              <i class="bi bi-send"></i> Submit Application
+            </button>
+
+            <!-- Privacy Notice -->
+            <p style="font-size: var(--font-size-xs); color: var(--text-tertiary); margin-top: var(--spacing-md); text-align: center;">
+              We respect your privacy. Your information will only be used to process your application.
+            </p>
+          </form>
+        </div>
+      </div>
+
+      <!-- Info Column -->
+      <div class="hidden-mobile">
+        <div class="card">
+          <div class="card-body">
+            <h3 style="margin-bottom: var(--spacing-lg);">What to Expect</h3>
+            
+            <ul class="list-unstyled">
+              <li>
+                <div style="display: flex; gap: var(--spacing-md); margin-bottom: var(--spacing-md);">
+                  <div style="flex-shrink: 0;">
+                    <div style="width: 2.5rem; height: 2.5rem; background: rgba(15, 118, 110, 0.1); border-radius: var(--radius-lg); display: flex; align-items: center; justify-content: center; color: var(--color-primary); font-weight: bold;">1</div>
+                  </div>
+                  <div>
+                    <h4 style="margin-bottom: var(--spacing-xs);">Application Review</h4>
+                    <p style="font-size: var(--font-size-sm); color: var(--text-secondary); margin: 0;">We'll review your application and contact you within 24 hours</p>
+                  </div>
+                </div>
+              </li>
+              
+              <li>
+                <div style="display: flex; gap: var(--spacing-md); margin-bottom: var(--spacing-md);">
+                  <div style="flex-shrink: 0;">
+                    <div style="width: 2.5rem; height: 2.5rem; background: rgba(15, 118, 110, 0.1); border-radius: var(--radius-lg); display: flex; align-items: center; justify-content: center; color: var(--color-primary); font-weight: bold;">2</div>
+                  </div>
+                  <div>
+                    <h4 style="margin-bottom: var(--spacing-xs);">Consultation Call</h4>
+                    <p style="font-size: var(--font-size-sm); color: var(--text-secondary); margin: 0;">Discuss your goals and find the perfect course for you</p>
+                  </div>
+                </div>
+              </li>
+              
+              <li>
+                <div style="display: flex; gap: var(--spacing-md);">
+                  <div style="flex-shrink: 0;">
+                    <div style="width: 2.5rem; height: 2.5rem; background: rgba(15, 118, 110, 0.1); border-radius: var(--radius-lg); display: flex; align-items: center; justify-content: center; color: var(--color-primary); font-weight: bold;">3</div>
+                  </div>
+                  <div>
+                    <h4 style="margin-bottom: var(--spacing-xs);">Enroll & Start</h4>
+                    <p style="font-size: var(--font-size-sm); color: var(--text-secondary); margin: 0;">Begin your learning journey with immediate access to materials</p>
+                  </div>
+                </div>
+              </li>
+            </ul>
+
+            <!-- Call-to-action card -->
+            <div style="background-color: var(--bg-secondary); border-radius: var(--radius-lg); padding: var(--spacing-lg); margin-top: var(--spacing-xl); text-align: center;">
+              <h4 style="margin-bottom: var(--spacing-sm);">Questions?</h4>
+              <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">Get in touch with our support team</p>
+              <a href="/contact" class="btn btn-secondary btn-sm">Contact Us</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Testimonials Section (Optional) -->
+<section style="background-color: var(--bg-secondary);">
+  <div class="container">
+    <div style="text-align: center; margin-bottom: var(--spacing-3xl);">
+      <h2>Success Stories</h2>
+      <p class="lead">What our graduates say about us</p>
+    </div>
+
+    <div class="grid grid-auto">
+      <div class="card">
+        <div class="card-body">
+          <div style="display: flex; gap: var(--spacing-xs); margin-bottom: var(--spacing-md);">
+            <% for (let i = 0; i < 5; i++) { %>
+              <i class="bi bi-star-fill" style="color: var(--color-warning);"></i>
+            <% } %>
+          </div>
+          <p style="margin-bottom: var(--spacing-md); font-style: italic;">
+            "The training was exactly what I needed to transition into the engineering field. The instructors were incredibly knowledgeable and the curriculum was practical."
+          </p>
+          <div>
+            <strong>Sarah Johnson</strong>
+            <p style="font-size: var(--font-size-sm); color: var(--text-secondary); margin: 0;">Senior Architect, BuildTech Solutions</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-body">
+          <div style="display: flex; gap: var(--spacing-xs); margin-bottom: var(--spacing-md);">
+            <% for (let i = 0; i < 5; i++) { %>
+              <i class="bi bi-star-fill" style="color: var(--color-warning);"></i>
+            <% } %>
+          </div>
+          <p style="margin-bottom: var(--spacing-md); font-style: italic;">
+            "Best investment in my career! Within 3 months of completing the course, I got a promotion and significant salary increase."
+          </p>
+          <div>
+            <strong>Michael Chen</strong>
+            <p style="font-size: var(--font-size-sm); color: var(--text-secondary); margin: 0;">Civil Engineer, Engineering Consultants Inc</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-body">
+          <div style="display: flex; gap: var(--spacing-xs); margin-bottom: var(--spacing-md);">
+            <% for (let i = 0; i < 5; i++) { %>
+              <i class="bi bi-star-fill" style="color: var(--color-warning);"></i>
+            <% } %>
+          </div>
+          <p style="margin-bottom: var(--spacing-md); font-style: italic;">
+            "The certificate I earned here is highly respected in the industry. Doors have opened for me that I didn't expect."
+          </p>
+          <div>
+            <strong>Amara Okonkwo</strong>
+            <p style="font-size: var(--font-size-sm); color: var(--text-secondary); margin: 0;">Structural Engineer, Global Design Group</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA Section -->
+<section style="background: linear-gradient(135deg, var(--color-primary), var(--color-primary-light)); color: white; text-align: center;">
+  <div class="container">
+    <h2 style="color: white; margin-bottom: var(--spacing-md);">Ready to Transform Your Career?</h2>
+    <p class="lead" style="color: rgba(255,255,255,0.9); margin-bottom: var(--spacing-xl);">
+      Join thousands of professionals who have advanced their careers with our courses
+    </p>
+    <button 
+      class="btn btn-lg" 
+      style="background: white; color: var(--color-primary); font-weight: var(--font-weight-semibold);"
+      onclick="document.getElementById('apply-form').scrollIntoView({behavior: 'smooth'})"
+    >
+      <i class="bi bi-arrow-up"></i> Apply Now
+    </button>
+  </div>
+</section>

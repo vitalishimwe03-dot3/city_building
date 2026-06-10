@@ -1,0 +1,108 @@
+<section class="auth-page">
+  <div class="auth-card">
+    <div class="auth-brand">
+      <div class="auth-icon"><i class="bi bi-person-plus"></i></div>
+      <div class="logo-text">City Building</div>
+      <div class="logo-sub">Engineering Company Ltd</div>
+    </div>
+    <h2>Create account</h2>
+    <p class="auth-subtitle">Join our community of future engineers</p>
+
+    <% if (typeof error !== 'undefined' && error) { %>
+      <div class="auth-error"><i class="bi bi-exclamation-triangle-fill"></i> <%= error %></div>
+    <% } %>
+
+    <form method="post" action="/signup" id="signupForm" novalidate>
+      <div class="form-floating-group">
+        <input name="fullName" class="form-control" id="signupName" placeholder="John Doe" required pattern="^[A-Za-z\s\-\.]{2,}$" autocomplete="name">
+        <label for="signupName">Full name</label>
+        <div class="invalid-feedback">Please enter your full name.</div>
+      </div>
+      <div class="form-floating-group">
+        <input type="email" name="email" class="form-control" id="signupEmail" placeholder="your@email.com" required autocomplete="email" pattern="^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$">
+        <label for="signupEmail">Email address</label>
+        <div class="invalid-feedback">Please enter a valid email.</div>
+      </div>
+      <div class="form-floating-group">
+        <input name="phone" class="form-control" id="signupPhone" placeholder="+250 7XX XXX XXX" required autocomplete="tel" pattern="^(\+250|\+234|\+27|\+233|\+225|\+254|\+256|\+237|\+212|\+213|\+1|\+44|\+33|\+49|\+20|\+966|\+91|\+234|\+27|\+81|\+7|\+55|\+34|\+39|\+90|\+62|\+60|\+82|\+972|\+351|\+358|\+46|\+48|\+380|\+998|\+84|\+66|\+63|\+64|\+61|\+64|\+1)[0-9]{7,15}$">
+        <label for="signupPhone">Phone number</label>
+        <div class="invalid-feedback">Please enter a valid phone number.</div>
+      </div>
+      <div class="form-floating-group">
+        <input type="password" name="password" class="form-control" id="signupPassword" placeholder="Create password" required autocomplete="new-password" pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=\[\]{};':\"\\|,.<>\/?]).{8,}$">
+        <label for="signupPassword">Password</label>
+        <button type="button" class="password-toggle" id="pwToggle" tabindex="-1" aria-label="Toggle password visibility"><i class="bi bi-eye-slash"></i></button>
+        <div class="pw-strength" id="pwStrength">
+          <span class="pw-bar"></span><span class="pw-bar"></span><span class="pw-bar"></span><span class="pw-bar"></span>
+        </div>
+        <div class="pw-strength-text" id="pwStrengthText"></div>
+        <div class="invalid-feedback">8+ chars, uppercase, lowercase, number & symbol required.</div>
+      </div>
+      <div class="form-floating-group">
+        <input type="password" name="confirmPassword" class="form-control" id="signupConfirm" placeholder="Confirm password" required autocomplete="new-password">
+        <label for="signupConfirm">Confirm password</label>
+        <div class="invalid-feedback" id="confirmFeedback">Passwords must match.</div>
+      </div>
+      <button class="btn btn-primary w-100" type="submit" id="signupSubmitBtn"><i class="bi bi-person-check"></i> Create Account</button>
+    </form>
+
+    <div class="auth-footer">
+      Already have an account? <a href="/login">Sign in</a>
+    </div>
+  </div>
+</section>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  var pwInput = document.getElementById('signupPassword');
+  var pwToggle = document.getElementById('pwToggle');
+  if (pwToggle) {
+    pwToggle.addEventListener('click', function() {
+      var type = pwInput.type === 'password' ? 'text' : 'password';
+      pwInput.type = type;
+      pwToggle.querySelector('i').className = type === 'password' ? 'bi bi-eye-slash' : 'bi bi-eye';
+    });
+  }
+  var pwStrength = document.getElementById('pwStrength');
+  var pwStrengthText = document.getElementById('pwStrengthText');
+  if (pwInput) {
+    pwInput.addEventListener('input', function() {
+      var val = pwInput.value;
+      var bars = pwStrength.querySelectorAll('.pw-bar');
+      bars.forEach(function(b) { b.className = 'pw-bar'; });
+      if (!val) { pwStrengthText.textContent = ''; return; }
+      var score = 0;
+      if (val.length >= 8) score++;
+      if (/[a-z]/.test(val)) score++;
+      if (/[A-Z]/.test(val)) score++;
+      if (/\d/.test(val)) score++;
+      if (/[^a-zA-Z0-9]/.test(val)) score++;
+      var label = '', cls = '';
+      if (score <= 2) { label = 'Weak'; cls = 'weak'; for (var i = 0; i < 1 && i < bars.length; i++) bars[i].className += ' ' + cls; }
+      else if (score <= 3) { label = 'Medium'; cls = 'medium'; for (var i = 0; i < 2 && i < bars.length; i++) bars[i].className += ' ' + cls; }
+      else if (score <= 4) { label = 'Strong'; cls = 'strong'; for (var i = 0; i < 3 && i < bars.length; i++) bars[i].className += ' ' + cls; }
+      else { label = 'Very strong'; cls = 'very-strong'; for (var i = 0; i < 4 && i < bars.length; i++) bars[i].className += ' ' + cls; }
+      pwStrengthText.textContent = label;
+      pwStrengthText.className = 'pw-strength-text ' + cls;
+    });
+  }
+  var form = document.getElementById('signupForm');
+  var submitBtn = document.getElementById('signupSubmitBtn');
+  form.addEventListener('submit', function(e) {
+    var pw = form.password.value;
+    var cpw = form.confirmPassword.value;
+    if (pw !== cpw) {
+      form.confirmPassword.setCustomValidity('Passwords do not match');
+      e.preventDefault();
+    } else {
+      form.confirmPassword.setCustomValidity('');
+    }
+    if (!form.checkValidity()) { e.preventDefault(); e.stopPropagation(); }
+    form.classList.add('was-validated');
+    if (form.checkValidity() && submitBtn) {
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Creating account...';
+    }
+  });
+});
+</script>

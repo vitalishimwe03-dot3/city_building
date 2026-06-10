@@ -1,0 +1,43 @@
+<div class="row mb-4">
+    <div class="col-md-8">
+        <h3><%= category ? 'Edit Category' : 'Create New Category' %></h3>
+    </div>
+</div>
+
+<div class="admin-card-modern" style="max-width: 600px;">
+    <% if (error) { %>
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <%= error %>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    <% } %>
+
+    <form method="POST" action="<%= category ? '/admin/categories/' + category.id : '/admin/categories' %>">
+        <div class="mb-3">
+            <label for="name" class="form-label">Category Name</label>
+            <input type="text" class="form-control" id="name" name="name" 
+                   value="<%= category?.name || '' %>" required>
+        </div>
+
+        <div class="mb-3">
+            <label for="slug" class="form-label">Slug (URL-friendly)</label>
+            <input type="text" class="form-control" id="slug" name="slug" 
+                   value="<%= category?.slug || '' %>" placeholder="e.g., architectural-software" required>
+            <small class="form-text text-muted">Use lowercase letters, numbers, and hyphens only</small>
+        </div>
+
+        <div class="mb-3">
+            <label for="description" class="form-label">Description</label>
+            <textarea class="form-control" id="description" name="description" rows="4"><%- category?.description || '' %></textarea>
+        </div>
+
+        <div class="d-flex gap-2">
+            <button type="submit" class="btn btn-sm-custom btn-edit-custom">
+                <i class="bi bi-check-circle"></i> <%= category ? 'Update' : 'Create' %> Category
+            </button>
+            <a href="/admin/categories" class="btn btn-sm-custom btn-view-custom">
+                <i class="bi bi-x"></i> Cancel
+            </a>
+        </div>
+    </form>
+</div>

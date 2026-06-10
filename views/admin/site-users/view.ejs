@@ -1,0 +1,97 @@
+﻿<div class="mb-4">
+  <a href="/admin/site-users" class="btn btn-sm-custom btn-edit-custom"><i class="bi bi-arrow-left"></i> Back to Users</a>
+</div>
+
+<div class="row g-4">
+  <div class="col-lg-8">
+    <div class="admin-card-modern">
+      <div class="card-header-custom">
+        <h5><i class="bi bi-person" style="color:#0891b2;"></i> User Information</h5>
+        <form method="POST" action="/admin/site-users/<%= user.id %>/toggle-active" style="display:inline;">
+          <button type="submit" class="btn btn-sm-custom <%= user.is_active ? 'btn-toggle-custom' : 'btn-edit-custom' %>">
+            <i class="bi bi-<%= user.is_active ? 'pause-circle' : 'play-circle' %>"></i>
+            <%= user.is_active ? 'Deactivate' : 'Activate' %> User
+          </button>
+        </form>
+      </div>
+
+      <div class="user-info-grid">
+        <div class="user-info-item">
+          <label>Full Name</label>
+          <div class="value"><%= user.full_name %></div>
+        </div>
+        <div class="user-info-item">
+          <label>Email</label>
+          <div class="value"><a href="mailto:<%= user.email %>"><%= user.email %></a></div>
+        </div>
+        <div class="user-info-item">
+          <label>Phone</label>
+          <div class="value"><%= user.phone || 'Not provided' %></div>
+        </div>
+        <div class="user-info-item">
+          <label>Language</label>
+          <div class="value"><span class="badge badge-custom info"><%= (user.language || 'en').toUpperCase() %></span></div>
+        </div>
+        <div class="user-info-item">
+          <label>Status</label>
+          <div class="value"><span class="badge badge-custom <%= user.is_active ? 'success' : 'danger' %>"><%= user.is_active ? 'Active' : 'Inactive' %></span></div>
+        </div>
+        <div class="user-info-item">
+          <label>Member Since</label>
+          <div class="value"><%= new Date(user.created_at).toLocaleDateString('en-US', { year:'numeric', month:'long', day:'numeric' }) %></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-4">
+    <div class="admin-card-modern">
+      <div class="card-header-custom">
+        <h5><i class="bi bi-journal-bookmark-fill" style="color:#10b981;"></i> Quick Stats</h5>
+      </div>
+      <div style="text-align:center;padding:16px 0;">
+        <div style="font-size:36px;font-weight:800;color:#0891b2;"><%= (user.registrations || []).length %></div>
+        <div style="font-size:13px;color:var(--text-secondary);margin-top:4px;">Course Registrations</div>
+      </div>
+      <hr style="border-color:var(--border-primary);margin:12px 0;">
+      <div style="display:flex;justify-content:space-around;padding:8px 0;">
+        <div style="text-align:center;">
+          <div style="font-size:20px;font-weight:700;color:#10b981;"><%= (user.registrations || []).filter(function(r){return r.status==='approved';}).length %></div>
+          <div style="font-size:11px;color:var(--text-secondary);">Approved</div>
+        </div>
+        <div style="text-align:center;">
+          <div style="font-size:20px;font-weight:700;color:#f59e0b;"><%= (user.registrations || []).filter(function(r){return r.status==='pending';}).length %></div>
+          <div style="font-size:11px;color:var(--text-secondary);">Pending</div>
+        </div>
+        <div style="text-align:center;">
+          <div style="font-size:20px;font-weight:700;color:#ef4444;"><%= (user.registrations || []).filter(function(r){return r.status==='rejected';}).length %></div>
+          <div style="font-size:11px;color:var(--text-secondary);">Rejected</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<% if (user.registrations && user.registrations.length > 0) { %>
+<div class="admin-card-modern mt-4">
+  <div class="card-header-custom">
+    <h5><i class="bi bi-journal-text" style="color:#0891b2;"></i> Course Registrations</h5>
+  </div>
+  <div class="table-responsive">
+    <table class="table-custom">
+      <thead><tr><th>Course</th><th>Category</th><th>Status</th><th>Notes</th><th>Date</th></tr></thead>
+      <tbody>
+        <% user.registrations.forEach(function(r) { %>
+          <tr>
+            <td><strong><%= r.course_name %></strong></td>
+            <td><small><%= r.category_name %></small></td>
+            <td><span class="badge badge-custom <%= r.status === 'approved' ? 'success' : (r.status === 'pending' ? 'warning' : 'danger') %>"><%= r.status %></span></td>
+            <td><small><%= r.notes || '-' %></small></td>
+            <td><small><%= new Date(r.created_at).toLocaleDateString() %></small></td>
+          </tr>
+        <% }); %>
+      </tbody>
+    </table>
+  </div>
+</div>
+<% } %>

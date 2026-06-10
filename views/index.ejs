@@ -1,0 +1,349 @@
+<section class="hero" id="home">
+  <div class="hero-slider" id="heroSlider"></div>
+  <div class="hero-slider-dots" id="heroDots"></div>
+  <div class="container">
+    <div class="row align-items-center" style="min-height: 90vh;">
+      <div class="col-12 col-lg-7">
+        <div class="hero-badge">
+          <i class="bi bi-geo-alt-fill"></i>
+          Kigali, Rwanda — May 2026 Intake
+        </div>
+        <h1 class="hero-title">
+          Build Your <span class="highlight">Engineering</span> Career
+        </h1>
+        <p class="hero-subtitle">
+          Professional software training in AutoCAD, Revit, ETABS, Lumion and more.
+          Hands-on courses designed for architects, engineers, and designers in Rwanda.
+        </p>
+        <div class="hero-actions">
+          <a href="/category/architectural" class="btn btn-primary btn-lg">
+            <i class="bi bi-compass"></i> Explore Courses
+          </a>
+          <a href="/contact" class="btn btn-outline btn-lg">
+            <i class="bi bi-chat-dots"></i> Enquire Now
+          </a>
+        </div>
+        <div class="hero-stats">
+          <div class="hero-stat">
+            <h3>10+</h3>
+            <p>Courses</p>
+          </div>
+          <div class="hero-stat">
+            <h3>500+</h3>
+            <p>Graduates</p>
+          </div>
+          <div class="hero-stat">
+            <h3>5★</h3>
+            <p>Training</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+.hero-slider-dots {
+  position: absolute;
+  bottom: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 5;
+  display: flex;
+  gap: 6px;
+  max-width: 92%;
+  overflow-x: auto;
+  padding: 4px 12px;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.hero-slider-dots::-webkit-scrollbar { display: none; }
+.hero-slider-dots .dot {
+  min-width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.4);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: 1.5px solid transparent;
+  flex-shrink: 0;
+}
+.hero-slider-dots .dot.active {
+  background: var(--accent);
+  border-color: rgba(255,255,255,0.6);
+  transform: scale(1.3);
+}
+[data-theme="light"] .hero-slider-dots .dot {
+  background: rgba(0,0,0,0.2);
+}
+[data-theme="light"] .hero-slider-dots .dot.active {
+  background: var(--accent);
+  border-color: rgba(0,0,0,0.25);
+}
+</style>
+
+<script>
+(function() {
+  var slides = [
+    {bg:'linear-gradient(135deg,#0a1628,#1a365d,#0e7490)',img:'https://picsum.photos/seed/civil1/1920/1080'},
+    {bg:'linear-gradient(135deg,#1e1b4b,#312e81,#4338ca)',img:'https://picsum.photos/seed/arch1/1920/1080'},
+    {bg:'linear-gradient(135deg,#0f1d35,#1e3a5f,#155e75)',img:'https://picsum.photos/seed/build1/1920/1080'},
+    {bg:'linear-gradient(135deg,#0b1a2e,#1f4a6e,#0369a1)',img:'https://picsum.photos/seed/const1/1920/1080'},
+    {bg:'linear-gradient(135deg,#1a0e2e,#3b1f6e,#6d28d9)',img:'https://picsum.photos/seed/bridge1/1920/1080'},
+    {bg:'linear-gradient(135deg,#0b1f35,#065f46,#047857)',img:'https://picsum.photos/seed/road1/1920/1080'},
+    {bg:'linear-gradient(135deg,#1c1917,#44403c,#57534e)',img:'https://picsum.photos/seed/tower1/1920/1080'},
+    {bg:'linear-gradient(135deg,#0c0a09,#292524,#451a03)',img:'https://picsum.photos/seed/struct1/1920/1080'},
+    {bg:'linear-gradient(135deg,#0f172a,#1e293b,#334155)',img:'https://picsum.photos/seed/engine1/1920/1080'},
+    {bg:'linear-gradient(135deg,#020617,#0f172a,#1e293b)',img:'https://picsum.photos/seed/draw1/1920/1080'},
+    {bg:'linear-gradient(135deg,#0a0e17,#111827,#1a2332)',img:'https://picsum.photos/seed/plan1/1920/1080'},
+    {bg:'linear-gradient(135deg,#0f1d35,#1a3a5f,#1e4a7a)',img:'https://picsum.photos/seed/design1/1920/1080'},
+    {bg:'linear-gradient(135deg,#0b1628,#1a365d,#0e7490)',img:'https://picsum.photos/seed/steel1/1920/1080'},
+    {bg:'linear-gradient(135deg,#1a0e28,#2d1b69,#4c1d95)',img:'https://picsum.photos/seed/concr1/1920/1080'},
+    {bg:'linear-gradient(135deg,#0b1a30,#1f4a6e,#0891b2)',img:'https://picsum.photos/seed/frame1/1920/1080'},
+    {bg:'linear-gradient(135deg,#0c1f35,#065f46,#059669)',img:'https://picsum.photos/seed/crane1/1920/1080'},
+    {bg:'linear-gradient(135deg,#1c1917,#57534e,#78716c)',img:'https://picsum.photos/seed/city1/1920/1080'},
+    {bg:'linear-gradient(135deg,#0f172a,#1e293b,#475569)',img:'https://picsum.photos/seed/sky1/1920/1080'},
+    {bg:'linear-gradient(135deg,#020617,#0f172a,#1e3a8a)',img:'https://picsum.photos/seed/modern1/1920/1080'},
+    {bg:'linear-gradient(135deg,#0a0e17,#111827,#374151)',img:'https://picsum.photos/seed/glass1/1920/1080'},
+    {bg:'linear-gradient(135deg,#0b1f35,#155e75,#0e7490)',img:'https://picsum.photos/seed/tunnel1/1920/1080'},
+    {bg:'linear-gradient(135deg,#1a0e2e,#4c1d95,#7c3aed)',img:'https://picsum.photos/seed/pav1/1920/1080'},
+    {bg:'linear-gradient(135deg,#0b1a2e,#0369a1,#0284c7)',img:'https://picsum.photos/seed/green1/1920/1080'},
+    {bg:'linear-gradient(135deg,#0c0a09,#451a03,#92400e)',img:'https://picsum.photos/seed/found1/1920/1080'}
+  ];
+  var container = document.getElementById('heroSlider');
+  var dotsContainer = document.getElementById('heroDots');
+  var current = 0;
+  var intervalId = null;
+
+  function goToSlide(index) {
+    var els = container.querySelectorAll('.hero-slide');
+    var dots = dotsContainer.querySelectorAll('.dot');
+    if (!els.length) return;
+    if (els[current]) els[current].classList.remove('active');
+    if (dots[current]) dots[current].classList.remove('active');
+    current = index;
+    if (els[current]) els[current].classList.add('active');
+    if (dots[current]) dots[current].classList.add('active');
+  }
+  function nextSlide() { goToSlide((current + 1) % slides.length); }
+  function start() { if (intervalId) clearInterval(intervalId); intervalId = setInterval(nextSlide, 5000); }
+  function stop() { if (intervalId) { clearInterval(intervalId); intervalId = null; } }
+
+  slides.forEach(function(item, i) {
+    var div = document.createElement('div');
+    div.className = 'hero-slide' + (i === 0 ? ' active' : '');
+    div.style.background = item.bg;
+    container.appendChild(div);
+    var dot = document.createElement('span');
+    dot.className = 'dot' + (i === 0 ? ' active' : '');
+    dot.setAttribute('role', 'button');
+    dot.setAttribute('aria-label', 'Slide ' + (i + 1));
+    dot.addEventListener('click', function() { stop(); goToSlide(i); start(); });
+    dotsContainer.appendChild(dot);
+    if (item.img) {
+      var img = new Image();
+      img.onload = function() { div.style.background = 'url(' + item.img + ') center/cover no-repeat'; };
+      img.src = item.img;
+    }
+  });
+
+  start();
+  var hero = document.getElementById('home');
+  if (hero) {
+    hero.addEventListener('mouseenter', stop);
+    hero.addEventListener('mouseleave', start);
+  }
+})();
+</script>
+
+<section class="section" style="background: linear-gradient(135deg, #0e7490 0%, #0891b2 100%);">
+  <div class="container">
+    <div class="row g-4">
+      <div class="col-md-4">
+        <div class="info-strip-card">
+          <div class="d-flex align-items-center gap-3 mb-2">
+            <i class="bi bi-bullseye" style="font-size: 1.5rem; color: var(--warm-light);"></i>
+            <h3 class="h5 fw-bold mb-0 text-white">Our Mission</h3>
+          </div>
+          <p class="mb-0" style="color: rgba(255,255,255,0.8);">Equip building professionals with practical skills, local project experience, and career-ready software training.</p>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="info-strip-card">
+          <div class="d-flex align-items-center gap-3 mb-2">
+            <i class="bi bi-eye" style="font-size: 1.5rem; color: var(--warm-light);"></i>
+            <h3 class="h5 fw-bold mb-0 text-white">Our Vision</h3>
+          </div>
+          <p class="mb-0" style="color: rgba(255,255,255,0.8);">A stronger construction sector across Rwanda through modern education, industry partnerships, and digital design excellence.</p>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="info-strip-card">
+          <div class="d-flex align-items-center gap-3 mb-2">
+            <i class="bi bi-hand-thumbs-up" style="font-size: 1.5rem; color: var(--warm-light);"></i>
+            <h3 class="h5 fw-bold mb-0 text-white">Our Promise</h3>
+          </div>
+          <p class="mb-0" style="color: rgba(255,255,255,0.8);">Clear, practical training paths with internship support and real-world project outcomes.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="courses" class="section">
+  <div class="container">
+    <div class="section-heading text-center mb-5">
+      <p class="text-uppercase fw-semibold mb-2">
+        <i class="bi bi-grid-3x3-gap-fill me-1"></i> Our Courses
+      </p>
+      <h2>Explore Professional Training</h2>
+      <p class="text-muted mx-auto" style="max-width: 720px;">Browse our software tracks and select a training path to view available softwares.</p>
+      <div class="mx-auto mt-4" style="max-width: 500px; position: relative;">
+        <input type="text" id="liveSearch" class="form-control form-control-lg" placeholder="Search courses..." autocomplete="off">
+        <div id="searchResults" class="list-group d-none position-absolute w-100 shadow" style="z-index: 1000; max-height: 400px; overflow-y: auto;"></div>
+      </div>
+    </div>
+
+    <div class="row g-4">
+      <% if (categories.length === 0) { %>
+        <div class="col-12">
+          <div class="alert alert-info"><i class="bi bi-info-circle me-2"></i>No courses are available yet. Please check back later.</div>
+        </div>
+      <% } %>
+      <% categories.forEach(category => { %>
+        <div class="col-md-6 col-lg-4">
+          <div class="card category-card h-100 border-0">
+            <div class="card-body d-flex flex-column">
+              <div class="d-flex align-items-center gap-2 mb-2">
+                <i class="bi bi-bookmark-fill" style="color: var(--accent-light);"></i>
+                <h3 class="h5 mb-0"><%= category.name %></h3>
+              </div>
+              <p class="text-muted flex-grow-1"><%= category.description %></p>
+              <a href="/category/<%= category.slug %>" class="btn btn-primary">
+                <i class="bi bi-arrow-right"></i> View Softwares
+              </a>
+            </div>
+          </div>
+        </div>
+      <% }) %>
+    </div>
+  </div>
+</section>
+
+<section class="section" style="background: var(--bg-secondary);">
+  <div class="container">
+    <div class="row align-items-center g-5">
+      <div class="col-lg-6">
+        <div class="section-label">Why Choose Us</div>
+        <h2 class="section-title">Why City Building training works</h2>
+        <p class="section-desc">Practical project-based learning for architects, engineers, designers and surveyors. Each training track includes current tools used in the Rwandan and international building industry.</p>
+        <ul class="list-unstyled feature-list">
+          <li>
+            <span class="badge rounded-pill me-2" style="background: linear-gradient(135deg, var(--accent), var(--accent-light)); color:#fff;">01</span>
+            Hands-on workspace simulations.
+          </li>
+          <li>
+            <span class="badge rounded-pill me-2" style="background: linear-gradient(135deg, var(--accent), var(--accent-light)); color:#fff;">02</span>
+            Industry software for real tasks.
+          </li>
+          <li>
+            <span class="badge rounded-pill me-2" style="background: linear-gradient(135deg, var(--accent), var(--accent-light)); color:#fff;">03</span>
+            Internship-ready curriculum.
+          </li>
+        </ul>
+      </div>
+      <div class="col-lg-6">
+        <div class="contact-card p-4">
+          <div class="d-flex align-items-center gap-2 mb-3">
+            <i class="bi bi-pencil-square" style="font-size: 1.5rem; color: var(--accent-light);"></i>
+            <h3 class="h4 fw-bold mb-0">Apply now</h3>
+          </div>
+          <p class="text-muted">Send your details and one of our advisors will contact you for registration and internship placement.</p>
+          <form id="applyForm" action="https://formspree.io/f/xnjyzgjr" method="POST" class="row g-3">
+            <input type="hidden" name="_subject" value="New course enquiry from City Building website">
+            <div data-fs-success class="alert alert-success d-none" role="alert">
+              <i class="bi bi-check-circle me-1"></i> Thank you! We'll be in touch soon.
+            </div>
+            <div data-fs-error class="alert alert-danger d-none" role="alert"></div>
+            <div class="col-12">
+              <input type="text" class="form-control" name="name" placeholder="Your name" data-fs-field required>
+              <span data-fs-error="name" class="invalid-feedback"></span>
+            </div>
+            <div class="col-md-6">
+              <input type="email" class="form-control" name="email" placeholder="Email address" data-fs-field required>
+              <span data-fs-error="email" class="invalid-feedback"></span>
+            </div>
+            <div class="col-md-6">
+              <input type="tel" class="form-control" name="phone" placeholder="Phone number" data-fs-field required>
+              <span data-fs-error="phone" class="invalid-feedback"></span>
+            </div>
+            <div class="col-12">
+              <select name="course" class="form-control" data-fs-field required>
+                <option value="">-- Select a course type --</option>
+                <% if (categories && categories.length > 0) { %>
+                  <% categories.forEach(cat => { %>
+                    <option value="<%= cat.name %>"><%= cat.name %></option>
+                  <% }); %>
+                <% } %>
+              </select>
+              <span data-fs-error="course" class="invalid-feedback"></span>
+            </div>
+            <div class="col-12">
+              <textarea class="form-control" name="message" rows="4" placeholder="Message (optional)" data-fs-field></textarea>
+            </div>
+            <div class="col-12">
+              <button type="submit" class="btn btn-primary w-100" data-fs-submit-btn>
+                <i class="bi bi-send"></i> Send enquiry
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+      <script>
+        window.formspree = window.formspree || function () { (formspree.q = formspree.q || []).push(arguments); };
+        formspree('initForm', { formElement: '#applyForm', formId: 'xnjyzgjr' });
+      </script>
+    </div>
+  </div>
+</section>
+
+<section id="contact" class="section">
+  <div class="container text-center">
+    <div class="section-label justify-content-center">Career pathways</div>
+    <h2 class="section-title mb-5">Your future starts here</h2>
+    <div class="row g-4 justify-content-center">
+      <div class="col-sm-6 col-lg-3">
+        <div class="path-card">
+          <div class="text-center">
+            <i class="bi bi-building" style="font-size: 2rem; color: var(--accent-light); display: block; margin-bottom: 0.5rem;"></i>
+            Architects
+          </div>
+        </div>
+      </div>
+      <div class="col-sm-6 col-lg-3">
+        <div class="path-card">
+          <div class="text-center">
+            <i class="bi bi-gear" style="font-size: 2rem; color: var(--accent-light); display: block; margin-bottom: 0.5rem;"></i>
+            Engineers
+          </div>
+        </div>
+      </div>
+      <div class="col-sm-6 col-lg-3">
+        <div class="path-card">
+          <div class="text-center">
+            <i class="bi bi-palette" style="font-size: 2rem; color: var(--accent-light); display: block; margin-bottom: 0.5rem;"></i>
+            Designers
+          </div>
+        </div>
+      </div>
+      <div class="col-sm-6 col-lg-3">
+        <div class="path-card">
+          <div class="text-center">
+            <i class="bi bi-rulers" style="font-size: 2rem; color: var(--accent-light); display: block; margin-bottom: 0.5rem;"></i>
+            Surveyors
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

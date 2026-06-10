@@ -1,0 +1,56 @@
+﻿<div class="d-flex justify-content-between align-items-center mb-4">
+  <div>
+    <h4 style="margin:0;font-weight:700;"><i class="bi bi-people"></i> Site Users</h4>
+    <small style="color:var(--text-muted);"><%= total %> total users (<%= stats.active %> active, <%= stats.inactive %> inactive)</small>
+  </div>
+  <div class="d-flex gap-2">
+    <a href="/admin/site-users/export/csv" class="btn btn-sm-custom btn-edit-custom"><i class="bi bi-download"></i> Export CSV</a>
+  </div>
+</div>
+
+<div class="admin-card-modern">
+  <form method="GET" action="/admin/site-users">
+    <div class="search-box-custom">
+      <input type="text" name="search" placeholder="Search by name, email, or phone..." value="<%= search || '' %>">
+      <button type="submit" class="btn btn-sm-custom btn-view-custom"><i class="bi bi-search"></i> Search</button>
+      <% if (search) { %><a href="/admin/site-users" class="btn btn-sm-custom btn-delete-custom"><i class="bi bi-x"></i> Clear</a><% } %>
+    </div>
+  </form>
+
+  <% if (users.length === 0) { %>
+    <div class="empty-state"><i class="bi bi-people"></i><h5>No users found</h5><p><%= search ? 'Try a different search term.' : 'No site users have signed up yet.' %></p></div>
+  <% } else { %>
+    <div class="table-responsive">
+      <table class="table-custom">
+        <thead><tr><th>Name</th><th>Email</th><th>Phone</th><th>Language</th><th>Status</th><th>Joined</th><th>Actions</th></tr></thead>
+        <tbody>
+          <% users.forEach(function(u) { %>
+            <tr>
+              <td><strong><%= u.full_name %></strong></td>
+              <td><%= u.email %></td>
+              <td><small><%= u.phone || '-' %></small></td>
+              <td><span class="badge badge-custom info"><%= (u.language || 'en').toUpperCase() %></span></td>
+              <td><span class="badge badge-custom <%= u.is_active ? 'success' : 'danger' %>"><%= u.is_active ? 'Active' : 'Inactive' %></span></td>
+              <td><small><%= new Date(u.created_at).toLocaleDateString() %></small></td>
+              <td>
+                <div class="action-btns">
+                  <a href="/admin/site-users/<%= u.id %>" class="btn btn-sm-custom btn-view-custom"><i class="bi bi-eye"></i> View</a>
+                </div>
+              </td>
+            </tr>
+          <% }); %>
+        </tbody>
+      </table>
+    </div>
+
+    <% if (totalPages > 1) { %>
+      <div class="pagination-custom">
+        <% if (page > 1) { %><a href="?page=<%= page - 1 %><%= search ? '&search=' + search : '' %>">&laquo; Prev</a><% } %>
+        <% for (var p = 1; p <= totalPages; p++) { %>
+          <% if (p === page) { %><span class="active"><%= p %></span><% } else if (p <= 3 || p > totalPages - 2 || Math.abs(p - page) <= 1) { %><a href="?page=<%= p %><%= search ? '&search=' + search : '' %>"><%= p %></a><% } %>
+        <% } %>
+        <% if (page < totalPages) { %><a href="?page=<%= page + 1 %><%= search ? '&search=' + search : '' %>">Next &raquo;</a><% } %>
+      </div>
+    <% } %>
+  <% } %>
+</div>

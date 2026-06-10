@@ -1,0 +1,53 @@
+<section class="py-5">
+  <div class="container">
+    <h1 class="display-5 mb-4">Contact Us</h1>
+    <div class="row g-4">
+      <div class="col-md-6">
+        <form id="contactForm" action="https://formspree.io/f/xnjyzgjr" method="POST" class="p-4 rounded-4 shadow-sm" style="background: var(--bg-surface);">
+          <input type="hidden" name="_subject" value="New contact request from City Building website">
+          <div data-fs-success class="alert alert-success d-none" role="alert"></div>
+          <div data-fs-error class="alert alert-danger d-none" role="alert"></div>
+          <div class="mb-3">
+            <label for="name" class="form-label">Full Name</label>
+            <input type="text" class="form-control" id="name" name="name" data-fs-field required>
+            <span data-fs-error="name" class="invalid-feedback"></span>
+          </div>
+          <div class="mb-3">
+            <label for="email" class="form-label">Email</label>
+            <input type="email" class="form-control" id="email" name="email" data-fs-field required>
+            <span data-fs-error="email" class="invalid-feedback"></span>
+          </div>
+          <div class="mb-3">
+            <label for="message" class="form-label">Message</label>
+            <textarea class="form-control" id="message" name="message" rows="5" data-fs-field required></textarea>
+            <span data-fs-error="message" class="invalid-feedback"></span>
+          </div>
+          <button type="submit" class="btn btn-primary" data-fs-submit-btn>Send Message</button>
+        </form>
+      </div>
+      <script>
+        window.formspree = window.formspree || function () { (formspree.q = formspree.q || []).push(arguments); };
+        formspree('initForm', { formElement: '#contactForm', formId: 'xnjyzgjr' });
+      </script>
+      <div class="col-md-6">
+        <div class="p-4 rounded-4 shadow-sm h-100" style="background: var(--bg-surface);">
+          <h2 class="h5 mb-3">Our Office</h2>
+          <p>City Building Engineering Company Ltd<br>KG 17 Ave, Remera, Gasabo District, Kigali, Rwanda (Near BK Arena)de s</p>
+          <p><i class="bi bi-envelope"></i> citybuildingengineeringcompany@gmail.com</p>
+          <p><i class="bi bi-telephone"></i> +250 789 257 758</p>
+          <div class="mt-4">
+            <h3 class="h6">Follow us</h3>
+            <div class="d-flex gap-3 social-icons">
+              <a href="#" class="text-primary fs-4"><i class="bi bi-facebook"></i></a>
+              <a href="#" class="text-info fs-4"><i class="bi bi-twitter"></i></a>
+              <a href="#" class="text-danger fs-4"><i class="bi bi-youtube"></i></a>
+              <a href="#" class="text-primary fs-4"><i class="bi bi-linkedin"></i></a>
+              <a href="https://www.instagram.com/city_building_engineering_cltd/" class="text-danger fs-4" target="_blank" rel="noreferrer" aria-label="Instagram"><i class="bi bi-instagram"></i></a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
