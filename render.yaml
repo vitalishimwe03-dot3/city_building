@@ -1,0 +1,28 @@
+services:
+  - type: web
+    name: city-building
+    runtime: node
+    repo: https://github.com/vitalishimwe03-dot3/city_building
+    plan: free
+    buildCommand: npm install
+    startCommand: npm start
+    healthCheckPath: /
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: SESSION_SECRET
+        generateValue: true
+      - key: DB_PATH
+        value: /data/city_building.db
+      - key: EMAIL_USER
+        sync: false
+      - key: EMAIL_PASS
+        sync: false
+      - key: ADMIN_EMAIL
+        sync: false
+      - key: EMAIL_SERVICE
+        value: gmail
+    disk:
+      name: sqlite-data
+      mountPath: /data
+      sizeGB: 1

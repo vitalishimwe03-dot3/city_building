@@ -3,7 +3,7 @@ const fs = require('fs');
 const path = require('path');
 require('dotenv').config();
 
-const dbPath = path.join(__dirname, '..', 'city_building.db');
+const dbPath = process.env.DB_PATH || path.join(__dirname, '..', 'city_building.db');
 let db = null;
 let SQL = null;
 
