@@ -38,6 +38,7 @@ async function init() {
     if (db) {
       var data = db.export();
       var buffer = Buffer.from(data);
+      try { fs.mkdirSync(path.dirname(dbFile), { recursive: true }); } catch (_) {}
       fs.writeFileSync(dbFile, buffer);
     }
     console.log('Database schema ensured and seeded.');

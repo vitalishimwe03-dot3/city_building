@@ -24,8 +24,11 @@ async function initializeDb() {
 
 function saveDb() {
   if (db) {
-    const data = db.export();
-    const buffer = Buffer.from(data);
+    var data = db.export();
+    var buffer = Buffer.from(data);
+    try {
+      fs.mkdirSync(path.dirname(dbPath), { recursive: true });
+    } catch (_) {}
     fs.writeFileSync(dbPath, buffer);
   }
 }

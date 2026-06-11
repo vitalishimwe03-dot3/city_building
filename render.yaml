@@ -12,8 +12,6 @@ services:
         value: production
       - key: SESSION_SECRET
         generateValue: true
-      - key: DB_PATH
-        value: /data/city_building.db
       - key: EMAIL_USER
         sync: false
       - key: EMAIL_PASS
@@ -22,7 +20,3 @@ services:
         sync: false
       - key: EMAIL_SERVICE
         value: gmail
-    disk:
-      name: sqlite-data
-      mountPath: /data
-      sizeGB: 1
