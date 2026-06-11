@@ -70,7 +70,14 @@
         <a href="/admin/enquiries" class="btn btn-sm-custom btn-edit-custom">View All</a>
       </div>
       <% if (monthlyEnquiries && monthlyEnquiries.length > 0) { %>
-        <canvas id="enquiriesChart" height="150"></canvas>
+        <% var lastEnq = monthlyEnquiries[monthlyEnquiries.length - 1]; %>
+        <div style="display:flex;gap:16px;margin-bottom:8px;">
+          <div><span style="font-size:11px;color:var(--text-muted);">This month</span><br><span style="font-size:20px;font-weight:700;color:#e2e8f0;"><%= lastEnq.count %></span></div>
+          <div><span style="font-size:11px;color:var(--text-muted);">Total</span><br><span style="font-size:20px;font-weight:700;color:#e2e8f0;"><%= monthlyEnquiries.reduce(function(s, d) { return s + d.count; }, 0) %></span></div>
+        </div>
+        <div class="chart-container" style="padding:8px;">
+          <canvas id="enquiriesChart" height="100"></canvas>
+        </div>
       <% } else { %>
         <div class="empty-state"><i class="bi bi-inbox"></i><h5>No data yet</h5><p>Enquiries will appear here once received.</p></div>
       <% } %>
@@ -83,7 +90,14 @@
         <a href="/admin/site-users" class="btn btn-sm-custom btn-edit-custom">View All</a>
       </div>
       <% if (monthlyUsers && monthlyUsers.length > 0) { %>
-        <canvas id="usersChart" height="150"></canvas>
+        <% var lastUser = monthlyUsers[monthlyUsers.length - 1]; %>
+        <div style="display:flex;gap:16px;margin-bottom:8px;">
+          <div><span style="font-size:11px;color:var(--text-muted);">This month</span><br><span style="font-size:20px;font-weight:700;color:#e2e8f0;"><%= lastUser.count %></span></div>
+          <div><span style="font-size:11px;color:var(--text-muted);">Total</span><br><span style="font-size:20px;font-weight:700;color:#e2e8f0;"><%= monthlyUsers.reduce(function(s, d) { return s + d.count; }, 0) %></span></div>
+        </div>
+        <div class="chart-container" style="padding:8px;">
+          <canvas id="usersChart" height="100"></canvas>
+        </div>
       <% } else { %>
         <div class="empty-state"><i class="bi bi-people"></i><h5>No users yet</h5><p>User signups will appear here.</p></div>
       <% } %>
@@ -145,66 +159,70 @@
 </div>
 
 <script>
+function createMiniChart(id, data, color, label) {
+  var canvas = document.getElementById(id);
+  if (!canvas) return;
+  var labels = data.map(function(d) { return d.month; });
+  var values = data.map(function(d) { return d.count; });
+  var max = Math.max.apply(null, values) || 1;
+
+  new Chart(canvas, {
+    type: 'bar',
+    data: {
+      labels: labels,
+      datasets: [{
+        data: values,
+        backgroundColor: values.map(function(v) {
+          return v === max ? color.replace('0.6', '0.9') : color;
+        }),
+        borderColor: values.map(function(v) {
+          return v === max ? color.replace('0.6', '1') : 'transparent';
+        }),
+        borderWidth: values.map(function(v) { return v === max ? 1 : 0; }),
+        borderRadius: 4,
+        barPercentage: 0.6
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          backgroundColor: '#1a2332',
+          titleColor: '#e2e8f0',
+          bodyColor: '#94a3b8',
+          borderColor: '#1e3a5f',
+          borderWidth: 1,
+          cornerRadius: 6,
+          padding: 8,
+          displayColors: false,
+          callbacks: {
+            label: function(ctx) { return label + ': ' + ctx.parsed.y; }
+          }
+        }
+      },
+      scales: {
+        y: { display: false, beginAtZero: true, max: max * 1.5 },
+        x: {
+          grid: { display: false },
+          ticks: {
+            color: '#64748b',
+            font: { size: 10, family: 'Inter, sans-serif' },
+            maxRotation: 0
+          }
+        }
+      }
+    }
+  });
+}
+
 document.addEventListener('DOMContentLoaded', function() {
   <% if (monthlyEnquiries && monthlyEnquiries.length > 0) { %>
-    var ctx1 = document.getElementById('enquiriesChart');
-    if (ctx1) {
-      var data1 = <%- JSON.stringify(monthlyEnquiries.reverse()) %>;
-      new Chart(ctx1, {
-        type: 'bar',
-        data: {
-          labels: data1.map(function(d) { return d.month; }),
-          datasets: [{
-            label: 'Enquiries',
-            data: data1.map(function(d) { return d.count; }),
-            backgroundColor: 'rgba(8,145,178,0.6)',
-            borderColor: '#0891b2',
-            borderWidth: 2,
-            borderRadius: 6
-          }]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: { legend: { display: false } },
-          scales: {
-            y: { beginAtZero: true, grid: { color: 'rgba(148,163,184,0.1)' }, ticks: { color: '#94a3b8' } },
-            x: { grid: { display: false }, ticks: { color: '#94a3b8' } }
-          }
-        }
-      });
-    }
+    createMiniChart('enquiriesChart', <%- JSON.stringify(monthlyEnquiries.reverse()) %>, 'rgba(8,145,178,0.6)', 'Enquiries');
   <% } %>
   <% if (monthlyUsers && monthlyUsers.length > 0) { %>
-    var ctx2 = document.getElementById('usersChart');
-    if (ctx2) {
-      var data2 = <%- JSON.stringify(monthlyUsers) %>;
-      new Chart(ctx2, {
-        type: 'line',
-        data: {
-          labels: data2.map(function(d) { return d.month; }),
-          datasets: [{
-            label: 'New Users',
-            data: data2.map(function(d) { return d.count; }),
-            backgroundColor: 'rgba(16,185,129,0.1)',
-            borderColor: '#10b981',
-            borderWidth: 2,
-            fill: true,
-            tension: 0.4,
-            pointBackgroundColor: '#10b981'
-          }]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: { legend: { display: false } },
-          scales: {
-            y: { beginAtZero: true, grid: { color: 'rgba(148,163,184,0.1)' }, ticks: { color: '#94a3b8' } },
-            x: { grid: { display: false }, ticks: { color: '#94a3b8' } }
-          }
-        }
-      });
-    }
+    createMiniChart('usersChart', <%- JSON.stringify(monthlyUsers) %>, 'rgba(16,185,129,0.6)', 'Users');
   <% } %>
 });
 </script>
