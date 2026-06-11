@@ -39,9 +39,9 @@
         <div class="hero-image-wrapper">
           <div class="card border-0 overflow-hidden shadow-lg" style="height: 350px;">
 <% if (course.image && (course.image.startsWith('http://') || course.image.startsWith('https://'))) { %>
-              <img src="<%= course.image %>" alt="<%= course.name %> software training at City Building Engineering" class="w-100 h-100" style="object-fit: contain; background: var(--bg-secondary); padding: 20px;">
+              <img src="<%= course.image %>" alt="<%= course.name %> software training at City Building Engineering" class="w-100 h-100" style="object-fit: contain; background: var(--bg-secondary); padding: 20px; border: 1px solid var(--border);">
             <% } else if (course.image) { %>
-              <img src="/images/<%= course.image %>" alt="<%= course.name %> training" class="w-100 h-100" style="object-fit: contain; background: var(--bg-secondary); padding: 20px;">
+              <img src="/images/<%= course.image %>" alt="<%= course.name %> training" class="w-100 h-100" style="object-fit: contain; background: var(--bg-secondary); padding: 20px; border: 1px solid var(--border);">
             <% } else { %>
               <img src="<%= defaultCourseImage %>" alt="<%= course.name %> training" class="w-100 h-100" style="object-fit: cover;">
             <% } %>
