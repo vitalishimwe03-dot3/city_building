@@ -13,6 +13,7 @@
     <% } %>
 
     <form method="POST" action="<%= category ? '/admin/categories/' + category.id : '/admin/categories' %>">
+        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
         <div class="mb-3">
             <label for="name" class="form-label">Category Name</label>
             <input type="text" class="form-control" id="name" name="name" 

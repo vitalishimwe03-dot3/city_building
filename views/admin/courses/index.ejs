@@ -27,6 +27,7 @@
                                 <div class="action-btns">
                                     <a href="/admin/courses/<%= course.id %>/edit" class="btn btn-sm-custom btn-edit-custom"><i class="bi bi-pencil"></i></a>
                                     <form action="/admin/courses/<%= course.id %>/delete" method="POST" style="display:inline;" onsubmit="return confirm('Delete course?')">
+                                        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
                                         <button type="submit" class="btn btn-sm-custom btn-delete-custom"><i class="bi bi-trash"></i></button>
                                     </form>
                                 </div>

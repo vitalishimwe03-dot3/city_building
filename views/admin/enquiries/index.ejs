@@ -30,6 +30,7 @@
                                 <div class="action-btns">
                                     <a href="/admin/enquiries/<%= enquiry.id %>" class="btn btn-sm-custom btn-view-custom"><i class="bi bi-eye"></i></a>
                                     <form action="/admin/enquiries/<%= enquiry.id %>/delete" method="POST" style="display:inline;" onsubmit="return confirm('Delete enquiry?')">
+                                        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
                                         <button type="submit" class="btn btn-sm-custom btn-delete-custom"><i class="bi bi-trash"></i></button>
                                     </form>
                                 </div>

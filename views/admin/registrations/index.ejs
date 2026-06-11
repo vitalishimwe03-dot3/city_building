@@ -29,6 +29,7 @@
                             <td><small><%= new Date(reg.created_at).toLocaleDateString() %></small></td>
                             <td>
                                 <form action="/admin/registrations/<%= reg.id %>/status" method="POST" style="display:inline;">
+                                    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
                                     <select name="status" class="form-select form-select-sm d-inline-block" style="width:auto;font-size:12px;padding:4px 8px;" onchange="this.form.submit()">
                                         <option value="pending" <%= reg.status === 'pending' ? 'selected' : '' %>>Pending</option>
                                         <option value="approved" <%= reg.status === 'approved' ? 'selected' : '' %>>Approved</option>

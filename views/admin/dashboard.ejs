@@ -63,14 +63,14 @@
       </div>
     </div>
   </div>
-  <div class="col-xl-8">
+  <div class="col-xl-4">
     <div class="admin-card-modern">
       <div class="card-header-custom">
         <h5><i class="bi bi-graph-up" style="color:#0891b2;"></i> Monthly Enquiries</h5>
         <a href="/admin/enquiries" class="btn btn-sm-custom btn-edit-custom">View All</a>
       </div>
       <% if (monthlyEnquiries && monthlyEnquiries.length > 0) { %>
-        <canvas id="enquiriesChart" height="200"></canvas>
+        <canvas id="enquiriesChart" height="150"></canvas>
       <% } else { %>
         <div class="empty-state"><i class="bi bi-inbox"></i><h5>No data yet</h5><p>Enquiries will appear here once received.</p></div>
       <% } %>
@@ -83,7 +83,7 @@
         <a href="/admin/site-users" class="btn btn-sm-custom btn-edit-custom">View All</a>
       </div>
       <% if (monthlyUsers && monthlyUsers.length > 0) { %>
-        <canvas id="usersChart" height="200"></canvas>
+        <canvas id="usersChart" height="150"></canvas>
       <% } else { %>
         <div class="empty-state"><i class="bi bi-people"></i><h5>No users yet</h5><p>User signups will appear here.</p></div>
       <% } %>

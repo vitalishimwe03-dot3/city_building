@@ -32,6 +32,7 @@ function setAdminPage(req, res, next) {
   const parts = req.path.split('/');
   res.locals.currentPage = parts[2] || 'dashboard';
   res.locals.layout = 'admin-layout';
+  res.locals.csrfToken = req.session?.csrfToken;
   pool.query("SELECT COUNT(*) as cnt FROM enquiries WHERE status='new'").then(function(r) {
     res.locals.newEnquiries = r[0]?.[0]?.cnt || 0;
     next();

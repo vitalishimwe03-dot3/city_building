@@ -13,6 +13,7 @@
     <% } %>
 
     <form method="POST" action="<%= course ? '/admin/courses/' + course.id : '/admin/courses' %>">
+        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
         <div class="mb-3">
             <label for="categoryId" class="form-label">Category</label>
             <select class="form-select" id="categoryId" name="categoryId" required>

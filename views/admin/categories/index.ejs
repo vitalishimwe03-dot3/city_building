@@ -26,6 +26,7 @@
                                 <div class="action-btns">
                                     <a href="/admin/categories/<%= category.id %>/edit" class="btn btn-sm-custom btn-edit-custom"><i class="bi bi-pencil"></i></a>
                                     <form action="/admin/categories/<%= category.id %>/delete" method="POST" style="display:inline;" onsubmit="return confirm('Delete category?')">
+                                        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
                                         <button type="submit" class="btn btn-sm-custom btn-delete-custom"><i class="bi bi-trash"></i></button>
                                     </form>
                                 </div>
