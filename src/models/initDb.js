@@ -2,10 +2,24 @@ const fs = require('fs');
 const path = require('path');
 const pool = require('../db');
 
+function findDbDir() {
+  var candidates = [
+    path.join(__dirname, '..', '..', 'db'),
+    path.join(process.cwd(), '..', 'db'),
+    path.join(process.cwd(), 'db'),
+    path.join(__dirname, '..', '..', '..', 'db')
+  ];
+  for (var i = 0; i < candidates.length; i++) {
+    if (fs.existsSync(candidates[i])) return candidates[i];
+  }
+  return candidates[0];
+}
+
 function runSqlFile(filename) {
   return new Promise((resolve, reject) => {
     try {
-      const sql = fs.readFileSync(path.join(__dirname, '..', '..', 'db', filename), 'utf8');
+      var dbPath = findDbDir();
+      var sql = fs.readFileSync(path.join(dbPath, filename), 'utf8');
       // Split by semicolon but preserve the statement structure
       const statements = sql.split(';').map(s => s.trim()).filter(Boolean);
       
