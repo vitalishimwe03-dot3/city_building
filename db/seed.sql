@@ -9,7 +9,7 @@ INSERT OR IGNORE INTO subcourses (category_id,name,slug,image,description) VALUE
 ((SELECT id FROM categories WHERE slug='architectural'),'Revit','revit','https://images.seeklogo.com/logo-png/48/1/autodesk-revit-logo-png_seeklogo-482393.png','Autodesk Revit course'),
 ((SELECT id FROM categories WHERE slug='architectural'),'ArchiCAD','archicad','https://static.food4rhino.com/cdn/farfuture/xyrPqO3quW2MDpWtN1q77PWdS56JQF_RFkkPgqfqj0o/mtime:1680615355/sites/default/files/public/users-files/graphisoft/app/archicadlogo.jpg','ArchiCAD BIM modelling course'),
 ((SELECT id FROM categories WHERE slug='architectural'),'SketchUp','sketchup','https://download-warehouse.sketchup.com/warehouse/v1.0/content/public/2871299f-70f9-42c5-9e94-92c9d58eb15f','SketchUp fundamentals'),
-((SELECT id FROM categories WHERE slug='architectural'),'AutoCAD','autocad','https://images.pexels.com/photos/716661/pexels-photo-716661.jpeg?auto=compress&cs=tinysrgb&w=1200','AutoCAD drafting course');
+((SELECT id FROM categories WHERE slug='architectural'),'AutoCAD','autocad','https://saasyto.com/wp-content/uploads/2024/08/Autodesk-AutoCAD-subscription-1.jpg','AutoCAD drafting course');
 
 INSERT OR IGNORE INTO subcourses (category_id,name,slug,image,description) VALUES
 ((SELECT id FROM categories WHERE slug='structural'),'Prostructure','prostructure','https://images.pexels.com/photos/3862632/pexels-photo-3862632.jpeg?auto=compress&cs=tinysrgb&w=1200','Prostructure structural modelling'),
