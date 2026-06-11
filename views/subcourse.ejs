@@ -38,12 +38,11 @@
       <div class="col-12 col-lg-5">
         <div class="hero-image-wrapper">
           <div class="card border-0 overflow-hidden shadow-lg" style="height: 350px;">
-            <% if (course.image && (course.image.startsWith('http://') || course.image.startsWith('https://'))) { %>
-              <img src="<%= course.image %>" alt="<%= course.name %> software training at City Building Engineering" class="w-100 h-100" style="object-fit: cover;">
+<% if (course.image && (course.image.startsWith('http://') || course.image.startsWith('https://'))) { %>
+              <img src="<%= course.image %>" alt="<%= course.name %> software training at City Building Engineering" class="w-100 h-100" style="object-fit: contain; background: var(--bg-secondary); padding: 20px;">
             <% } else if (course.image) { %>
-              <img src="/images/<%= course.image %>" alt="<%= course.name %> training" class="w-100 h-100" style="object-fit: cover;">
+              <img src="/images/<%= course.image %>" alt="<%= course.name %> training" class="w-100 h-100" style="object-fit: contain; background: var(--bg-secondary); padding: 20px;">
             <% } else { %>
-              <% const defaultCourseImage = getToolImage(course.name) || 'https://images.pexels.com/photos/1487014679447-9f8336841d58?auto=compress&cs=tinysrgb&w=1200'; %>
               <img src="<%= defaultCourseImage %>" alt="<%= course.name %> training" class="w-100 h-100" style="object-fit: cover;">
             <% } %>
           </div>
