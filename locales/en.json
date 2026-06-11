@@ -1,0 +1,108 @@
+{
+  "nav": {
+    "home": "Home",
+    "about": "About Us",
+    "services": "Services",
+    "contact": "Contact",
+    "certificate": "Certificate",
+    "career": "Career",
+    "login": "Login",
+    "signup": "Sign Up",
+    "logout": "Logout",
+    "account": "Account",
+    "dashboard": "Dashboard"
+  },
+  "hero": {
+    "title": "Professional Training in Construction & Engineering Software",
+    "subtitle": "Master the tools shaping our cities",
+    "cta": "Explore Courses"
+  },
+  "courses": {
+    "title": "Our Courses",
+    "categories": "Course Categories",
+    "explore": "Explore Courses",
+    "viewAll": "View All Courses",
+    "noCategory": "Category not found",
+    "noCourse": "Course not found"
+  },
+  "auth": {
+    "signup": "Sign Up",
+    "login": "Login",
+    "email": "Email",
+    "password": "Password",
+    "fullName": "Full Name",
+    "phone": "Phone",
+    "confirmPassword": "Confirm Password",
+    "rememberMe": "Remember me",
+    "forgotPassword": "Forgot Password?",
+    "noAccount": "Don't have an account?",
+    "haveAccount": "Already have an account?",
+    "signupHere": "Sign up here",
+    "loginHere": "Login here",
+    "verifyEmail": "Verify Email",
+    "otp": "One-Time Password",
+    "otpSent": "Verification code sent to your email",
+    "resendOTP": "Resend Code",
+    "invalidCredentials": "Invalid email or password",
+    "emailExists": "Email already registered"
+  },
+  "account": {
+    "settings": "Account Settings",
+    "profile": "Profile",
+    "password": "Password",
+    "notifications": "Notifications",
+    "language": "Language",
+    "save": "Save Changes",
+    "changePassword": "Change Password",
+    "currentPassword": "Current Password",
+    "newPassword": "New Password",
+    "confirmNewPassword": "Confirm New Password",
+    "preferredLanguage": "Preferred Language"
+  },
+  "contact": {
+    "title": "Contact Us",
+    "name": "Name",
+    "email": "Email",
+    "phone": "Phone",
+    "message": "Message",
+    "send": "Send Enquiry",
+    "enquireNow": "Enquire Now",
+    "thankYou": "Thank you for your enquiry!"
+  },
+  "errors": {
+    "serverError": "Server error",
+    "unexpectedError": "Something unexpected happened. Please try again later.",
+    "notFound": "Page not found",
+    "pageNotExist": "The page you are looking for does not exist.",
+    "validationFailed": "Validation failed",
+    "required": "This field is required",
+    "sessionExpired": "Session expired. Please try again."
+  },
+  "admin": {
+    "dashboard": "Admin Dashboard",
+    "users": "Users",
+    "categories": "Categories",
+    "courses": "Courses",
+    "enquiries": "Enquiries",
+    "manage": "Manage",
+    "create": "Create",
+    "edit": "Edit",
+    "delete": "Delete",
+    "view": "View",
+    "logout": "Logout",
+    "username": "Username",
+    "role": "Role",
+    "active": "Active",
+    "actions": "Actions",
+    "description": "Description",
+    "slug": "Slug",
+    "name": "Name",
+    "confirm": "Are you sure?"
+  },
+  "footer": {
+    "about": "About",
+    "privacy": "Privacy Policy",
+    "terms": "Terms of Service",
+    "contact": "Contact"
+  }
+}

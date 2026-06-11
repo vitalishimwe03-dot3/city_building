@@ -43,17 +43,21 @@ function loadTranslations() {
 }
 
 // Get translation string by key path (e.g., "nav.home")
-function t(language, keyPath, defaultValue = keyPath) {
+function t(language, keyPath, defaultValue) {
+  if (defaultValue === undefined) defaultValue = keyPath;
   if (!translations[language]) {
-    return t('en', keyPath, defaultValue);
+    language = 'en';
+  }
+  if (!translations[language]) {
+    return defaultValue;
   }
 
-  const keys = keyPath.split('.');
-  let value = translations[language];
-  
-  for (const key of keys) {
-    if (value && typeof value === 'object' && key in value) {
-      value = value[key];
+  var keys = keyPath.split('.');
+  var value = translations[language];
+
+  for (var i = 0; i < keys.length; i++) {
+    if (value && typeof value === 'object' && keys[i] in value) {
+      value = value[keys[i]];
     } else {
       return defaultValue;
     }

@@ -1,0 +1,11 @@
+{
+  "nav": { "home": "首页", "about": "关于", "services": "服务", "contact": "联系", "certificate": "证书", "career": "职业", "login": "登录", "signup": "注册", "logout": "登出", "account": "账户", "dashboard": "仪表板" },
+  "hero": { "title": "建筑和工程软件专业培训", "subtitle": "掌握塑造城市的工具", "cta": "探索课程" },
+  "courses": { "title": "我们的课程", "categories": "课程类别", "explore": "探索课程", "viewAll": "查看所有课程", "noCategory": "未找到类别", "noCourse": "未找到课程" },
+  "auth": { "signup": "注册", "login": "登录", "email": "电子邮件", "password": "密码", "fullName": "全名", "phone": "电话", "confirmPassword": "确认密码", "rememberMe": "记住我", "forgotPassword": "忘记密码？", "noAccount": "没有账户？", "haveAccount": "已有账户？", "signupHere": "在此注册", "loginHere": "在此登录", "verifyEmail": "验证电子邮件", "otp": "一次性密码", "otpSent": "验证码已发送到您的电子邮件", "resendOTP": "重新发送代码", "invalidCredentials": "无效的电子邮件或密码", "emailExists": "电子邮件已注册" },
+  "account": { "settings": "账户设置", "profile": "个人资料", "password": "密码", "notifications": "通知", "language": "语言", "save": "保存更改", "changePassword": "更改密码", "currentPassword": "当前密码", "newPassword": "新密码", "confirmNewPassword": "确认新密码", "preferredLanguage": "首选语言" },
+  "contact": { "title": "联系我们", "name": "名字", "email": "电子邮件", "phone": "电话", "message": "消息", "send": "发送询问", "enquireNow": "立即咨询", "thankYou": "感谢您的咨询！" },
+  "errors": { "serverError": "服务器错误", "unexpectedError": "发生了意外错误。请稍后重试。", "notFound": "页面未找到", "pageNotExist": "您查找的页面不存在。", "validationFailed": "验证失败", "required": "此字段为必填项", "sessionExpired": "会话已过期。请重试。" },
+  "admin": { "dashboard": "管理员仪表板", "users": "用户", "categories": "类别", "courses": "课程", "enquiries": "询问", "manage": "管理", "create": "创建", "edit": "编辑", "delete": "删除", "view": "查看", "logout": "登出", "username": "用户名", "role": "角色", "active": "活跃", "actions": "操作", "description": "描述", "slug": "Slug", "name": "名称", "confirm": "您确定吗？" },
+  "footer": { "about": "关于", "privacy": "隐私政策", "terms": "服务条款", "contact": "联系" }
+}

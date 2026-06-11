@@ -1,0 +1,11 @@
+{
+  "nav": { "home": "መግቢያ", "about": "ስለ እኛ", "services": "አገልግሎቶች", "contact": "ለመገኛ", "certificate": "ሰertificat", "career": "ስራ", "login": "ግባ", "signup": "ተመዝገብ", "logout": "ወጣ", "account": "ሒساብ", "dashboard": "ናሞ" },
+  "hero": { "title": "በግንባታ እና ኢንጂነሪንግ ሶፍትዌር ውስጥ ሙያዊ ስልጠና", "subtitle": "ከተሞቻችንን የሚሸጩ መሳሪያዎችን ይወዙ", "cta": "ኮርሶችን ያስሱ" },
+  "courses": { "title": "ኮርሶቻችን", "categories": "የኮርስ ምድቦች", "explore": "ኮርሶችን ያስሱ", "viewAll": "ሁሉም ኮርሶች ይመልከቱ", "noCategory": "ምድብ አልተገኘም", "noCourse": "ኮርስ አልተገኘም" },
+  "auth": { "signup": "ተመዝገብ", "login": "ግባ", "email": "ኢሜይል", "password": "ይለፍ ቃል", "fullName": "ሙሉ ስም", "phone": "ስልክ", "confirmPassword": "ይለፍ ቃልን አረጋግጥ", "rememberMe": "አስታውስ", "forgotPassword": "ይለፍ ቃልዎን ረስተዋል?", "noAccount": "ሂሳብ የላዎም?", "haveAccount": "ቀደም ሲል ሂሳብ ያለዎት?", "signupHere": "እዚህ ተመዝገቡ", "loginHere": "እዚህ ይግቡ", "verifyEmail": "ኢሜይልን አረጋግጥ", "otp": "ነጠላ ጊዜ ይለፍ ቃል", "otpSent": "ማረጋገጫ ኮድ ወደ ኢሜይልዎ ተልክቷል", "resendOTP": "ኮድ እንደገና ላክ", "invalidCredentials": "ያልሆነ ኢሜይል ወይም ይለፍ ቃል", "emailExists": "ኢሜይል ቀድሞ ተመዝግቧል" },
+  "account": { "settings": "ሂሳብ ቅንጅቶች", "profile": "መገለጫ", "password": "ይለፍ ቃል", "notifications": "ማሳወቂያዎች", "language": "ቋንቋ", "save": "ለውጦችን አስቀምጥ", "changePassword": "ይለፍ ቃልን ይለውጡ", "currentPassword": "የሚገባው ይለፍ ቃል", "newPassword": "አዲስ ይለፍ ቃል", "confirmNewPassword": "አዲስ ይለፍ ቃልን አረጋግጥ", "preferredLanguage": "ምርጫ ቋንቋ" },
+  "contact": { "title": "ዋሪያ", "name": "ስም", "email": "ኢሜይል", "phone": "ስልክ", "message": "መልእክት", "send": "ጥያቄ ላክ", "enquireNow": "አሁን ጠይቅ", "thankYou": "ለጥያቄዎ 감사합니다!" },
+  "errors": { "serverError": "የሰርቨር ስህተት", "unexpectedError": "ያልተጠበቀ ነገር ተከስቷል። እባክዎ በኋላ እንደገና ይሞክሩ።", "notFound": "ገጽ አልተገኘም", "pageNotExist": "ከፍለጋ ለሚያስፈልገው ገጽ ስሪት የለም።", "validationFailed": "ማረጋገጥ አልተሳካም", "required": "ይህ ሜዳ ያስፈልጋል", "sessionExpired": "ክፍለ ጊዜ ያለፈ ነበር። እንደገና ይሞክሩ።" },
+  "admin": { "dashboard": "የአስተዳደር ሳሳ", "users": "ተጠቃሚዎች", "categories": "ምድቦች", "courses": "ኮርሶች", "enquiries": "ጥያቄዎች", "manage": "አስተዳድር", "create": "ፍጠር", "edit": "ተስተካክል", "delete": "ሰርዝ", "view": "ይመልከቱ", "logout": "ወጣ", "username": "ተጠቃሚ ስም", "role": "ሚና", "active": "እንቅስቃሴ", "actions": "እርምጃዎች", "description": "መግለጫ", "slug": "Slug", "name": "ስም", "confirm": "እርግጠኛ ነዎት?" },
+  "footer": { "about": "ስለ እኛ", "privacy": "የግላዊነት ፖሊሲ", "terms": "የአገልግሎት ውል", "contact": "ለመገኛ" }
+}

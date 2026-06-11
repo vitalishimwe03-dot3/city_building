@@ -1,0 +1,108 @@
+{
+  "nav": {
+    "home": "Accueil",
+    "about": "À propos",
+    "services": "Services",
+    "contact": "Contact",
+    "certificate": "Certificat",
+    "career": "Carrière",
+    "login": "Connexion",
+    "signup": "S'inscrire",
+    "logout": "Déconnexion",
+    "account": "Compte",
+    "dashboard": "Tableau de bord"
+  },
+  "hero": {
+    "title": "Formation professionnelle en logiciels de construction et d'ingénierie",
+    "subtitle": "Maîtrisez les outils qui façonnent nos villes",
+    "cta": "Explorer les cours"
+  },
+  "courses": {
+    "title": "Nos cours",
+    "categories": "Catégories de cours",
+    "explore": "Explorer les cours",
+    "viewAll": "Voir tous les cours",
+    "noCategory": "Catégorie non trouvée",
+    "noCourse": "Cours non trouvé"
+  },
+  "auth": {
+    "signup": "S'inscrire",
+    "login": "Connexion",
+    "email": "Email",
+    "password": "Mot de passe",
+    "fullName": "Nom complet",
+    "phone": "Téléphone",
+    "confirmPassword": "Confirmer le mot de passe",
+    "rememberMe": "Se souvenir de moi",
+    "forgotPassword": "Mot de passe oublié?",
+    "noAccount": "Vous n'avez pas de compte?",
+    "haveAccount": "Vous avez déjà un compte?",
+    "signupHere": "S'inscrire ici",
+    "loginHere": "Se connecter ici",
+    "verifyEmail": "Vérifier l'email",
+    "otp": "Code à usage unique",
+    "otpSent": "Code de vérification envoyé à votre email",
+    "resendOTP": "Renvoyer le code",
+    "invalidCredentials": "Email ou mot de passe invalide",
+    "emailExists": "Email déjà enregistré"
+  },
+  "account": {
+    "settings": "Paramètres du compte",
+    "profile": "Profil",
+    "password": "Mot de passe",
+    "notifications": "Notifications",
+    "language": "Langue",
+    "save": "Enregistrer les modifications",
+    "changePassword": "Changer le mot de passe",
+    "currentPassword": "Mot de passe actuel",
+    "newPassword": "Nouveau mot de passe",
+    "confirmNewPassword": "Confirmer le nouveau mot de passe",
+    "preferredLanguage": "Langue préférée"
+  },
+  "contact": {
+    "title": "Nous contacter",
+    "name": "Nom",
+    "email": "Email",
+    "phone": "Téléphone",
+    "message": "Message",
+    "send": "Envoyer la demande",
+    "enquireNow": "Demander maintenant",
+    "thankYou": "Merci pour votre demande!"
+  },
+  "errors": {
+    "serverError": "Erreur serveur",
+    "unexpectedError": "Quelque chose d'inattendu s'est produit. Veuillez réessayer plus tard.",
+    "notFound": "Page non trouvée",
+    "pageNotExist": "La page que vous recherchez n'existe pas.",
+    "validationFailed": "Validation échouée",
+    "required": "Ce champ est obligatoire",
+    "sessionExpired": "Session expirée. Veuillez réessayer."
+  },
+  "admin": {
+    "dashboard": "Tableau de bord administrateur",
+    "users": "Utilisateurs",
+    "categories": "Catégories",
+    "courses": "Cours",
+    "enquiries": "Demandes",
+    "manage": "Gérer",
+    "create": "Créer",
+    "edit": "Modifier",
+    "delete": "Supprimer",
+    "view": "Voir",
+    "logout": "Déconnexion",
+    "username": "Nom d'utilisateur",
+    "role": "Rôle",
+    "active": "Actif",
+    "actions": "Actions",
+    "description": "Description",
+    "slug": "Slug",
+    "name": "Nom",
+    "confirm": "Êtes-vous sûr?"
+  },
+  "footer": {
+    "about": "À propos",
+    "privacy": "Politique de confidentialité",
+    "terms": "Conditions d'utilisation",
+    "contact": "Contact"
+  }
+}
