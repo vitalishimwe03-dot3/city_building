@@ -124,4 +124,68 @@ router.get('/chat/search', async (req, res, next) => {
   }
 });
 
+// ====== COURSE PROGRESS TRACKING ======
+
+router.get('/my-progress', async (req, res, next) => {
+  try {
+    if (!req.session.siteUser) return res.json([]);
+    const [progress] = await pool.query(
+      `SELECT r.id as registration_id, r.subcourse_id, r.status as reg_status,
+              s.name as course_name, s.slug as course_slug, c.name as category_name,
+              (SELECT COUNT(*) FROM course_modules WHERE subcourse_id = r.subcourse_id) as total_modules,
+              (SELECT COUNT(*) FROM course_progress cp JOIN course_modules cm ON cp.module_id = cm.id WHERE cm.subcourse_id = r.subcourse_id AND cp.user_id = r.user_id AND cp.completed = 1) as completed_modules
+       FROM course_registrations r
+       JOIN subcourses s ON r.subcourse_id = s.id
+       JOIN categories c ON s.category_id = c.id
+       WHERE r.user_id = ?
+       ORDER BY r.created_at DESC`,
+      [req.session.siteUser.id]
+    );
+    res.json(progress || []);
+  } catch (err) {
+    next(err);
+  }
+});
+
+router.get('/course/:id/modules', async (req, res, next) => {
+  try {
+    const [modules] = await pool.query(
+      'SELECT cm.*, COALESCE(cp.completed, 0) as completed, cp.completed_at FROM course_modules cm LEFT JOIN course_progress cp ON cp.module_id = cm.id AND cp.user_id = ? WHERE cm.subcourse_id = ? ORDER BY cm.order_index ASC',
+      [req.session.siteUser?.id || 0, req.params.id]
+    );
+    res.json(modules || []);
+  } catch (err) {
+    next(err);
+  }
+});
+
+router.post('/course/:id/module/:moduleId/complete', async (req, res, next) => {
+  try {
+    if (!req.session.siteUser) return res.status(401).json({ error: 'Please log in.' });
+    const userId = req.session.siteUser.id;
+    const moduleId = req.params.moduleId;
+    const [[existing]] = await pool.query('SELECT id FROM course_progress WHERE user_id = ? AND module_id = ?', [userId, moduleId]);
+    if (existing) {
+      return res.json({ success: true, message: 'Already completed.' });
+    }
+    await pool.query(
+      "INSERT INTO course_progress (user_id, module_id, completed, completed_at) VALUES (?, ?, 1, datetime('now'))",
+      [userId, moduleId]
+    );
+    res.json({ success: true, message: 'Module marked as complete!' });
+  } catch (err) {
+    next(err);
+  }
+});
+
+router.post('/course/:id/module/:moduleId/uncomplete', async (req, res, next) => {
+  try {
+    if (!req.session.siteUser) return res.status(401).json({ error: 'Please log in.' });
+    await pool.query('DELETE FROM course_progress WHERE user_id = ? AND module_id = ?', [req.session.siteUser.id, req.params.moduleId]);
+    res.json({ success: true, message: 'Module unmarked.' });
+  } catch (err) {
+    next(err);
+  }
+});
+
 module.exports = router;

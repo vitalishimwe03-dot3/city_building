@@ -1,7 +1,7 @@
 // Admin authentication middleware - enforces admin-only access
 function isAdminAuthenticated(req, res, next) {
   if (!req.session || !req.session.userId || !req.session.adminUser) {
-    return res.status(403).redirect('/admin/login');
+    return res.status(403).redirect('/login');
   }
   
   // Verify the user is actually an admin
