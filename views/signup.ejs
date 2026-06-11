@@ -24,8 +24,39 @@
         <div class="invalid-feedback">Please enter a valid email.</div>
       </div>
       <div class="form-floating-group">
-        <input name="phone" class="form-control" id="signupPhone" placeholder="+250 7XX XXX XXX" required autocomplete="tel" pattern="^(\+250|\+234|\+27|\+233|\+225|\+254|\+256|\+237|\+212|\+213|\+1|\+44|\+33|\+49|\+20|\+966|\+91|\+234|\+27|\+81|\+7|\+55|\+34|\+39|\+90|\+62|\+60|\+82|\+972|\+351|\+358|\+46|\+48|\+380|\+998|\+84|\+66|\+63|\+64|\+61|\+64|\+1)[0-9]{7,15}$">
-        <label for="signupPhone">Phone number</label>
+
+        <div class="phone-group" id="phoneGroup">
+          <select class="country-code" id="signupCountryCode" required>
+            <option value="+250" data-code="RW">🇷🇼 +250</option>
+            <option value="+256" data-code="UG">🇺🇬 +256</option>
+            <option value="+254" data-code="KE">🇰🇪 +254</option>
+            <option value="+255" data-code="TZ">🇹🇿 +255</option>
+            <option value="+257" data-code="BI">🇧🇮 +257</option>
+            <option value="+243" data-code="CD">🇨🇩 +243</option>
+            <option value="+27" data-code="ZA">🇿🇦 +27</option>
+            <option value="+234" data-code="NG">🇳🇬 +234</option>
+            <option value="+233" data-code="GH">🇬🇭 +233</option>
+            <option value="+251" data-code="ET">🇪🇹 +251</option>
+            <option value="+20" data-code="EG">🇪🇬 +20</option>
+            <option value="+212" data-code="MA">🇲🇦 +212</option>
+            <option value="+225" data-code="CI">🇨🇮 +225</option>
+            <option value="+237" data-code="CM">🇨🇲 +237</option>
+            <option value="+211" data-code="SS">🇸🇸 +211</option>
+            <option value="+1" data-code="US">🇺🇸 +1</option>
+            <option value="+44" data-code="GB">🇬🇧 +44</option>
+            <option value="+33" data-code="FR">🇫🇷 +33</option>
+            <option value="+49" data-code="DE">🇩🇪 +49</option>
+            <option value="+86" data-code="CN">🇨🇳 +86</option>
+            <option value="+91" data-code="IN">🇮🇳 +91</option>
+            <option value="+971" data-code="AE">🇦🇪 +971</option>
+            <option value="+966" data-code="SA">🇸🇦 +966</option>
+            <option value="+81" data-code="JP">🇯🇵 +81</option>
+          </select>
+          <input type="tel" name="phone" class="form-control phone-input" id="signupPhone"
+                 placeholder="7XX XXX XXX" required autocomplete="tel">
+        </div>
+
+        <label for="signupPhone" style="position:static;transform:none;margin-bottom:4px;font-size:13px;color:var(--text-muted);">Phone number</label>
         <div class="invalid-feedback">Please enter a valid phone number.</div>
       </div>
       <div class="form-floating-group">
@@ -86,8 +117,17 @@ document.addEventListener('DOMContentLoaded', function() {
       pwStrengthText.className = 'pw-strength-text ' + cls;
     });
   }
+  var countryCode = document.getElementById('signupCountryCode');
+  var phoneInput = document.getElementById('signupPhone');
   var form = document.getElementById('signupForm');
   var submitBtn = document.getElementById('signupSubmitBtn');
+
+  if (countryCode && phoneInput) {
+    phoneInput.addEventListener('input', function() {
+      this.value = this.value.replace(/[^0-9\s\-\(\)]/g, '');
+    });
+  }
+
   form.addEventListener('submit', function(e) {
     var pw = form.password.value;
     var cpw = form.confirmPassword.value;
@@ -96,6 +136,9 @@ document.addEventListener('DOMContentLoaded', function() {
       e.preventDefault();
     } else {
       form.confirmPassword.setCustomValidity('');
+    }
+    if (countryCode && phoneInput) {
+      phoneInput.value = countryCode.value + ' ' + phoneInput.value.replace(/^\+?\d+\s*/, '');
     }
     if (!form.checkValidity()) { e.preventDefault(); e.stopPropagation(); }
     form.classList.add('was-validated');

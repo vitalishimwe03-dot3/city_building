@@ -5,7 +5,7 @@
         <div class="d-flex flex-column flex-md-row justify-content-between align-items-start gap-3 mb-4">
           <div>
             <h2 class="h3 mb-1">Account Dashboard</h2>
-            <p class="text-muted mb-0">Welcome back, <strong><%= user.full_name %></strong>. Manage your profile, security settings, and keep up with the latest account news.</p>
+            <p class="text-muted mb-0">Welcome back, <strong><%= user.full_name %></strong>. Track your courses and manage your profile.</p>
           </div>
           <div class="text-md-end">
             <span class="badge bg-primary">Member since <%= new Date(user.created_at).toLocaleDateString() %></span>
@@ -33,6 +33,9 @@
                 <button class="nav-link active" id="dashboard-tab" data-bs-toggle="tab" data-bs-target="#dashboard" type="button" role="tab">Dashboard</button>
               </li>
               <li class="nav-item" role="presentation">
+                <button class="nav-link" id="courses-tab" data-bs-toggle="tab" data-bs-target="#courses" type="button" role="tab">My Courses</button>
+              </li>
+              <li class="nav-item" role="presentation">
                 <button class="nav-link" id="profile-tab" data-bs-toggle="tab" data-bs-target="#profile" type="button" role="tab">Profile</button>
               </li>
               <li class="nav-item" role="presentation">
@@ -50,7 +53,7 @@
                     <div class="card h-100 border-primary">
                       <div class="card-body">
                         <h5 class="card-title">Welcome back!</h5>
-                        <p class="card-text">Your account is active and ready. Use the tabs below to update your profile information, secure your password, or choose your preferred language.</p>
+                        <p class="card-text">Your account is active and ready. Use the tabs to update your profile, secure your password, or choose your preferred language.</p>
                       </div>
                     </div>
                   </div>
@@ -66,7 +69,16 @@
                   </div>
                 </div>
 
-                <div class="row g-3">
+                <div class="row g-3" id="progressOverview">
+                  <div class="col-12">
+                    <h5 class="fw-bold mb-3"><i class="bi bi-graph-up"></i> Learning Progress</h5>
+                  </div>
+                  <div class="col-12 text-center py-4 text-muted" id="progressLoading">
+                    <div class="spinner-border spinner-border-sm me-2" role="status"></div> Loading your progress...
+                  </div>
+                </div>
+
+                <div class="row g-3 mt-2">
                   <% if (dashboardNews && dashboardNews.length) { %>
                     <% dashboardNews.forEach(item => { %>
                       <div class="col-md-6">
@@ -83,11 +95,19 @@
                     <div class="col-12">
                       <div class="card">
                         <div class="card-body">
-                          <p class="mb-0">No dashboard news is available right now. Check back later for updates.</p>
+                          <p class="mb-0">No dashboard news available right now.</p>
                         </div>
                       </div>
                     </div>
                   <% } %>
+                </div>
+              </div>
+
+              <div class="tab-pane fade" id="courses" role="tabpanel" aria-labelledby="courses-tab">
+                <div id="coursesContainer">
+                  <div class="text-center py-4 text-muted">
+                    <div class="spinner-border spinner-border-sm me-2" role="status"></div> Loading your courses...
+                  </div>
                 </div>
               </div>
 
@@ -103,7 +123,62 @@
                   </div>
                   <div class="col-md-6">
                     <label class="form-label">Phone</label>
-                    <input type="text" name="phone" class="form-control" value="<%= user.phone %>">
+                    <div class="phone-group">
+                      <select class="country-code" id="profileCountryCode">
+                        <option value="+250" data-code="RW">🇷🇼 +250</option>
+                        <option value="+256" data-code="UG">🇺🇬 +256</option>
+                        <option value="+254" data-code="KE">🇰🇪 +254</option>
+                        <option value="+255" data-code="TZ">🇹🇿 +255</option>
+                        <option value="+257" data-code="BI">🇧🇮 +257</option>
+                        <option value="+243" data-code="CD">🇨🇩 +243</option>
+                        <option value="+27" data-code="ZA">🇿🇦 +27</option>
+                        <option value="+234" data-code="NG">🇳🇬 +234</option>
+                        <option value="+233" data-code="GH">🇬🇭 +233</option>
+                        <option value="+251" data-code="ET">🇪🇹 +251</option>
+                        <option value="+20" data-code="EG">🇪🇬 +20</option>
+                        <option value="+212" data-code="MA">🇲🇦 +212</option>
+                        <option value="+225" data-code="CI">🇨🇮 +225</option>
+                        <option value="+237" data-code="CM">🇨🇲 +237</option>
+                        <option value="+211" data-code="SS">🇸🇸 +211</option>
+                        <option value="+1" data-code="US">🇺🇸 +1</option>
+                        <option value="+44" data-code="GB">🇬🇧 +44</option>
+                        <option value="+33" data-code="FR">🇫🇷 +33</option>
+                        <option value="+49" data-code="DE">🇩🇪 +49</option>
+                        <option value="+86" data-code="CN">🇨🇳 +86</option>
+                        <option value="+91" data-code="IN">🇮🇳 +91</option>
+                        <option value="+971" data-code="AE">🇦🇪 +971</option>
+                        <option value="+966" data-code="SA">🇸🇦 +966</option>
+                        <option value="+81" data-code="JP">🇯🇵 +81</option>
+                      </select>
+                      <input type="tel" name="phone" class="form-control phone-input" id="profilePhone" value="<%= user.phone ? user.phone.replace(/^\+\d+\s*/,'') : '' %>" placeholder="Phone number">
+                    </div>
+                    <script>
+                      (function() {
+                        var select = document.getElementById('profileCountryCode');
+                        var input = document.getElementById('profilePhone');
+                        if (select && input) {
+                          var full = '<%= user.phone || "" %>';
+                          var match = full.match(/^(\+\d+)\s*(.*)/);
+                          if (match) {
+                            for (var i = 0; i < select.options.length; i++) {
+                              if (select.options[i].value === match[1]) {
+                                select.selectedIndex = i; break;
+                              }
+                            }
+                            input.value = match[2];
+                          }
+                          input.addEventListener('input', function() {
+                            this.value = this.value.replace(/[^0-9\s\-\(\)]/g, '');
+                          });
+                          var form = select.closest('form');
+                          if (form) {
+                            form.addEventListener('submit', function() {
+                              input.value = select.value + ' ' + input.value.replace(/^\+?\d+\s*/, '');
+                            });
+                          }
+                        }
+                      })();
+                    </script>
                   </div>
                   <div class="col-12">
                     <button type="submit" class="btn btn-primary">Update Profile</button>
@@ -164,3 +239,148 @@
     </div>
   </div>
 </section>
+
+<style>
+.progress-card { background: var(--bg-card); border: 1px solid var(--border-primary); border-radius: 12px; padding: 20px; transition: transform 0.2s, box-shadow 0.2s; }
+.progress-card:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.12); }
+.progress-card .course-title { font-size: 16px; font-weight: 700; margin-bottom: 4px; }
+.progress-card .course-category { font-size: 12px; color: var(--text-muted); margin-bottom: 12px; }
+.progress-card .progress-wrap { height: 8px; background: var(--bg-surface); border-radius: 4px; overflow: hidden; margin-bottom: 8px; }
+.progress-card .progress-wrap .progress-fill { height: 100%; border-radius: 4px; background: linear-gradient(90deg, #0891b2, #06b6d4); transition: width 0.6s ease; }
+.progress-card .progress-stats { display: flex; justify-content: space-between; font-size: 13px; color: var(--text-secondary); }
+.module-item { display: flex; align-items: center; gap: 12px; padding: 10px 12px; border-radius: 8px; background: var(--bg-surface); margin-bottom: 6px; transition: background 0.2s; }
+.module-item:hover { background: var(--bg-elevated); }
+.module-item .module-check { width: 22px; height: 22px; border-radius: 50%; border: 2px solid var(--text-muted); display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s; flex-shrink: 0; }
+.module-item .module-check.done { background: #10b981; border-color: #10b981; color: #fff; }
+.module-item .module-check:hover { border-color: #0891b2; }
+.module-item .module-title { flex: 1; font-size: 14px; font-weight: 500; }
+.module-item .module-order { font-size: 11px; color: var(--text-muted); }
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  loadProgress();
+  loadCourses();
+
+  document.getElementById('courses-tab')?.addEventListener('shown.bs.tab', function() { loadCourses(); });
+  document.getElementById('dashboard-tab')?.addEventListener('shown.bs.tab', function() { loadProgress(); });
+});
+
+async function loadProgress() {
+  const container = document.getElementById('progressOverview');
+  const loading = document.getElementById('progressLoading');
+  if (!container) return;
+  try {
+    const res = await fetch('/api/my-progress');
+    const courses = await res.json();
+    if (loading) loading.style.display = 'none';
+
+    const existingCards = container.querySelectorAll('.progress-card-wrap');
+    existingCards.forEach(el => el.remove());
+
+    if (!courses || courses.length === 0) {
+      container.insertAdjacentHTML('beforeend', '<div class="col-12 progress-card-wrap"><div class="card"><div class="card-body text-center text-muted py-4"><i class="bi bi-book" style="font-size:32px;display:block;margin-bottom:8px;opacity:0.4;"></i>You are not enrolled in any courses yet. <a href="/">Browse courses</a> to get started!</div></div></div>');
+      return;
+    }
+
+    courses.forEach(c => {
+      const pct = c.total_modules > 0 ? Math.round((c.completed_modules / c.total_modules) * 100) : 0;
+      const badge = pct === 100 ? '<span class="badge bg-success">Completed</span>' : (pct > 0 ? '<span class="badge bg-info">In Progress</span>' : '<span class="badge bg-secondary">Not Started</span>');
+      container.insertAdjacentHTML('beforeend',
+        '<div class="col-md-6 progress-card-wrap">' +
+          '<div class="progress-card">' +
+            '<div class="course-title">' + escHtml(c.course_name) + '</div>' +
+            '<div class="course-category">' + escHtml(c.category_name) + ' — ' + badge + '</div>' +
+            '<div class="progress-wrap"><div class="progress-fill" style="width:' + pct + '%"></div></div>' +
+            '<div class="progress-stats"><span>' + c.completed_modules + '/' + c.total_modules + ' modules</span><span>' + pct + '%</span></div>' +
+          '</div>' +
+        '</div>'
+      );
+    });
+  } catch (e) {
+    console.error('Failed to load progress:', e);
+    if (loading) loading.style.display = 'none';
+  }
+}
+
+async function loadCourses() {
+  const container = document.getElementById('coursesContainer');
+  if (!container) return;
+  try {
+    const res = await fetch('/api/my-registrations');
+    const registrations = await res.json();
+    if (!registrations || registrations.length === 0) {
+      container.innerHTML = '<div class="text-center py-4 text-muted"><i class="bi bi-journal-plus" style="font-size:48px;display:block;margin-bottom:12px;opacity:0.3;"></i><p>You are not enrolled in any courses yet.</p><a href="/" class="btn btn-primary">Browse Courses</a></div>';
+      return;
+    }
+    let html = '';
+    for (const reg of registrations) {
+      const modRes = await fetch('/api/course/' + reg.subcourse_id + '/modules');
+      const modules = await modRes.json();
+      const total = modules.length;
+      const done = modules.filter(m => m.completed).length;
+      const pct = total > 0 ? Math.round((done / total) * 100) : 0;
+      const statusBadge = pct === 100 ? 'bg-success' : (pct > 0 ? 'bg-info' : 'bg-secondary');
+      const statusText = pct === 100 ? 'Completed' : (pct > 0 ? 'In Progress' : 'Not Started');
+
+      html += '<div class="card mb-3">' +
+        '<div class="card-body">' +
+          '<div class="d-flex justify-content-between align-items-start mb-2">' +
+            '<div>' +
+              '<h5 class="mb-1">' + escHtml(reg.course_name) + '</h5>' +
+              '<small class="text-muted">' + escHtml(reg.category_name) + ' — <span class="badge ' + statusBadge + '">' + statusText + '</span></small>' +
+            '</div>' +
+            '<div class="text-end">' +
+              '<div class="fw-bold fs-5" style="color:var(--accent);">' + pct + '%</div>' +
+              '<small class="text-muted">' + done + '/' + total + '</small>' +
+            '</div>' +
+          '</div>' +
+          '<div class="progress mb-3" style="height:6px;"><div class="progress-bar" style="width:' + pct + '%;background:linear-gradient(90deg,#0891b2,#06b6d4);"></div></div>' +
+          '<div class="modules-list">';
+
+      modules.forEach(m => {
+        const checked = m.completed ? 'done' : '';
+        const icon = m.completed ? 'bi-check-lg' : 'bi-circle';
+        html += '<div class="module-item" data-module-id="' + m.id + '" data-course-id="' + reg.subcourse_id + '" data-completed="' + m.completed + '">' +
+          '<div class="module-check ' + checked + '"><i class="bi ' + icon + '" style="font-size:12px;"></i></div>' +
+          '<span class="module-order">Module ' + m.order_index + '</span>' +
+          '<span class="module-title">' + escHtml(m.title) + '</span>' +
+          (m.completed ? '<small class="text-success"><i class="bi bi-check-circle"></i> Done</small>' : '') +
+        '</div>';
+      });
+
+      html += '</div></div></div>';
+    }
+    container.innerHTML = html;
+
+    container.querySelectorAll('.module-check').forEach(el => {
+      el.addEventListener('click', async function() {
+        const moduleId = this.closest('.module-item').dataset.moduleId;
+        const courseId = this.closest('.module-item').dataset.courseId;
+        const isCompleted = this.closest('.module-item').dataset.completed === '1';
+        const url = isCompleted
+          ? '/api/course/' + courseId + '/module/' + moduleId + '/uncomplete'
+          : '/api/course/' + courseId + '/module/' + moduleId + '/complete';
+        try {
+          const res = await fetch(url, { method: 'POST' });
+          const data = await res.json();
+          if (data.success) {
+            loadCourses();
+            loadProgress();
+          }
+        } catch (e) {
+          console.error('Failed to update module:', e);
+        }
+      });
+    });
+  } catch (e) {
+    console.error('Failed to load courses:', e);
+    container.innerHTML = '<div class="alert alert-danger">Failed to load your courses. Please try again later.</div>';
+  }
+}
+
+function escHtml(str) {
+  if (!str) return '';
+  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+</script>

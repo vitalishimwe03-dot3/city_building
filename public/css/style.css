@@ -1434,6 +1434,31 @@ a:hover { color: var(--accent); }
   border-color: var(--accent);
 }
 
+/* Phone input with country code */
+.phone-group { display: flex; gap: 8px; align-items: stretch; }
+.phone-group .country-code {
+  flex: 0 0 110px;
+  min-width: 0;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background: rgba(255,255,255,0.04) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%2394a3b8'/%3E%3C/svg%3E") no-repeat right 12px center;
+  padding-right: 32px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  color: var(--text-primary);
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all var(--transition);
+}
+.phone-group .country-code:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-glow);
+  outline: none;
+}
+.phone-group .country-code option { background: #1a2332; color: #edf2f7; }
+.phone-group .phone-input { flex: 1; min-width: 0; }
+
 /* Mobile responsive */
 @media (max-width: 480px) {
   .auth-card { padding: 28px 20px; }
@@ -1441,3 +1466,22 @@ a:hover { color: var(--accent); }
   .auth-card .social-login { flex-direction: column; }
   .auth-card .auth-steps { flex-direction: column; align-items: stretch; }
 }
+
+/* Progress tracking styles */
+.progress-card { background: var(--bg-card); border: 1px solid var(--border-primary); border-radius: 12px; padding: 20px; transition: transform 0.2s, box-shadow 0.2s; }
+.progress-card:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.12); }
+.progress-card .course-title { font-size: 16px; font-weight: 700; margin-bottom: 4px; }
+.progress-card .course-category { font-size: 12px; color: var(--text-muted); margin-bottom: 12px; }
+.progress-wrap { height: 8px; background: var(--bg-surface); border-radius: 4px; overflow: hidden; margin-bottom: 8px; }
+.progress-wrap .progress-fill { height: 100%; border-radius: 4px; background: linear-gradient(90deg, #0891b2, #06b6d4); transition: width 0.6s ease; }
+
+.module-item { display: flex; align-items: center; gap: 12px; padding: 10px 12px; border-radius: 8px; background: var(--bg-surface); margin-bottom: 6px; transition: background 0.2s; }
+.module-item:hover { background: var(--bg-elevated); }
+.module-item .module-check { width: 22px; height: 22px; border-radius: 50%; border: 2px solid var(--text-muted); display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s; flex-shrink: 0; }
+.module-item .module-check.done { background: #10b981; border-color: #10b981; color: #fff; }
+.module-item .module-check:hover { border-color: #0891b2; }
+.module-item .module-title { flex: 1; font-size: 14px; font-weight: 500; }
+.module-item .module-order { font-size: 11px; color: var(--text-muted); }
+
+.auth-role-indicator { margin-top: 16px; padding: 10px; border-radius: 8px; background: rgba(16,185,129,0.08); text-align: center; font-size: 13px; color: var(--text-secondary); }
+.auth-role-indicator .badge { font-size: 10px; text-transform: uppercase; letter-spacing: 0.05em; }
