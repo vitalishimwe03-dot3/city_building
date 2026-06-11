@@ -11,6 +11,9 @@
     <% if (typeof error !== 'undefined' && error) { %>
       <div class="auth-error"><i class="bi bi-exclamation-triangle-fill"></i> <%= error %></div>
     <% } %>
+    <% if (typeof success !== 'undefined' && success) { %>
+      <div class="auth-success"><i class="bi bi-check-circle-fill"></i> <%= success %></div>
+    <% } %>
 
     <form method="post" action="/verify-otp" id="otpForm">
       <input type="hidden" name="email" value="<%= email %>">
@@ -29,9 +32,15 @@
 
     <div class="auth-footer">
       <p class="mb-2 small" style="color: var(--text-muted);">Didn't receive the code?</p>
-      <a href="/signup" class="btn btn-sm" style="background: var(--bg-surface); border: 1px solid var(--border); color: var(--text-secondary); border-radius: var(--radius); padding: 8px 20px; text-decoration: none;">
-        <i class="bi bi-arrow-left"></i> Go back &amp; try again
-      </a>
+      <button class="btn btn-sm" id="resendOtpBtn" style="background: var(--bg-surface); border: 1px solid var(--border); color: var(--accent); border-radius: var(--radius); padding: 8px 20px; cursor: pointer;">
+        <i class="bi bi-arrow-repeat"></i> Resend code
+      </button>
+      <div class="mt-2">
+        <a href="/signup" style="color: var(--text-muted); font-size: 13px;">
+          <i class="bi bi-arrow-left"></i> Start over
+        </a>
+      </div>
+      <div id="resendStatus" class="mt-2 small" style="color: var(--text-muted); display: none;"></div>
     </div>
   </div>
 </section>
@@ -66,5 +75,42 @@ document.addEventListener('DOMContentLoaded', function() {
     var code = ''; inputs.forEach(function(inp) { code += inp.value; }); hidden.value = code;
     if (code.length < 6) { e.preventDefault(); alert('Please enter the complete 6-digit code.'); }
   });
+
+  var resendBtn = document.getElementById('resendOtpBtn');
+  var resendStatus = document.getElementById('resendStatus');
+  var email = '<%= email %>';
+  if (resendBtn) {
+    resendBtn.addEventListener('click', function() {
+      resendBtn.disabled = true;
+      resendBtn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Sending...';
+      resendStatus.style.display = 'block';
+      resendStatus.textContent = 'Sending new code...';
+      resendStatus.style.color = 'var(--text-muted)';
+
+      fetch('/resend-otp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: 'email=' + encodeURIComponent(email)
+      })
+      .then(function(r) { return r.json(); })
+      .then(function(data) {
+        if (data.error) {
+          resendStatus.textContent = data.error;
+          resendStatus.style.color = '#ef4444';
+        } else {
+          resendStatus.textContent = data.message;
+          resendStatus.style.color = '#22c55e';
+        }
+        resendBtn.disabled = false;
+        resendBtn.innerHTML = '<i class="bi bi-arrow-repeat"></i> Resend code';
+      })
+      .catch(function() {
+        resendStatus.textContent = 'Network error. Please try again.';
+        resendStatus.style.color = '#ef4444';
+        resendBtn.disabled = false;
+        resendBtn.innerHTML = '<i class="bi bi-arrow-repeat"></i> Resend code';
+      });
+    });
+  }
 });
 </script>

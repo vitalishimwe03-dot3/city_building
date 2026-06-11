@@ -1,6 +1,5 @@
 const express = require('express');
 const router = express.Router();
-const rateLimit = require('express-rate-limit');
 const crypto = require('crypto');
 const pool = require('../db');
 const User = require('../models/User');
@@ -10,51 +9,13 @@ const initDb = require('../models/initDb');
 const { isAdminAuthenticated } = require('../middleware/auth');
 const { sendAdminPasswordResetEmail } = require('../email');
 
-// Account lockout tracking (in-memory)
-const loginAttempts = {};
-const LOCKOUT_THRESHOLD = 5;
-const LOCKOUT_DURATION_MS = 15 * 60 * 1000; // 15 min
-
 function getClientIp(req) {
   return req.headers['x-forwarded-for']?.split(',')[0]?.trim() || req.connection?.remoteAddress || req.ip;
 }
 
-function checkAccountLockout(username) {
-  const key = username?.toLowerCase();
-  const record = loginAttempts[key];
-  if (!record) return false;
-  if (record.count >= LOCKOUT_THRESHOLD) {
-    if (Date.now() - record.firstAttempt < LOCKOUT_DURATION_MS) return true;
-    delete loginAttempts[key];
-  }
-  return false;
-}
-
-function recordFailedAttempt(username, ip) {
-  const key = username?.toLowerCase();
-  if (!loginAttempts[key]) loginAttempts[key] = { count: 0, firstAttempt: Date.now(), ip };
-  loginAttempts[key].count++;
-  loginAttempts[key].ip = ip;
-  loginAttempts[key].lastAttempt = Date.now();
-}
-
-function clearLoginAttempts(username) {
-  delete loginAttempts[username?.toLowerCase()];
-}
-
-// CSRF token generation
 function generateCsrfToken() {
   return crypto.randomBytes(32).toString('hex');
 }
-
-// Admin rate limiter (more strict)
-const adminLoginLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  max: 10,
-  message: { error: 'Too many login attempts, please try again after 15 minutes.' },
-  standardHeaders: true,
-  legacyHeaders: false,
-});
 
 // Password strength validation
 function validatePasswordStrength(password) {
@@ -81,69 +42,20 @@ router.get('/', (req, res) => {
   if (req.session?.adminUser && ['admin', 'super_admin', 'superadmin'].includes(req.session.adminUser.role)) {
     res.redirect('/admin/dashboard');
   } else {
-    res.redirect('/admin/login');
+    res.redirect('/login');
   }
 });
 
+// Admin login is now handled via unified /login route in auth.js
 router.get('/login', (req, res) => {
-  if (req.session?.userId) {
-    res.redirect('/admin/dashboard');
-  } else {
-    res.render('admin/login', { title: 'Admin Login', layout: false, error: null });
-  }
-});
-
-router.post('/login', adminLoginLimiter, async (req, res, next) => {
-  try {
-    const { username, password } = req.body;
-    const clientIp = getClientIp(req);
-    if (!username || !password) {
-      return res.status(400).render('admin/login', { title: 'Admin Login', layout: false, error: 'Username and password are required.' });
-    }
-    // Account lockout check
-    if (checkAccountLockout(username)) {
-      console.warn(`Blocked locked-out admin login attempt for ${username} from IP ${clientIp}`);
-      return res.status(429).render('admin/login', { title: 'Admin Login', layout: false, error: 'Account temporarily locked due to too many failed attempts. Try again in 15 minutes.' });
-    }
-    const user = await User.verifyUser(username, password);
-    if (!user) {
-      recordFailedAttempt(username, clientIp);
-      console.warn(`Failed admin login attempt: invalid credentials for ${username} from IP ${clientIp}`);
-      const remaining = LOCKOUT_THRESHOLD - (loginAttempts[username?.toLowerCase()]?.count || 0);
-      const msg = remaining > 0 ? `Invalid username or password. ${remaining} attempt(s) remaining before lockout.` : 'Account locked due to too many failed attempts.';
-      return res.status(401).render('admin/login', { title: 'Admin Login', layout: false, error: msg });
-    }
-    if (!user.is_active) {
-      console.warn(`Disabled admin account login attempt: ${username}`);
-      return res.status(403).render('admin/login', { title: 'Admin Login', layout: false, error: 'This account has been deactivated. Contact your system administrator.' });
-    }
-    if (!user.role || !['admin', 'super_admin', 'superadmin'].includes(user.role)) {
-      console.warn(`Unauthorized admin login attempt: user ${username} has role ${user.role}`);
-      return res.status(403).render('admin/login', { title: 'Admin Login', layout: false, error: 'Your account does not have admin privileges.' });
-    }
-    // Clear lockout on success
-    clearLoginAttempts(username);
-    // Session regeneration (prevents session fixation)
-    req.session.regenerate(function(err) {
-      if (err) return next(err);
-      req.session.userId = user.id;
-      req.session.adminUser = user;
-      req.session.csrfToken = generateCsrfToken();
-      req.session.createdAt = Date.now();
-      console.log(`Admin login successful: ${username} from IP ${clientIp}`);
-      Admin.logActivity(user.id, user.full_name || user.username, 'Logged in', 'auth', null, `IP: ${clientIp}`, clientIp).catch(function() {});
-      res.redirect('/admin/dashboard');
-    });
-  } catch (err) {
-    next(err);
-  }
+  res.redirect('/login');
 });
 
 router.get('/logout', (req, res) => {
   const name = req.session?.adminUser?.full_name || req.session?.adminUser?.username || 'Unknown';
   const ip = getClientIp(req);
   Admin.logActivity(req.session?.adminUser?.id, name, 'Logged out', 'auth', null, `IP: ${ip}`, ip).catch(function() {});
-  req.session.destroy(() => { res.redirect('/admin/login'); });
+  req.session.destroy(() => { res.redirect('/login'); });
 });
 
 // CSRF validation middleware for all admin POST/PUT/DELETE requests
@@ -152,7 +64,7 @@ function csrfProtection(req, res, next) {
     const token = req.body._csrf || req.headers['x-csrf-token'];
     if (!token || token !== req.session?.csrfToken) {
       console.warn(`CSRF validation failed for ${req.method} ${req.path} from IP ${getClientIp(req)}`);
-      return res.status(403).render('admin/login', { title: 'Security Error', layout: false, error: 'Security token validation failed. Please sign in again.' });
+      return res.status(403).redirect('/login');
     }
   }
   next();
@@ -163,7 +75,7 @@ function sessionTimeout(req, res, next) {
   if (req.session?.createdAt) {
     const elapsed = Date.now() - req.session.createdAt;
     if (elapsed > 4 * 60 * 60 * 1000) {
-      req.session.destroy(() => { res.redirect('/admin/login'); });
+      req.session.destroy(() => { res.redirect('/login'); });
       return;
     }
     req.session.createdAt = Date.now(); // refresh on each activity
@@ -626,15 +538,14 @@ router.post('/settings/change-password', async (req, res, next) => {
       return res.status(401).render('admin/settings', { title: 'Settings', user, error: 'Current password is incorrect.', success: null });
     }
     await User.updatePassword(req.session.adminUser.id, newPassword);
-    // Force session re-login after password change
-    req.session.destroy();
     await Admin.logActivity(
       req.session.adminUser.id, req.session.adminUser.full_name || req.session.adminUser.username,
       'Changed password', null, null,
       'Admin changed their password',
       req.ip
     );
-    res.redirect('/admin/login');
+    // Force session re-login after password change
+    req.session.destroy(() => { res.redirect('/login'); });
   } catch (err) {
     next(err);
   }

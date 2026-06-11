@@ -2,10 +2,11 @@ const express = require('express');
 const router = express.Router();
 const rateLimit = require('express-rate-limit');
 const bcrypt = require('bcrypt');
+const crypto = require('crypto');
 const pool = require('../db');
 const SiteUser = require('../models/SiteUser');
 const User = require('../models/User');
-const { sendNewStudentNotification, sendUserPasswordResetEmail, sendAdminPasswordResetEmail, sendOtpEmail } = require('../email');
+const { sendNewStudentNotification, sendUserPasswordResetEmail, sendAdminPasswordResetEmail } = require('../email');
 
 const loginLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
@@ -42,18 +43,17 @@ router.post('/signup', signupLimiter, async (req, res, next) => {
     const exists = await SiteUser.getUserByEmail(email);
     if (exists) return res.status(400).render('signup', { title: 'Sign up', error: 'Email already registered.' });
 
-    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    await SiteUser.createUser(fullName, email, phone, password);
 
-    await pool.query('DELETE FROM user_otps WHERE email = ?', [email]);
-    await pool.query("INSERT INTO user_otps (email, otp, expires_at) VALUES (?, ?, datetime('now', '+10 minutes'))", [email, otp]);
-
-    req.session.pendingSignup = { fullName, email, phone, password };
-
-    sendOtpEmail(email, otp).catch(e => {
-      console.error('Failed to send OTP email:', e);
+    sendNewStudentNotification({ fullName, email, phone }).catch(e => {
+      console.error('Failed to send new-student notification:', e);
     });
 
-    res.redirect('/verify-otp?email=' + encodeURIComponent(email));
+    res.render('thankyou', {
+      title: 'Welcome',
+      name: fullName,
+      message: 'Your account has been created successfully. You can now log in and explore courses.'
+    });
   } catch (err) {
     return res.status(503).render('signup', { title: 'Sign up', error: 'Signup service is temporarily unavailable. Please try again later.' });
   }
@@ -67,6 +67,28 @@ router.post('/login', loginLimiter, async (req, res, next) => {
   try {
     const { email, password } = req.body;
     if (!email || !password) return res.status(400).render('login', { title: 'Login', error: 'Email and password required.' });
+
+    // 1. Try admin authentication first
+    const admin = await User.verifyUser(email, password);
+    if (admin) {
+      if (!admin.is_active) {
+        return res.status(403).render('login', { title: 'Login', error: 'This account has been deactivated. Contact your administrator.' });
+      }
+      if (!admin.role || !['admin', 'super_admin', 'superadmin'].includes(admin.role)) {
+        return res.status(403).render('login', { title: 'Login', error: 'Your account does not have admin privileges.' });
+      }
+      req.session.regenerate(function(err) {
+        if (err) return next(err);
+        req.session.userId = admin.id;
+        req.session.adminUser = admin;
+        req.session.csrfToken = crypto.randomBytes(32).toString('hex');
+        req.session.createdAt = Date.now();
+        res.redirect('/admin/dashboard');
+      });
+      return;
+    }
+
+    // 2. Try student authentication
     const user = await SiteUser.verifyUser(email, password);
     if (!user) return res.status(401).render('login', { title: 'Login', error: 'Invalid credentials.' });
     req.session.siteUser = { id: user.id, email: user.email, full_name: user.full_name };
@@ -155,9 +177,11 @@ router.post('/forgot-password', async (req, res, next) => {
       return res.render('forgot-password-sent', { title: 'Password Reset Sent', email, message: 'If an account exists with this email, you will receive a password reset link.' });
     }
     const baseUrl = `${req.protocol}://${req.get('host')}`;
-    sendUserPasswordResetEmail(resetData.user, resetData.token, baseUrl).catch(e => {
-      console.error('Failed to send password reset email:', e);
-    });
+    try {
+      await sendUserPasswordResetEmail(resetData.user, resetData.token, baseUrl);
+    } catch (emailErr) {
+      console.error('Failed to send password reset email:', emailErr.message);
+    }
     res.render('forgot-password-sent', { title: 'Password Reset Sent', email, message: 'If an account exists with this email, you will receive a password reset link.' });
   } catch (err) {
     next(err);
@@ -188,48 +212,6 @@ router.post('/reset-password', async (req, res, next) => {
   }
 });
 
-router.get('/verify-otp', (req, res) => {
-  const email = req.query.email;
-  if (!email || !req.session.pendingSignup || req.session.pendingSignup.email !== email) {
-    return res.redirect('/signup');
-  }
-  res.render('verify-otp', { title: 'Verify Email', email, error: null });
-});
-
-router.post('/verify-otp', async (req, res, next) => {
-  try {
-    const { email, otp } = req.body;
-    if (!email || !otp || !req.session.pendingSignup || req.session.pendingSignup.email !== email) {
-      return res.redirect('/signup');
-    }
-
-    const [[stored]] = await pool.query(
-      "SELECT * FROM user_otps WHERE email = ? AND otp = ? AND expires_at > datetime('now')",
-      [email, otp]
-    );
-
-    if (!stored) {
-      return res.render('verify-otp', { title: 'Verify Email', email, error: 'Invalid or expired verification code. Please request a new one.' });
-    }
-
-    const { fullName, phone, password } = req.session.pendingSignup;
-    await SiteUser.createUser(fullName, email, phone, password);
-
-    await pool.query('DELETE FROM user_otps WHERE email = ?', [email]);
-    delete req.session.pendingSignup;
-
-    sendNewStudentNotification({ fullName, email, phone }).catch(e => {
-      console.error('Failed to send new-student notification:', e);
-    });
-
-    res.render('thankyou', {
-      title: 'Welcome',
-      name: fullName,
-      message: 'Your email has been verified and your student account created successfully. You can now log in and explore courses.'
-    });
-  } catch (err) {
-    next(err);
-  }
-});
+// Email verification removed. Signup now creates accounts directly.
 
 module.exports = router;
