@@ -124,52 +124,102 @@
                   <div class="col-md-6">
                     <label class="form-label">Phone</label>
                     <div class="phone-group">
-                      <select class="country-code" id="profileCountryCode">
-                        <option value="+250" data-code="RW">🇷🇼 +250</option>
-                        <option value="+256" data-code="UG">🇺🇬 +256</option>
-                        <option value="+254" data-code="KE">🇰🇪 +254</option>
-                        <option value="+255" data-code="TZ">🇹🇿 +255</option>
-                        <option value="+257" data-code="BI">🇧🇮 +257</option>
-                        <option value="+243" data-code="CD">🇨🇩 +243</option>
-                        <option value="+27" data-code="ZA">🇿🇦 +27</option>
-                        <option value="+234" data-code="NG">🇳🇬 +234</option>
-                        <option value="+233" data-code="GH">🇬🇭 +233</option>
-                        <option value="+251" data-code="ET">🇪🇹 +251</option>
-                        <option value="+20" data-code="EG">🇪🇬 +20</option>
-                        <option value="+212" data-code="MA">🇲🇦 +212</option>
-                        <option value="+225" data-code="CI">🇨🇮 +225</option>
-                        <option value="+237" data-code="CM">🇨🇲 +237</option>
-                        <option value="+211" data-code="SS">🇸🇸 +211</option>
-                        <option value="+1" data-code="US">🇺🇸 +1</option>
-                        <option value="+44" data-code="GB">🇬🇧 +44</option>
-                        <option value="+33" data-code="FR">🇫🇷 +33</option>
-                        <option value="+49" data-code="DE">🇩🇪 +49</option>
-                        <option value="+86" data-code="CN">🇨🇳 +86</option>
-                        <option value="+91" data-code="IN">🇮🇳 +91</option>
-                        <option value="+971" data-code="AE">🇦🇪 +971</option>
-                        <option value="+966" data-code="SA">🇸🇦 +966</option>
-                        <option value="+81" data-code="JP">🇯🇵 +81</option>
-                      </select>
+                      <div class="flag-select" id="profileFlagSelect">
+                        <div class="flag-trigger" id="profileFlagTrigger">
+                          <span class="flag-emoji" id="profileFlagEmoji">🇷🇼</span>
+                          <span class="flag-code" id="profileFlagCode">+250</span>
+                        </div>
+                        <div class="flag-dropdown" id="profileFlagDropdown"></div>
+                        <select name="countryCode" id="profileCountryCode" style="display:none">
+                          <option value="+250" data-flag="🇷🇼" data-name="Rwanda">+250</option>
+                          <option value="+256" data-flag="🇺🇬" data-name="Uganda">+256</option>
+                          <option value="+254" data-flag="🇰🇪" data-name="Kenya">+254</option>
+                          <option value="+255" data-flag="🇹🇿" data-name="Tanzania">+255</option>
+                          <option value="+257" data-flag="🇧🇮" data-name="Burundi">+257</option>
+                          <option value="+243" data-flag="🇨🇩" data-name="DRC">+243</option>
+                          <option value="+27" data-flag="🇿🇦" data-name="South Africa">+27</option>
+                          <option value="+234" data-flag="🇳🇬" data-name="Nigeria">+234</option>
+                          <option value="+233" data-flag="🇬🇭" data-name="Ghana">+233</option>
+                          <option value="+251" data-flag="🇪🇹" data-name="Ethiopia">+251</option>
+                          <option value="+20" data-flag="🇪🇬" data-name="Egypt">+20</option>
+                          <option value="+212" data-flag="🇲🇦" data-name="Morocco">+212</option>
+                          <option value="+225" data-flag="🇨🇮" data-name="Côte d'Ivoire">+225</option>
+                          <option value="+237" data-flag="🇨🇲" data-name="Cameroon">+237</option>
+                          <option value="+211" data-flag="🇸🇸" data-name="South Sudan">+211</option>
+                          <option value="+1" data-flag="🇺🇸" data-name="USA">+1</option>
+                          <option value="+44" data-flag="🇬🇧" data-name="UK">+44</option>
+                          <option value="+33" data-flag="🇫🇷" data-name="France">+33</option>
+                          <option value="+49" data-flag="🇩🇪" data-name="Germany">+49</option>
+                          <option value="+86" data-flag="🇨🇳" data-name="China">+86</option>
+                          <option value="+91" data-flag="🇮🇳" data-name="India">+91</option>
+                          <option value="+971" data-flag="🇦🇪" data-name="UAE">+971</option>
+                          <option value="+966" data-flag="🇸🇦" data-name="Saudi Arabia">+966</option>
+                          <option value="+81" data-flag="🇯🇵" data-name="Japan">+81</option>
+                        </select>
+                      </div>
                       <input type="tel" name="phone" class="form-control phone-input" id="profilePhone" value="<%= user.phone ? user.phone.replace(/^\+\d+\s*/,'') : '' %>" placeholder="Phone number">
                     </div>
                     <script>
                       (function() {
                         var select = document.getElementById('profileCountryCode');
                         var input = document.getElementById('profilePhone');
-                        if (select && input) {
+                        var trigger = document.getElementById('profileFlagTrigger');
+                        var dropdown = document.getElementById('profileFlagDropdown');
+                        var emoji = document.getElementById('profileFlagEmoji');
+                        var code = document.getElementById('profileFlagCode');
+
+                        function buildList() {
+                          dropdown.innerHTML = '';
+                          for (var i = 0; i < select.options.length; i++) {
+                            var opt = select.options[i];
+                            var div = document.createElement('div');
+                            div.className = 'flag-option' + (opt.selected ? ' active' : '');
+                            div.innerHTML = '<span class="flag-emoji">' + (opt.getAttribute('data-flag') || '') + '</span><span class="flag-label">' + (opt.getAttribute('data-name') || '') + '</span><span class="flag-dial">' + opt.value + '</span>';
+                            div.dataset.value = opt.value;
+                            div.dataset.flag = opt.getAttribute('data-flag') || '';
+                            div.addEventListener('click', function() {
+                              select.value = this.dataset.value;
+                              emoji.textContent = this.dataset.flag;
+                              code.textContent = this.dataset.value;
+                              if (dropdown) dropdown.classList.remove('open');
+                              var all = dropdown.querySelectorAll('.flag-option');
+                              for (var j = 0; j < all.length; j++) all[j].classList.remove('active');
+                              this.classList.add('active');
+                            });
+                            dropdown.appendChild(div);
+                          }
+                        }
+
+                        if (select && input && dropdown && emoji && code) {
+                          buildList();
+
                           var full = '<%= user.phone || "" %>';
                           var match = full.match(/^(\+\d+)\s*(.*)/);
                           if (match) {
                             for (var i = 0; i < select.options.length; i++) {
                               if (select.options[i].value === match[1]) {
-                                select.selectedIndex = i; break;
+                                select.selectedIndex = i;
+                                emoji.textContent = select.options[i].getAttribute('data-flag') || '';
+                                code.textContent = match[1];
+                                break;
                               }
                             }
                             input.value = match[2];
                           }
+
                           input.addEventListener('input', function() {
                             this.value = this.value.replace(/[^0-9\s\-\(\)]/g, '');
                           });
+
+                          trigger.addEventListener('click', function(e) {
+                            e.stopPropagation();
+                            dropdown.classList.toggle('open');
+                          });
+
+                          document.addEventListener('click', function() {
+                            dropdown.classList.remove('open');
+                          });
+
                           var form = select.closest('form');
                           if (form) {
                             form.addEventListener('submit', function() {
