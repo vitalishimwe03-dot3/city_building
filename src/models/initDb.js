@@ -2,40 +2,25 @@ const fs = require('fs');
 const path = require('path');
 const pool = require('../db');
 
-function findDbDir() {
-  var candidates = [
-    path.join(__dirname, '..', '..', 'db'),
-    path.join(process.cwd(), '..', 'db'),
-    path.join(process.cwd(), 'db'),
-    path.join(__dirname, '..', '..', '..', 'db')
-  ];
-  for (var i = 0; i < candidates.length; i++) {
-    if (fs.existsSync(candidates[i])) return candidates[i];
-  }
-  return candidates[0];
-}
+var projectRoot = path.resolve(__dirname, '..', '..');
+var dbDir = path.join(projectRoot, 'db');
+var dbFile = process.env.DB_PATH || path.join(projectRoot, 'city_building.db');
 
 function runSqlFile(filename) {
-  return new Promise((resolve, reject) => {
+  return new Promise(function(resolve, reject) {
     try {
-      var dbPath = findDbDir();
-      var sql = fs.readFileSync(path.join(dbPath, filename), 'utf8');
-      // Split by semicolon but preserve the statement structure
-      const statements = sql.split(';').map(s => s.trim()).filter(Boolean);
-      
-      for (const stmt of statements) {
+      var sql = fs.readFileSync(path.join(dbDir, filename), 'utf8');
+      var statements = sql.split(';').map(function(s) { return s.trim(); }).filter(Boolean);
+      for (var i = 0; i < statements.length; i++) {
         try {
-          const db = pool.getDb();
-          if (!db) {
-            throw new Error('Database not initialized');
-          }
-          db.run(stmt);
+          var db = pool.getDb();
+          if (!db) throw new Error('Database not initialized');
+          db.run(statements[i]);
         } catch (err) {
-          err.message = `Failed to execute SQL: ${err.message}\nStatement:\n${stmt}`;
+          err.message = 'Failed to execute SQL: ' + err.message + '\nStatement:\n' + statements[i];
           throw err;
         }
       }
-      
       resolve();
     } catch (err) {
       reject(err);
@@ -49,13 +34,11 @@ async function init() {
     await runSqlFile('schema.sql');
     await runSqlFile('seed.sql');
     await runSqlFile('admin-seed.sql');
-    const db = pool.getDb();
+    var db = pool.getDb();
     if (db) {
-      const data = db.export();
-      const buffer = Buffer.from(data);
-      const fs = require('fs');
-      const path = require('path');
-      fs.writeFileSync(path.join(__dirname, '..', '..', 'city_building.db'), buffer);
+      var data = db.export();
+      var buffer = Buffer.from(data);
+      fs.writeFileSync(dbFile, buffer);
     }
     console.log('Database schema ensured and seeded.');
   } catch (err) {
