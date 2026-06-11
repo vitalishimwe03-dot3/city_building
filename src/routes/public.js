@@ -13,7 +13,7 @@ const fallbackCategories = [
 ];
 
 const fallbackSubcourses = [
-  { id: 'revit', category_slug: 'architectural', category_name: 'Architectural Software', name: 'Revit', slug: 'revit', image: '/images/revit-logo.png', description: 'Autodesk Revit course' },
+  { id: 'revit', category_slug: 'architectural', category_name: 'Architectural Software', name: 'Revit', slug: 'revit', image: 'revit-logo.png', description: 'Autodesk Revit course' },
   { id: 'archicad', category_slug: 'architectural', category_name: 'Architectural Software', name: 'ArchiCAD', slug: 'archicad', image: 'https://static.food4rhino.com/cdn/farfuture/xyrPqO3quW2MDpWtN1q77PWdS56JQF_RFkkPgqfqj0o/mtime:1680615355/sites/default/files/public/users-files/graphisoft/app/archicadlogo.jpg', description: 'ArchiCAD BIM modelling course' },
   { id: 'sketchup', category_slug: 'architectural', category_name: 'Architectural Software', name: 'SketchUp', slug: 'sketchup', image: 'https://download-warehouse.sketchup.com/warehouse/v1.0/content/public/2871299f-70f9-42c5-9e94-92c9d58eb15f', description: 'SketchUp fundamentals' },
   { id: 'autocad', category_slug: 'architectural', category_name: 'Architectural Software', name: 'AutoCAD', slug: 'autocad', image: 'https://saasyto.com/wp-content/uploads/2024/08/Autodesk-AutoCAD-subscription-1.jpg', description: 'AutoCAD drafting course' },
