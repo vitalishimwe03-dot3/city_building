@@ -6,7 +6,7 @@ INSERT OR IGNORE INTO categories (name, description, slug) VALUES
 ('Water & Road Design Software','Water and road design tools','water-road');
 
 INSERT OR IGNORE INTO subcourses (category_id,name,slug,image,description) VALUES
-((SELECT id FROM categories WHERE slug='architectural'),'Revit','revit','https://images.pexels.com/photos/34010690/pexels-photo-34010690.jpeg?auto=compress&cs=tinysrgb&w=1200','Autodesk Revit course'),
+((SELECT id FROM categories WHERE slug='architectural'),'Revit','revit','https://images.seeklogo.com/logo-png/48/1/autodesk-revit-logo-png_seeklogo-482393.png','Autodesk Revit course'),
 ((SELECT id FROM categories WHERE slug='architectural'),'ArchiCAD','archicad','https://static.food4rhino.com/cdn/farfuture/xyrPqO3quW2MDpWtN1q77PWdS56JQF_RFkkPgqfqj0o/mtime:1680615355/sites/default/files/public/users-files/graphisoft/app/archicadlogo.jpg','ArchiCAD BIM modelling course'),
 ((SELECT id FROM categories WHERE slug='architectural'),'SketchUp','sketchup','https://images.pexels.com/photos/33021967/pexels-photo-33021967.jpeg?auto=compress&cs=tinysrgb&w=1200','SketchUp fundamentals'),
 ((SELECT id FROM categories WHERE slug='architectural'),'AutoCAD','autocad','https://images.pexels.com/photos/716661/pexels-photo-716661.jpeg?auto=compress&cs=tinysrgb&w=1200','AutoCAD drafting course');
