@@ -4,7 +4,18 @@ const pool = require('../db');
 
 var projectRoot = path.resolve(__dirname, '..', '..');
 var dbDir = path.join(projectRoot, 'db');
-var dbFile = process.env.DB_PATH || path.join(projectRoot, 'city_building.db');
+var dbFile = (function() {
+  var configured = process.env.DB_PATH;
+  if (configured) {
+    try {
+      fs.mkdirSync(path.dirname(configured), { recursive: true });
+      return configured;
+    } catch (_) {
+      console.warn('DB_PATH directory not writable, falling back to project root');
+    }
+  }
+  return path.join(projectRoot, 'city_building.db');
+})();
 
 function runSqlFile(filename) {
   return new Promise(function(resolve, reject) {

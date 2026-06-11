@@ -3,7 +3,20 @@ const fs = require('fs');
 const path = require('path');
 require('dotenv').config();
 
-const dbPath = process.env.DB_PATH || path.join(__dirname, '..', 'city_building.db');
+var dbPath = (function() {
+  var dir = path.resolve(__dirname, '..');
+  var configured = process.env.DB_PATH;
+  if (configured) {
+    try {
+      var parent = path.dirname(configured);
+      if (parent) fs.mkdirSync(parent, { recursive: true });
+      return configured;
+    } catch (_) {
+      console.warn('DB_PATH directory not writable, falling back to project root');
+    }
+  }
+  return path.join(dir, 'city_building.db');
+})();
 let db = null;
 let SQL = null;
 

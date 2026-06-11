@@ -93,12 +93,19 @@ app.use((err, req, res, next) => {
 
 const port = process.env.PORT || 3000;
 
+console.log('Starting server...');
+console.log('__dirname:', __dirname);
+console.log('projectRoot (from initDb):', require('path').resolve(__dirname, 'src', 'models', '..', '..'));
 initDb.init()
   .then(() => {
-    app.listen(port, () => console.log(`Server listening on http://localhost:${port}`));
+    app.listen(port, function() {
+      console.log('Server listening on http://localhost:' + port);
+    });
   })
-  .catch((err) => {
-    console.error('Failed to initialize database, exiting.', err);
+  .catch(function(err) {
+    console.error('Failed to initialize database, exiting.');
+    console.error('Error:', err.message);
+    console.error('Stack:', err.stack);
     process.exit(1);
   });
 
