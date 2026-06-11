@@ -6,7 +6,7 @@ INSERT OR IGNORE INTO categories (name, description, slug) VALUES
 ('Water & Road Design Software','Water and road design tools','water-road');
 
 INSERT OR IGNORE INTO subcourses (category_id,name,slug,image,description) VALUES
-((SELECT id FROM categories WHERE slug='architectural'),'Revit','revit','https://images.seeklogo.com/logo-png/48/1/autodesk-revit-logo-png_seeklogo-482393.png','Autodesk Revit course'),
+((SELECT id FROM categories WHERE slug='architectural'),'Revit','revit','https://1000logos.net/wp-content/uploads/2020/08/Revit-Logo.png','Autodesk Revit course'),
 ((SELECT id FROM categories WHERE slug='architectural'),'ArchiCAD','archicad','https://static.food4rhino.com/cdn/farfuture/xyrPqO3quW2MDpWtN1q77PWdS56JQF_RFkkPgqfqj0o/mtime:1680615355/sites/default/files/public/users-files/graphisoft/app/archicadlogo.jpg','ArchiCAD BIM modelling course'),
 ((SELECT id FROM categories WHERE slug='architectural'),'SketchUp','sketchup','https://download-warehouse.sketchup.com/warehouse/v1.0/content/public/2871299f-70f9-42c5-9e94-92c9d58eb15f','SketchUp fundamentals'),
 ((SELECT id FROM categories WHERE slug='architectural'),'AutoCAD','autocad','https://saasyto.com/wp-content/uploads/2024/08/Autodesk-AutoCAD-subscription-1.jpg','AutoCAD drafting course');
