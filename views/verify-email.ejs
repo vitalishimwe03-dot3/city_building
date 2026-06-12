@@ -1,0 +1,101 @@
+<section class="auth-page">
+  <div class="auth-card" style="max-width:440px;">
+    <div class="auth-brand">
+      <div class="auth-icon"><i class="bi bi-envelope-check"></i></div>
+      <div class="logo-text">City Building</div>
+      <div class="logo-sub">Engineering Company Ltd</div>
+    </div>
+    <h2>Verify your email</h2>
+    <p class="auth-subtitle">Enter the 6-digit code sent to <strong><%= email %></strong></p>
+
+    <% if (typeof pending !== 'undefined' && pending === 'true') { %>
+      <div class="auth-warning"><i class="bi bi-info-circle-fill"></i> Your email is not yet verified. A new code has been sent to your email.</div>
+    <% } %>
+    <% if (typeof error !== 'undefined' && error) { %>
+      <div class="auth-error"><i class="bi bi-exclamation-triangle-fill"></i> <%= error %></div>
+    <% } %>
+    <% if (typeof success !== 'undefined' && success) { %>
+      <div class="auth-success"><i class="bi bi-check-circle-fill"></i> <%= success %></div>
+      <div style="text-align:center;margin-top:16px;">
+        <a href="/login" class="btn btn-primary"><i class="bi bi-box-arrow-in-right"></i> Sign In</a>
+      </div>
+    <% } else { %>
+      <form method="post" action="/verify-email" id="otpForm" novalidate>
+        <input type="hidden" name="email" value="<%= email %>">
+        <div class="otp-input-group">
+          <input type="text" name="otp" class="form-control otp-input" id="otpInput"
+                 placeholder="000000" required pattern="[0-9]{6}" maxlength="6"
+                 inputmode="numeric" autocomplete="one-time-code"
+                 style="text-align:center;font-size:28px;font-weight:700;letter-spacing:10px;font-family:monospace;padding:16px;height:64px;">
+          <div class="invalid-feedback" style="text-align:center;">Enter the 6-digit code.</div>
+        </div>
+        <button class="btn btn-primary w-100 mt-3" type="submit" id="otpSubmitBtn">
+          <i class="bi bi-check-lg"></i> Verify Email
+        </button>
+      </form>
+
+      <div class="auth-footer" style="flex-direction:column;gap:8px;">
+        <span class="text-muted small">Didn't receive the code?</span>
+        <button class="btn btn-link btn-sm" id="resendBtn" onclick="resendOtp()" style="color:var(--accent);text-decoration:none;">
+          <i class="bi bi-arrow-clockwise"></i> Resend code
+        </button>
+        <span id="resendTimer" class="small text-muted" style="display:none;"></span>
+      </div>
+    <% } %>
+  </div>
+</section>
+
+<style>
+.otp-input-group { max-width:280px; margin:0 auto; }
+.otp-input { background:var(--bg-surface) !important; border:2px solid var(--border-primary) !important; color:var(--text-primary) !important; border-radius:12px !important; }
+.otp-input:focus { border-color:var(--accent) !important; box-shadow:0 0 0 3px rgba(8,145,178,0.15) !important; }
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  var otp = document.getElementById('otpInput');
+  var form = document.getElementById('otpForm');
+  var btn = document.getElementById('otpSubmitBtn');
+  if (otp) {
+    otp.addEventListener('input', function() { this.value = this.value.replace(/\D/g, '').slice(0,6); });
+    form.addEventListener('submit', function(e) {
+      if (!form.checkValidity()) { e.preventDefault(); e.stopPropagation(); }
+      form.classList.add('was-validated');
+      if (form.checkValidity() && btn) {
+        btn.disabled = true;
+        btn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Verifying...';
+      }
+    });
+  }
+});
+
+function resendOtp() {
+  var btn = document.getElementById('resendBtn');
+  var timer = document.getElementById('resendTimer');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Sending...';
+  fetch('/resend-otp', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: 'email=<%= encodeURIComponent(email) %>'
+  }).then(function(r) { return r.json(); }).then(function(d) {
+    if (d.success) {
+      btn.innerHTML = '<i class="bi bi-check-circle"></i> Code sent';
+      var count = 30;
+      timer.style.display = 'inline';
+      timer.textContent = 'Resend in ' + count + 's';
+      var iv = setInterval(function() {
+        count--;
+        if (count <= 0) { clearInterval(iv); timer.style.display = 'none'; btn.disabled = false; btn.innerHTML = '<i class="bi bi-arrow-clockwise"></i> Resend code'; }
+        else { timer.textContent = 'Resend in ' + count + 's'; }
+      }, 1000);
+    } else {
+      btn.innerHTML = '<i class="bi bi-exclamation-triangle"></i> ' + (d.error || 'Failed');
+      setTimeout(function() { btn.disabled = false; btn.innerHTML = '<i class="bi bi-arrow-clockwise"></i> Resend code'; }, 3000);
+    }
+  }).catch(function() {
+    btn.innerHTML = '<i class="bi bi-exclamation-triangle"></i> Error';
+    setTimeout(function() { btn.disabled = false; btn.innerHTML = '<i class="bi bi-arrow-clockwise"></i> Resend code'; }, 3000);
+  });
+}
+</script>

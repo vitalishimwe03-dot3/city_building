@@ -3,6 +3,7 @@ const expressLayouts = require('express-ejs-layouts');
 const path = require('path');
 const session = require('express-session');
 const helmet = require('helmet');
+const passport = require('./src/config/passport');
 const pool = require('./src/db');
 const initDb = require('./src/models/initDb');
 const { setAdminLocals } = require('./src/middleware/auth');
@@ -10,6 +11,7 @@ const { localizationMiddleware } = require('./src/localization');
 require('dotenv').config();
 
 const app = express();
+app.use(passport.initialize());
 
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
@@ -70,7 +72,10 @@ app.get('/sitemap.xml', async (req, res, next) => {
 app.use('/', require('./src/routes/public'));
 app.use('/', require('./src/routes/auth'));
 app.use('/admin', require('./src/routes/admin'));
+app.use('/admin/images', require('./src/routes/admin-images'));
+app.use('/admin/slides', require('./src/routes/admin-slides'));
 app.use('/api', require('./src/routes/api'));
+app.use('/api', require('./src/routes/api-images'));
 
 app.use((req, res) => {
   res.status(404).render('404', { title: 'Page not found', message: 'The page you are looking for does not exist.' });

@@ -16,7 +16,7 @@
           Hands-on courses designed for architects, engineers, and designers in Rwanda.
         </p>
         <div class="hero-actions">
-          <a href="/category/architectural" class="btn btn-primary btn-lg">
+          <a href="/category/architecture" class="btn btn-primary btn-lg">
             <i class="bi bi-compass"></i> Explore Courses
           </a>
           <a href="/contact" class="btn btn-outline btn-lg">
@@ -84,36 +84,17 @@
 
 <script>
 (function() {
-  var slides = [
-    {bg:'linear-gradient(135deg,#0a1628,#1a365d,#0e7490)',img:'https://picsum.photos/seed/civil1/1920/1080'},
-    {bg:'linear-gradient(135deg,#1e1b4b,#312e81,#4338ca)',img:'https://picsum.photos/seed/arch1/1920/1080'},
-    {bg:'linear-gradient(135deg,#0f1d35,#1e3a5f,#155e75)',img:'https://picsum.photos/seed/build1/1920/1080'},
-    {bg:'linear-gradient(135deg,#0b1a2e,#1f4a6e,#0369a1)',img:'https://picsum.photos/seed/const1/1920/1080'},
-    {bg:'linear-gradient(135deg,#1a0e2e,#3b1f6e,#6d28d9)',img:'https://picsum.photos/seed/bridge1/1920/1080'},
-    {bg:'linear-gradient(135deg,#0b1f35,#065f46,#047857)',img:'https://picsum.photos/seed/road1/1920/1080'},
-    {bg:'linear-gradient(135deg,#1c1917,#44403c,#57534e)',img:'https://picsum.photos/seed/tower1/1920/1080'},
-    {bg:'linear-gradient(135deg,#0c0a09,#292524,#451a03)',img:'https://picsum.photos/seed/struct1/1920/1080'},
-    {bg:'linear-gradient(135deg,#0f172a,#1e293b,#334155)',img:'https://picsum.photos/seed/engine1/1920/1080'},
-    {bg:'linear-gradient(135deg,#020617,#0f172a,#1e293b)',img:'https://picsum.photos/seed/draw1/1920/1080'},
-    {bg:'linear-gradient(135deg,#0a0e17,#111827,#1a2332)',img:'https://picsum.photos/seed/plan1/1920/1080'},
-    {bg:'linear-gradient(135deg,#0f1d35,#1a3a5f,#1e4a7a)',img:'https://picsum.photos/seed/design1/1920/1080'},
-    {bg:'linear-gradient(135deg,#0b1628,#1a365d,#0e7490)',img:'https://picsum.photos/seed/steel1/1920/1080'},
-    {bg:'linear-gradient(135deg,#1a0e28,#2d1b69,#4c1d95)',img:'https://picsum.photos/seed/concr1/1920/1080'},
-    {bg:'linear-gradient(135deg,#0b1a30,#1f4a6e,#0891b2)',img:'https://picsum.photos/seed/frame1/1920/1080'},
-    {bg:'linear-gradient(135deg,#0c1f35,#065f46,#059669)',img:'https://picsum.photos/seed/crane1/1920/1080'},
-    {bg:'linear-gradient(135deg,#1c1917,#57534e,#78716c)',img:'https://picsum.photos/seed/city1/1920/1080'},
-    {bg:'linear-gradient(135deg,#0f172a,#1e293b,#475569)',img:'https://picsum.photos/seed/sky1/1920/1080'},
-    {bg:'linear-gradient(135deg,#020617,#0f172a,#1e3a8a)',img:'https://picsum.photos/seed/modern1/1920/1080'},
-    {bg:'linear-gradient(135deg,#0a0e17,#111827,#374151)',img:'https://picsum.photos/seed/glass1/1920/1080'},
-    {bg:'linear-gradient(135deg,#0b1f35,#155e75,#0e7490)',img:'https://picsum.photos/seed/tunnel1/1920/1080'},
-    {bg:'linear-gradient(135deg,#1a0e2e,#4c1d95,#7c3aed)',img:'https://picsum.photos/seed/pav1/1920/1080'},
-    {bg:'linear-gradient(135deg,#0b1a2e,#0369a1,#0284c7)',img:'https://picsum.photos/seed/green1/1920/1080'},
-    {bg:'linear-gradient(135deg,#0c0a09,#451a03,#92400e)',img:'https://picsum.photos/seed/found1/1920/1080'}
-  ];
   var container = document.getElementById('heroSlider');
   var dotsContainer = document.getElementById('heroDots');
   var current = 0;
   var intervalId = null;
+  var slides = [];
+
+  var fallbackSlides = [
+    {img:'https://picsum.photos/seed/civil1/1920/1080'},
+    {img:'https://picsum.photos/seed/arch1/1920/1080'},
+    {img:'https://picsum.photos/seed/build1/1920/1080'}
+  ];
 
   function goToSlide(index) {
     var els = container.querySelectorAll('.hero-slide');
@@ -126,28 +107,41 @@
     if (dots[current]) dots[current].classList.add('active');
   }
   function nextSlide() { goToSlide((current + 1) % slides.length); }
-  function start() { if (intervalId) clearInterval(intervalId); intervalId = setInterval(nextSlide, 5000); }
+  function start() { if (intervalId) clearInterval(intervalId); intervalId = setInterval(nextSlide, slides[0]?.transition_speed || 5000); }
   function stop() { if (intervalId) { clearInterval(intervalId); intervalId = null; } }
 
-  slides.forEach(function(item, i) {
-    var div = document.createElement('div');
-    div.className = 'hero-slide' + (i === 0 ? ' active' : '');
-    div.style.background = item.bg;
-    container.appendChild(div);
-    var dot = document.createElement('span');
-    dot.className = 'dot' + (i === 0 ? ' active' : '');
-    dot.setAttribute('role', 'button');
-    dot.setAttribute('aria-label', 'Slide ' + (i + 1));
-    dot.addEventListener('click', function() { stop(); goToSlide(i); start(); });
-    dotsContainer.appendChild(dot);
-    if (item.img) {
-      var img = new Image();
-      img.onload = function() { div.style.background = 'url(' + item.img + ') center/cover no-repeat'; };
-      img.src = item.img;
-    }
-  });
+  function buildSlides(slideData) {
+    slides = slideData;
+    container.innerHTML = '';
+    dotsContainer.innerHTML = '';
+    if (!slides.length) slides = fallbackSlides;
+    slides.forEach(function(item, i) {
+      var div = document.createElement('div');
+      div.className = 'hero-slide' + (i === 0 ? ' active' : '');
+      container.appendChild(div);
+      var dot = document.createElement('span');
+      dot.className = 'dot' + (i === 0 ? ' active' : '');
+      dot.setAttribute('role', 'button');
+      dot.setAttribute('aria-label', 'Slide ' + (i + 1));
+      dot.addEventListener('click', function() { stop(); goToSlide(i); start(); });
+      dotsContainer.appendChild(dot);
+      if (item.image) {
+        var img = new Image();
+        img.onload = function() { div.style.background = 'url(' + item.image + ') center/cover no-repeat'; };
+        img.onerror = function() { div.style.background = 'linear-gradient(135deg,#0a1628,#1a365d,#0e7490)'; };
+        img.src = item.image;
+      } else {
+        div.style.background = 'linear-gradient(135deg,#0a1628,#1a365d,#0e7490)';
+      }
+    });
+    start();
+  }
 
-  start();
+  fetch('/api/slides').then(function(r){ return r.json(); }).then(function(d){
+    if (d.success && d.slides.length) buildSlides(d.slides);
+    else buildSlides(fallbackSlides);
+  }).catch(function(){ buildSlides(fallbackSlides); });
+
   var hero = document.getElementById('home');
   if (hero) {
     hero.addEventListener('mouseenter', stop);

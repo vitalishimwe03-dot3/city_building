@@ -1,40 +1,61 @@
 INSERT OR IGNORE INTO categories (name, description, slug) VALUES
-('Architectural Software','Architectural software courses','architectural'),
-('Structural Software','Structural analysis & design software','structural'),
-('Geotechnical Software','Geotechnical analysis tools','geotechnical'),
-('Rendering Software','Visualization and rendering tools','rendering'),
-('Water & Road Design Software','Water and road design tools','water-road');
+('Architecture','Architectural design and documentation software training','architecture'),
+('Structural Engineering','Structural analysis and design software training','structural-engineering'),
+('Geotechnical Engineering','Soil analysis and geotechnical software training','geotechnical-engineering'),
+('Visualization & Rendering','3D visualization and rendering software training','visualization-rendering'),
+('Civil Engineering','Road design and GIS mapping software training','civil-engineering'),
+('Water Engineering','Water distribution and hydraulic modeling software training','water-engineering'),
+('Training Services','Professional training and internship programs','training-services'),
+('Career Development','Career pathways for building professionals','career-development');
 
-INSERT OR IGNORE INTO subcourses (category_id,name,slug,image,description) VALUES
-((SELECT id FROM categories WHERE slug='architectural'),'Revit','revit','https://1000logos.net/wp-content/uploads/2020/08/Revit-Logo.png','Autodesk Revit course'),
-((SELECT id FROM categories WHERE slug='architectural'),'ArchiCAD','archicad','https://static.food4rhino.com/cdn/farfuture/xyrPqO3quW2MDpWtN1q77PWdS56JQF_RFkkPgqfqj0o/mtime:1680615355/sites/default/files/public/users-files/graphisoft/app/archicadlogo.jpg','ArchiCAD BIM modelling course'),
-((SELECT id FROM categories WHERE slug='architectural'),'SketchUp','sketchup','https://download-warehouse.sketchup.com/warehouse/v1.0/content/public/2871299f-70f9-42c5-9e94-92c9d58eb15f','SketchUp fundamentals'),
-((SELECT id FROM categories WHERE slug='architectural'),'AutoCAD','autocad','https://saasyto.com/wp-content/uploads/2024/08/Autodesk-AutoCAD-subscription-1.jpg','AutoCAD drafting course');
+INSERT OR IGNORE INTO subcourses (category_id,name,slug,image,description,sub_category) VALUES
+((SELECT id FROM categories WHERE slug='architecture'),'Revit','revit','revit-logo.svg','Building Information Modeling (BIM) and architectural design','Architectural Design'),
+((SELECT id FROM categories WHERE slug='architecture'),'ArchiCAD','archicad','archicad-logo.svg','Building design and documentation','Architectural Design'),
+((SELECT id FROM categories WHERE slug='architecture'),'SketchUp','sketchup','sketchup-logo.svg','3D modeling and conceptual design','Architectural Design'),
+((SELECT id FROM categories WHERE slug='architecture'),'AutoCAD','autocad','autocad-logo.svg','Technical drafting and drawing','Architectural Design');
 
-INSERT OR IGNORE INTO subcourses (category_id,name,slug,image,description) VALUES
-((SELECT id FROM categories WHERE slug='structural'),'Prostructure','prostructure','https://images.pexels.com/photos/3862632/pexels-photo-3862632.jpeg?auto=compress&cs=tinysrgb&w=1200','Prostructure structural modelling'),
-((SELECT id FROM categories WHERE slug='structural'),'CSI Etabs','etabs','https://images.pexels.com/photos/11157438/pexels-photo-11157438.jpeg?auto=compress&cs=tinysrgb&w=1200','Etabs analysis'),
-((SELECT id FROM categories WHERE slug='structural'),'Prokon','prokon','https://images.pexels.com/photos/3862377/pexels-photo-3862377.jpeg?auto=compress&cs=tinysrgb&w=1200','Prokon structural tools'),
-((SELECT id FROM categories WHERE slug='structural'),'Robot Structure','robot-structure','https://images.pexels.com/photos/7564864/pexels-photo-7564864.jpeg?auto=compress&cs=tinysrgb&w=1200','Autodesk Robot Structural Analysis'),
-((SELECT id FROM categories WHERE slug='structural'),'CSI Safe','csisafe','https://images.pexels.com/photos/7859760/pexels-photo-7859760.jpeg?auto=compress&cs=tinysrgb&w=1200','CSI Safe design'),
-((SELECT id FROM categories WHERE slug='structural'),'CSI Detailer','csidetailer','https://images.pexels.com/photos/1113839/pexels-photo-1113839.jpeg?auto=compress&cs=tinysrgb&w=1200','CSI Detailer workflows'),
-((SELECT id FROM categories WHERE slug='structural'),'CSI Bridge','csibridge','https://images.pexels.com/photos/28370582/pexels-photo-28370582.jpeg?auto=compress&cs=tinysrgb&w=1200','CSI Bridge for bridges');
+INSERT OR IGNORE INTO subcourses (category_id,name,slug,image,description,sub_category) VALUES
+((SELECT id FROM categories WHERE slug='structural-engineering'),'ProtaStructure','prostructure','prostructure-logo.png','Structural design and analysis','Structural Analysis'),
+((SELECT id FROM categories WHERE slug='structural-engineering'),'CSI ETABS','etabs','csi-logo.svg','Analysis and design of buildings','Structural Analysis'),
+((SELECT id FROM categories WHERE slug='structural-engineering'),'Prokon','prokon','prokon-logo.png','Structural calculations and design','Structural Analysis'),
+((SELECT id FROM categories WHERE slug='structural-engineering'),'Robot Structural Analysis','robot-structure','robot-structure-logo.svg','Structural modeling and analysis','Structural Analysis'),
+((SELECT id FROM categories WHERE slug='structural-engineering'),'CSI Safe','csisafe','csi-logo.svg','Foundation and slab design','Foundation Design'),
+((SELECT id FROM categories WHERE slug='structural-engineering'),'CSI Detailer','csidetailer','csi-logo.svg','Reinforcement detailing','Detailing'),
+((SELECT id FROM categories WHERE slug='structural-engineering'),'CSI Bridge','csibridge','csi-logo.svg','Bridge analysis and design','Bridge Design');
 
-INSERT OR IGNORE INTO subcourses (category_id,name,slug,image,description) VALUES
-((SELECT id FROM categories WHERE slug='geotechnical'),'Plaxis 2D','plaxis-2d','https://images.pexels.com/photos/18812422/pexels-photo-18812422.jpeg?auto=compress&cs=tinysrgb&w=1200','Plaxis 2D geotech modelling'),
-((SELECT id FROM categories WHERE slug='geotechnical'),'Plaxis 3D','plaxis-3d','https://images.pexels.com/photos/14466335/pexels-photo-14466335.jpeg?auto=compress&cs=tinysrgb&w=1200','Plaxis 3D geotechnical analysis');
+INSERT OR IGNORE INTO subcourses (category_id,name,slug,image,description,sub_category) VALUES
+((SELECT id FROM categories WHERE slug='geotechnical-engineering'),'Plaxis 2D','plaxis-2d','bentley-logo.svg','Soil and foundation analysis','Soil Analysis'),
+((SELECT id FROM categories WHERE slug='geotechnical-engineering'),'Plaxis 3D','plaxis-3d','bentley-logo.svg','Soil and foundation analysis','Soil Analysis');
 
-INSERT OR IGNORE INTO subcourses (category_id,name,slug,image,description) VALUES
-((SELECT id FROM categories WHERE slug='rendering'),'Lumion','lumion','https://images.pexels.com/photos/13203180/pexels-photo-13203180.jpeg?auto=compress&cs=tinysrgb&w=1200','Lumion rendering workflows'),
-((SELECT id FROM categories WHERE slug='rendering'),'Twin Motion','twinmotion','https://images.pexels.com/photos/16037755/pexels-photo-16037755.jpeg?auto=compress&cs=tinysrgb&w=1200','Twinmotion visualization'),
-((SELECT id FROM categories WHERE slug='rendering'),'Enscape','enscape','https://images.pexels.com/photos/10813067/pexels-photo-10813067.jpeg?auto=compress&cs=tinysrgb&w=1200','Enscape realtime rendering'),
-((SELECT id FROM categories WHERE slug='rendering'),'V-Ray','vray','https://images.pexels.com/photos/5265286/pexels-photo-5265286.jpeg?auto=compress&cs=tinysrgb&w=1200','V-Ray photoreal rendering');
+INSERT OR IGNORE INTO subcourses (category_id,name,slug,image,description,sub_category) VALUES
+((SELECT id FROM categories WHERE slug='visualization-rendering'),'Lumion','lumion','lumion-logo.svg','Realistic rendering and animations','Architectural Visualization'),
+((SELECT id FROM categories WHERE slug='visualization-rendering'),'Twinmotion','twinmotion','twinmotion-logo.svg','Real-time visualization','Architectural Visualization'),
+((SELECT id FROM categories WHERE slug='visualization-rendering'),'Enscape','enscape','enscape-logo.svg','Interactive rendering','Architectural Visualization'),
+((SELECT id FROM categories WHERE slug='visualization-rendering'),'V-Ray','vray','vray-logo.svg','High-quality rendering','Architectural Visualization');
 
-INSERT OR IGNORE INTO subcourses (category_id,name,slug,image,description) VALUES
-((SELECT id FROM categories WHERE slug='water-road'),'ArcGIS','arcgis','https://images.pexels.com/photos/8472920/pexels-photo-8472920.jpeg?auto=compress&cs=tinysrgb&w=1200','ArcGIS for infrastructure'),
-((SELECT id FROM categories WHERE slug='water-road'),'Civil 3D','civil3d','https://images.pexels.com/photos/34338597/pexels-photo-34338597.jpeg?auto=compress&cs=tinysrgb&w=1200','Civil 3D road design'),
-((SELECT id FROM categories WHERE slug='water-road'),'WaterCAD','watercad','https://images.pexels.com/photos/31326225/pexels-photo-31326225.jpeg?auto=compress&cs=tinysrgb&w=1200','WaterCAD distribution modelling'),
-((SELECT id FROM categories WHERE slug='water-road'),'WaterGEM','watergem','https://images.pexels.com/photos/31326225/pexels-photo-31326225.jpeg?auto=compress&cs=tinysrgb&w=1200','WaterGEM hydraulic modelling');
+INSERT OR IGNORE INTO subcourses (category_id,name,slug,image,description,sub_category) VALUES
+((SELECT id FROM categories WHERE slug='civil-engineering'),'Civil 3D','civil3d','civil3d-logo.svg','Road and infrastructure design','Road Design'),
+((SELECT id FROM categories WHERE slug='civil-engineering'),'ArcGIS','arcgis','arcgis-logo.svg','Geographic Information Systems (GIS)','GIS Mapping');
+
+INSERT OR IGNORE INTO subcourses (category_id,name,slug,image,description,sub_category) VALUES
+((SELECT id FROM categories WHERE slug='water-engineering'),'WaterCAD','watercad','watercad-logo.svg','Water network design','Water Distribution'),
+((SELECT id FROM categories WHERE slug='water-engineering'),'WaterGEMS','watergem','watergem-logo.svg','Water system modeling and management','Water Distribution');
+
+INSERT OR IGNORE INTO subcourses (category_id,name,slug,image,description,sub_category) VALUES
+((SELECT id FROM categories WHERE slug='training-services'),'Short Courses','short-courses','training-icon.svg','Engineering software training','Professional Training'),
+((SELECT id FROM categories WHERE slug='training-services'),'Academic Internship','academic-internship','internship-icon.svg','Practical engineering experience','Internship Program');
+
+INSERT OR IGNORE INTO subcourses (category_id,name,slug,image,description,sub_category) VALUES
+((SELECT id FROM categories WHERE slug='career-development'),'Architects','architects','architect-icon.svg','Architecture profession','Career Pathways'),
+((SELECT id FROM categories WHERE slug='career-development'),'Engineers','engineers','engineer-icon.svg','Engineering profession','Career Pathways'),
+((SELECT id FROM categories WHERE slug='career-development'),'Designers','designers','designer-icon.svg','Design profession','Career Pathways'),
+((SELECT id FROM categories WHERE slug='career-development'),'Surveyors','surveyors','surveyor-icon.svg','Surveying profession','Career Pathways');
+
+-- Hero slideshow seed data
+INSERT OR IGNORE INTO hero_slides (title, description, image_path, link_url, btn_text, animation, display_order, is_active, auto_play, transition_speed) VALUES
+('Welcome to City Building Engineering', 'Professional software training for architecture, engineering, and design careers in Kigali, Rwanda.', 'https://images.unsplash.com/photo-1487958449943-2429e8be8625?w=1400&q=80', '/about', 'Learn More', 'fade', 1, 1, 1, 6000),
+('Master Industry Software', 'Hands-on training in Revit, AutoCAD, ETABS, Lumion, and more. Build your career with us.', 'https://images.unsplash.com/photo-1504917595217-d4dc5ebe6122?w=1400&q=80', '/services', 'Explore Courses', 'slide', 2, 1, 1, 6000),
+('Join Our Community', 'Career-ready training with recognized certificates. Enroll today and shape your future.', 'https://images.unsplash.com/photo-1523240795612-9a054b0db644?w=1400&q=80', '/contact', 'Contact Us', 'zoom', 3, 1, 1, 6000);
 
 -- Course modules for progress tracking
 INSERT OR IGNORE INTO course_modules (subcourse_id, title, description, order_index) VALUES

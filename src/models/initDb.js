@@ -39,12 +39,31 @@ function runSqlFile(filename) {
   });
 }
 
+async function runMigrations() {
+  var db = pool.getDb();
+  if (!db) return;
+  var migrations = [
+    "ALTER TABLE users ADD COLUMN google_id VARCHAR(255) UNIQUE",
+    "ALTER TABLE users ADD COLUMN avatar VARCHAR(512)",
+    "ALTER TABLE users ADD COLUMN is_verified BOOLEAN DEFAULT false"
+  ];
+  for (var i = 0; i < migrations.length; i++) {
+    try {
+      db.run(migrations[i]);
+      console.log('Migration applied: ' + migrations[i]);
+    } catch (e) {
+      // Column already exists or migration not needed
+    }
+  }
+}
+
 async function init() {
   try {
     await pool.initialize();
     await runSqlFile('schema.sql');
     await runSqlFile('seed.sql');
     await runSqlFile('admin-seed.sql');
+    await runMigrations();
     var db = pool.getDb();
     if (db) {
       var data = db.export();

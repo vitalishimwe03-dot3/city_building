@@ -44,12 +44,22 @@
       <input id="courseFilter" type="text" class="form-control" placeholder="Type a software name to filter...">
     </div>
 
+    <% 
+      let currentSubCat = '';
+      const sortedCourses = [...subcourses];
+    %>
     <div id="courses" class="row g-4">
       <% if (subcourses.length === 0) { %>
         <div class="col-12"><div class="alert alert-warning">No softwares are available for this category yet.</div></div>
       <% } %>
-      <% subcourses.forEach(course => { %>
-        <div class="col-md-6 col-xl-4 course-card" data-title="<%= course.name.toLowerCase() %>" data-description="<%= (course.description || '').toLowerCase() %>">
+      <% sortedCourses.forEach(course => { %>
+        <% if (course.sub_category && course.sub_category !== currentSubCat) { %>
+          <% currentSubCat = course.sub_category; %>
+          <div class="col-12 mb-2 mt-3">
+            <h4 class="h6 text-uppercase fw-semibold" style="color: var(--accent-primary-light); letter-spacing: 1px;"><%= currentSubCat %></h4>
+          </div>
+        <% } %>
+        <div class="col-md-6 col-xl-4 course-card" data-title="<%= course.name.toLowerCase() %>" data-description="<%= (course.description || '').toLowerCase() %>" data-subcategory="<%= (course.sub_category || '').toLowerCase() %>">
           <div class="card shadow-sm border-0 h-100 overflow-hidden">
             <div class="course-image position-relative" style="height: 200px; overflow: hidden;">
               <% if (course.image && (course.image.startsWith('http://') || course.image.startsWith('https://'))) { %>

@@ -64,19 +64,19 @@ async function getAllSubcourses() {
 }
 
 // Create subcourse
-async function createSubcourse(categoryId, name, slug, description, image) {
+async function createSubcourse(categoryId, name, slug, description, image, subCategory) {
   const [result] = await pool.query(
-    'INSERT INTO subcourses (category_id, name, slug, description, image) VALUES (?, ?, ?, ?, ?)',
-    [categoryId, name, slug, description, image]
+    'INSERT INTO subcourses (category_id, name, slug, description, image, sub_category) VALUES (?, ?, ?, ?, ?, ?)',
+    [categoryId, name, slug, description, image, subCategory || '']
   );
   return result;
 }
 
 // Update subcourse
-async function updateSubcourse(id, categoryId, name, slug, description, image) {
+async function updateSubcourse(id, categoryId, name, slug, description, image, subCategory) {
   await pool.query(
-    'UPDATE subcourses SET category_id = ?, name = ?, slug = ?, description = ?, image = ? WHERE id = ?',
-    [categoryId, name, slug, description, image, id]
+    'UPDATE subcourses SET category_id = ?, name = ?, slug = ?, description = ?, image = ?, sub_category = ? WHERE id = ?',
+    [categoryId, name, slug, description, image, subCategory || '', id]
   );
   const [[subcourse]] = await pool.query('SELECT * FROM subcourses WHERE id = ?', [id]);
   return subcourse;

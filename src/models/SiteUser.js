@@ -14,13 +14,45 @@ function generateResetToken() {
   return crypto.randomBytes(32).toString('hex');
 }
 
+function generateOtp() {
+  return String(Math.floor(100000 + Math.random() * 900000));
+}
+
 async function createUser(fullName, email, phone, password) {
   const passwordHash = await hashPassword(password);
   const [result] = await pool.query(
-    'INSERT INTO users (full_name, email, phone, password_hash) VALUES (?, ?, ?, ?)',
+    'INSERT INTO users (full_name, email, phone, password_hash, is_verified, is_active) VALUES (?, ?, ?, ?, 0, 0)',
     [fullName, email, phone || '', passwordHash]
   );
   return result;
+}
+
+async function createOtp(email, otp) {
+  const expiresAt = new Date(Date.now() + 10 * 60 * 1000).toISOString();
+  await pool.query(
+    'INSERT OR REPLACE INTO user_otps (email, otp, expires_at) VALUES (?, ?, ?)',
+    [email, otp, expiresAt]
+  );
+}
+
+async function verifyOtp(email, otp) {
+  const [[row]] = await pool.query(
+    "SELECT * FROM user_otps WHERE email = ? AND otp = ? AND expires_at > datetime('now')",
+    [email, otp]
+  );
+  if (!row) return false;
+  await pool.query('DELETE FROM user_otps WHERE email = ?', [email]);
+  await pool.query('UPDATE users SET is_verified = 1, is_active = 1 WHERE email = ?', [email]);
+  return true;
+}
+
+async function resendOtp(email) {
+  const user = await getUserByEmail(email);
+  if (!user) return false;
+  if (user.is_verified) return false;
+  const otp = generateOtp();
+  await createOtp(email, otp);
+  return otp;
 }
 
 async function getUserByEmail(email) {
@@ -29,8 +61,25 @@ async function getUserByEmail(email) {
 }
 
 async function getUserById(id) {
-  const [[user]] = await pool.query('SELECT id, full_name, email, phone, language, is_active, created_at FROM users WHERE id = ?', [id]);
+  const [[user]] = await pool.query('SELECT id, full_name, email, phone, avatar, language, is_active, is_verified, created_at FROM users WHERE id = ?', [id]);
   return user;
+}
+
+async function getUserByGoogleId(googleId) {
+  const [[user]] = await pool.query('SELECT * FROM users WHERE google_id = ?', [googleId]);
+  return user;
+}
+
+async function createGoogleUser({ google_id, email, full_name, avatar }) {
+  const [result] = await pool.query(
+    'INSERT INTO users (full_name, email, google_id, avatar, is_verified, is_active, password_hash) VALUES (?, ?, ?, ?, 1, 1, ?)',
+    [full_name, email, google_id, avatar || '', '']
+  );
+  return { id: result?.insertId, full_name, email, google_id, avatar, is_verified: 1, is_active: 1 };
+}
+
+async function linkGoogleAccount(userId, googleId, avatar) {
+  await pool.query('UPDATE users SET google_id = ?, avatar = ?, is_verified = 1, is_active = 1 WHERE id = ?', [googleId, avatar || '', userId]);
 }
 
 async function updateProfile(id, fullName, phone) {
@@ -44,6 +93,9 @@ async function updateProfile(id, fullName, phone) {
 async function verifyUser(email, password) {
   const [[user]] = await pool.query('SELECT * FROM users WHERE email = ?', [email]);
   if (!user) return null;
+  if (!user.password_hash) {
+    return { googleOnly: true, email: user.email, full_name: user.full_name };
+  }
   const ok = await comparePassword(password, user.password_hash);
   if (!ok) return null;
   const { password_hash, ...safe } = user;
@@ -67,9 +119,10 @@ async function updatePassword(id, newPassword) {
 async function requestPasswordReset(email) {
   const user = await getUserByEmail(email);
   if (!user) return null;
+  if (!user.is_verified) return null;
 
   const resetToken = generateResetToken();
-  const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours
+  const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000);
 
   await pool.query(
     'INSERT INTO user_password_resets (user_id, reset_token, expires_at) VALUES (?, ?, ?)',
@@ -95,24 +148,22 @@ async function resetPasswordWithToken(token, newPassword) {
   if (!resetData) return null;
 
   const { reset, user } = resetData;
-  
-  // Update password
   await updatePassword(user.id, newPassword);
-  
-  // Mark token as used
   await pool.query(
     'UPDATE user_password_resets SET is_used = true WHERE id = ?',
     [reset.id]
+  );
+  await pool.query(
+    'UPDATE users SET is_verified = 1 WHERE id = ? AND is_verified = 0',
+    [user.id]
   );
 
   return user;
 }
 
-// ====== Admin management methods for site users ======
-
 async function getAllUsers(page = 1, limit = 20, search = '') {
   const offset = (page - 1) * limit;
-  let query = 'SELECT id, full_name, email, phone, language, is_active, created_at, updated_at FROM users';
+  let query = 'SELECT id, full_name, email, phone, avatar, language, is_active, is_verified, created_at, updated_at FROM users';
   let countQuery = 'SELECT COUNT(*) as total FROM users';
   const params = [];
   const countParams = [];
@@ -171,10 +222,11 @@ async function getUserStats() {
        COUNT(*) as total,
        SUM(CASE WHEN is_active = 1 THEN 1 ELSE 0 END) as active,
        SUM(CASE WHEN is_active = 0 THEN 1 ELSE 0 END) as inactive,
+       SUM(CASE WHEN is_verified = 0 THEN 1 ELSE 0 END) as unverified,
        COUNT(DISTINCT strftime('%Y-%m', created_at)) as months_active
      FROM users`
   );
-  return stats[0] || { total: 0, active: 0, inactive: 0, months_active: 0 };
+  return stats[0] || { total: 0, active: 0, inactive: 0, unverified: 0, months_active: 0 };
 }
 
 async function getMonthlyUserRegistrations(months = 6) {
@@ -193,6 +245,9 @@ module.exports = {
   createUser,
   getUserByEmail,
   getUserById,
+  getUserByGoogleId,
+  createGoogleUser,
+  linkGoogleAccount,
   verifyUser,
   updateProfile,
   updateLanguage,
@@ -205,4 +260,8 @@ module.exports = {
   toggleUserActive,
   getUserStats,
   getMonthlyUserRegistrations,
+  createOtp,
+  verifyOtp,
+  resendOtp,
+  generateOtp
 };

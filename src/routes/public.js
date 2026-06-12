@@ -5,35 +5,44 @@ const initDb = require('../models/initDb');
 const { sendEnquiryNotification } = require('../email');
 
 const fallbackCategories = [
-  { id: 'architectural', name: 'Architectural Software', description: 'Architectural software courses', slug: 'architectural' },
-  { id: 'structural', name: 'Structural Software', description: 'Structural analysis & design software', slug: 'structural' },
-  { id: 'geotechnical', name: 'Geotechnical Software', description: 'Geotechnical analysis tools', slug: 'geotechnical' },
-  { id: 'rendering', name: 'Rendering Software', description: 'Visualization and rendering tools', slug: 'rendering' },
-  { id: 'water-road', name: 'Water & Road Design Software', description: 'Water and road design tools', slug: 'water-road' }
+  { id: 'architecture', name: 'Architecture', description: 'Architectural design and documentation software training', slug: 'architecture' },
+  { id: 'structural-engineering', name: 'Structural Engineering', description: 'Structural analysis and design software training', slug: 'structural-engineering' },
+  { id: 'geotechnical-engineering', name: 'Geotechnical Engineering', description: 'Soil analysis and geotechnical software training', slug: 'geotechnical-engineering' },
+  { id: 'visualization-rendering', name: 'Visualization & Rendering', description: '3D visualization and rendering software training', slug: 'visualization-rendering' },
+  { id: 'civil-engineering', name: 'Civil Engineering', description: 'Road design and GIS mapping software training', slug: 'civil-engineering' },
+  { id: 'water-engineering', name: 'Water Engineering', description: 'Water distribution and hydraulic modeling software training', slug: 'water-engineering' },
+  { id: 'training-services', name: 'Training Services', description: 'Professional training and internship programs', slug: 'training-services' },
+  { id: 'career-development', name: 'Career Development', description: 'Career pathways for building professionals', slug: 'career-development' }
 ];
 
 const fallbackSubcourses = [
-  { id: 'revit', category_slug: 'architectural', category_name: 'Architectural Software', name: 'Revit', slug: 'revit', image: 'revit-logo.png', description: 'Autodesk Revit course' },
-  { id: 'archicad', category_slug: 'architectural', category_name: 'Architectural Software', name: 'ArchiCAD', slug: 'archicad', image: 'https://static.food4rhino.com/cdn/farfuture/xyrPqO3quW2MDpWtN1q77PWdS56JQF_RFkkPgqfqj0o/mtime:1680615355/sites/default/files/public/users-files/graphisoft/app/archicadlogo.jpg', description: 'ArchiCAD BIM modelling course' },
-  { id: 'sketchup', category_slug: 'architectural', category_name: 'Architectural Software', name: 'SketchUp', slug: 'sketchup', image: 'https://download-warehouse.sketchup.com/warehouse/v1.0/content/public/2871299f-70f9-42c5-9e94-92c9d58eb15f', description: 'SketchUp fundamentals' },
-  { id: 'autocad', category_slug: 'architectural', category_name: 'Architectural Software', name: 'AutoCAD', slug: 'autocad', image: 'https://saasyto.com/wp-content/uploads/2024/08/Autodesk-AutoCAD-subscription-1.jpg', description: 'AutoCAD drafting course' },
-  { id: 'prostructure', category_slug: 'structural', category_name: 'Structural Software', name: 'Prostructure', slug: 'prostructure', image: 'https://images.pexels.com/photos/3862632/pexels-photo-3862632.jpeg?auto=compress&cs=tinysrgb&w=1200', description: 'Prostructure structural modelling' },
-  { id: 'etabs', category_slug: 'structural', category_name: 'Structural Software', name: 'CSI Etabs', slug: 'etabs', image: 'https://images.pexels.com/photos/11157438/pexels-photo-11157438.jpeg?auto=compress&cs=tinysrgb&w=1200', description: 'Etabs analysis' },
-  { id: 'prokon', category_slug: 'structural', category_name: 'Structural Software', name: 'Prokon', slug: 'prokon', image: 'https://images.pexels.com/photos/3862377/pexels-photo-3862377.jpeg?auto=compress&cs=tinysrgb&w=1200', description: 'Prokon structural tools' },
-  { id: 'robot-structure', category_slug: 'structural', category_name: 'Structural Software', name: 'Robot Structure', slug: 'robot-structure', image: 'https://images.pexels.com/photos/7564864/pexels-photo-7564864.jpeg?auto=compress&cs=tinysrgb&w=1200', description: 'Autodesk Robot Structural Analysis' },
-  { id: 'csisafe', category_slug: 'structural', category_name: 'Structural Software', name: 'CSI Safe', slug: 'csisafe', image: 'https://images.pexels.com/photos/7859760/pexels-photo-7859760.jpeg?auto=compress&cs=tinysrgb&w=1200', description: 'CSI Safe design' },
-  { id: 'csidetailer', category_slug: 'structural', category_name: 'Structural Software', name: 'CSI Detailer', slug: 'csidetailer', image: 'https://images.pexels.com/photos/1113839/pexels-photo-1113839.jpeg?auto=compress&cs=tinysrgb&w=1200', description: 'CSI Detailer workflows' },
-  { id: 'csibridge', category_slug: 'structural', category_name: 'Structural Software', name: 'CSI Bridge', slug: 'csibridge', image: 'https://images.pexels.com/photos/28370582/pexels-photo-28370582.jpeg?auto=compress&cs=tinysrgb&w=1200', description: 'CSI Bridge for bridges' },
-  { id: 'plaxis-2d', category_slug: 'geotechnical', category_name: 'Geotechnical Software', name: 'Plaxis 2D', slug: 'plaxis-2d', image: 'https://images.pexels.com/photos/18812422/pexels-photo-18812422.jpeg?auto=compress&cs=tinysrgb&w=1200', description: 'Plaxis 2D geotech modelling' },
-  { id: 'plaxis-3d', category_slug: 'geotechnical', category_name: 'Geotechnical Software', name: 'Plaxis 3D', slug: 'plaxis-3d', image: 'https://images.pexels.com/photos/14466335/pexels-photo-14466335.jpeg?auto=compress&cs=tinysrgb&w=1200', description: 'Plaxis 3D geotechnical analysis' },
-  { id: 'lumion', category_slug: 'rendering', category_name: 'Rendering Software', name: 'Lumion', slug: 'lumion', image: 'https://images.pexels.com/photos/13203180/pexels-photo-13203180.jpeg?auto=compress&cs=tinysrgb&w=1200', description: 'Lumion rendering workflows' },
-  { id: 'twinmotion', category_slug: 'rendering', category_name: 'Rendering Software', name: 'Twin Motion', slug: 'twinmotion', image: 'https://images.pexels.com/photos/16037755/pexels-photo-16037755.jpeg?auto=compress&cs=tinysrgb&w=1200', description: 'Twinmotion visualization' },
-  { id: 'enscape', category_slug: 'rendering', category_name: 'Rendering Software', name: 'Enscape', slug: 'enscape', image: 'https://images.pexels.com/photos/10813067/pexels-photo-10813067.jpeg?auto=compress&cs=tinysrgb&w=1200', description: 'Enscape realtime rendering' },
-  { id: 'vray', category_slug: 'rendering', category_name: 'Rendering Software', name: 'V-Ray', slug: 'vray', image: 'https://images.pexels.com/photos/5265286/pexels-photo-5265286.jpeg?auto=compress&cs=tinysrgb&w=1200', description: 'V-Ray photoreal rendering' },
-  { id: 'arcgis', category_slug: 'water-road', category_name: 'Water & Road Design Software', name: 'ArcGIS', slug: 'arcgis', image: 'https://images.pexels.com/photos/8472920/pexels-photo-8472920.jpeg?auto=compress&cs=tinysrgb&w=1200', description: 'ArcGIS for infrastructure' },
-  { id: 'civil3d', category_slug: 'water-road', category_name: 'Water & Road Design Software', name: 'Civil 3D', slug: 'civil3d', image: 'https://images.pexels.com/photos/34338597/pexels-photo-34338597.jpeg?auto=compress&cs=tinysrgb&w=1200', description: 'Civil 3D road design' },
-  { id: 'watercad', category_slug: 'water-road', category_name: 'Water & Road Design Software', name: 'WaterCAD', slug: 'watercad', image: 'https://images.pexels.com/photos/31326225/pexels-photo-31326225.jpeg?auto=compress&cs=tinysrgb&w=1200', description: 'WaterCAD distribution modelling' },
-  { id: 'watergem', category_slug: 'water-road', category_name: 'Water & Road Design Software', name: 'WaterGEM', slug: 'watergem', image: 'https://images.pexels.com/photos/31326225/pexels-photo-31326225.jpeg?auto=compress&cs=tinysrgb&w=1200', description: 'WaterGEM hydraulic modelling' }
+  { id: 'revit', category_slug: 'architecture', category_name: 'Architecture', name: 'Revit', slug: 'revit', image: 'revit-logo.svg', description: 'Building Information Modeling (BIM) and architectural design', sub_category: 'Architectural Design' },
+  { id: 'archicad', category_slug: 'architecture', category_name: 'Architecture', name: 'ArchiCAD', slug: 'archicad', image: 'archicad-logo.svg', description: 'Building design and documentation', sub_category: 'Architectural Design' },
+  { id: 'sketchup', category_slug: 'architecture', category_name: 'Architecture', name: 'SketchUp', slug: 'sketchup', image: 'sketchup-logo.svg', description: '3D modeling and conceptual design', sub_category: 'Architectural Design' },
+  { id: 'autocad', category_slug: 'architecture', category_name: 'Architecture', name: 'AutoCAD', slug: 'autocad', image: 'autocad-logo.svg', description: 'Technical drafting and drawing', sub_category: 'Architectural Design' },
+  { id: 'prostructure', category_slug: 'structural-engineering', category_name: 'Structural Engineering', name: 'ProtaStructure', slug: 'prostructure', image: 'prostructure-logo.png', description: 'Structural design and analysis', sub_category: 'Structural Analysis' },
+  { id: 'etabs', category_slug: 'structural-engineering', category_name: 'Structural Engineering', name: 'CSI ETABS', slug: 'etabs', image: 'csi-logo.svg', description: 'Analysis and design of buildings', sub_category: 'Structural Analysis' },
+  { id: 'prokon', category_slug: 'structural-engineering', category_name: 'Structural Engineering', name: 'Prokon', slug: 'prokon', image: 'prokon-logo.png', description: 'Structural calculations and design', sub_category: 'Structural Analysis' },
+  { id: 'robot-structure', category_slug: 'structural-engineering', category_name: 'Structural Engineering', name: 'Robot Structural Analysis', slug: 'robot-structure', image: 'robot-structure-logo.svg', description: 'Structural modeling and analysis', sub_category: 'Structural Analysis' },
+  { id: 'csisafe', category_slug: 'structural-engineering', category_name: 'Structural Engineering', name: 'CSI Safe', slug: 'csisafe', image: 'csi-logo.svg', description: 'Foundation and slab design', sub_category: 'Foundation Design' },
+  { id: 'csidetailer', category_slug: 'structural-engineering', category_name: 'Structural Engineering', name: 'CSI Detailer', slug: 'csidetailer', image: 'csi-logo.svg', description: 'Reinforcement detailing', sub_category: 'Detailing' },
+  { id: 'csibridge', category_slug: 'structural-engineering', category_name: 'Structural Engineering', name: 'CSI Bridge', slug: 'csibridge', image: 'csi-logo.svg', description: 'Bridge analysis and design', sub_category: 'Bridge Design' },
+  { id: 'plaxis-2d', category_slug: 'geotechnical-engineering', category_name: 'Geotechnical Engineering', name: 'Plaxis 2D', slug: 'plaxis-2d', image: 'bentley-logo.svg', description: 'Soil and foundation analysis', sub_category: 'Soil Analysis' },
+  { id: 'plaxis-3d', category_slug: 'geotechnical-engineering', category_name: 'Geotechnical Engineering', name: 'Plaxis 3D', slug: 'plaxis-3d', image: 'bentley-logo.svg', description: 'Soil and foundation analysis', sub_category: 'Soil Analysis' },
+  { id: 'lumion', category_slug: 'visualization-rendering', category_name: 'Visualization & Rendering', name: 'Lumion', slug: 'lumion', image: 'lumion-logo.svg', description: 'Realistic rendering and animations', sub_category: 'Architectural Visualization' },
+  { id: 'twinmotion', category_slug: 'visualization-rendering', category_name: 'Visualization & Rendering', name: 'Twinmotion', slug: 'twinmotion', image: 'twinmotion-logo.svg', description: 'Real-time visualization', sub_category: 'Architectural Visualization' },
+  { id: 'enscape', category_slug: 'visualization-rendering', category_name: 'Visualization & Rendering', name: 'Enscape', slug: 'enscape', image: 'enscape-logo.svg', description: 'Interactive rendering', sub_category: 'Architectural Visualization' },
+  { id: 'vray', category_slug: 'visualization-rendering', category_name: 'Visualization & Rendering', name: 'V-Ray', slug: 'vray', image: 'vray-logo.svg', description: 'High-quality rendering', sub_category: 'Architectural Visualization' },
+  { id: 'civil3d', category_slug: 'civil-engineering', category_name: 'Civil Engineering', name: 'Civil 3D', slug: 'civil3d', image: 'civil3d-logo.svg', description: 'Road and infrastructure design', sub_category: 'Road Design' },
+  { id: 'arcgis', category_slug: 'civil-engineering', category_name: 'Civil Engineering', name: 'ArcGIS', slug: 'arcgis', image: 'arcgis-logo.svg', description: 'Geographic Information Systems (GIS)', sub_category: 'GIS Mapping' },
+  { id: 'watercad', category_slug: 'water-engineering', category_name: 'Water Engineering', name: 'WaterCAD', slug: 'watercad', image: 'watercad-logo.svg', description: 'Water network design', sub_category: 'Water Distribution' },
+  { id: 'watergem', category_slug: 'water-engineering', category_name: 'Water Engineering', name: 'WaterGEMS', slug: 'watergem', image: 'watergem-logo.svg', description: 'Water system modeling and management', sub_category: 'Water Distribution' },
+  { id: 'short-courses', category_slug: 'training-services', category_name: 'Training Services', name: 'Short Courses', slug: 'short-courses', image: 'training-icon.svg', description: 'Engineering software training', sub_category: 'Professional Training' },
+  { id: 'academic-internship', category_slug: 'training-services', category_name: 'Training Services', name: 'Academic Internship', slug: 'academic-internship', image: 'internship-icon.svg', description: 'Practical engineering experience', sub_category: 'Internship Program' },
+  { id: 'architects', category_slug: 'career-development', category_name: 'Career Development', name: 'Architects', slug: 'architects', image: 'architect-icon.svg', description: 'Architecture profession', sub_category: 'Career Pathways' },
+  { id: 'engineers', category_slug: 'career-development', category_name: 'Career Development', name: 'Engineers', slug: 'engineers', image: 'engineer-icon.svg', description: 'Engineering profession', sub_category: 'Career Pathways' },
+  { id: 'designers', category_slug: 'career-development', category_name: 'Career Development', name: 'Designers', slug: 'designers', image: 'designer-icon.svg', description: 'Design profession', sub_category: 'Career Pathways' },
+  { id: 'surveyors', category_slug: 'career-development', category_name: 'Career Development', name: 'Surveyors', slug: 'surveyors', image: 'surveyor-icon.svg', description: 'Surveying profession', sub_category: 'Career Pathways' }
 ];
 
 function findFallbackCategory(slug) {
@@ -74,7 +83,7 @@ router.get('/about', (req, res) => {
 });
 
 router.get('/services', (req, res) => {
-  res.render('services', { title: 'Services', metaDescription: 'Explore our professional training services in architectural, structural, geotechnical, rendering, and water & road design software at City Building Engineering.' });
+  res.render('services', { title: 'Services', metaDescription: 'Explore our professional training services in architecture, structural engineering, geotechnical engineering, visualization & rendering, civil engineering, and water engineering at City Building Engineering.' });
 });
 
 router.get('/contact', (req, res) => {

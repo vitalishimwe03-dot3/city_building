@@ -1,0 +1,623 @@
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <div>
+    <h4 class="fw-bold mb-1">Hero Slideshow</h4>
+    <p class="text-muted mb-0 small">Manage homepage hero slider banners</p>
+  </div>
+  <div>
+    <button class="btn btn-primary" onclick="openSlideForm()" style="background:linear-gradient(135deg,#0891b2,#06b6d4);border:none;">
+      <i class="bi bi-plus-lg me-1"></i> New Slide
+    </button>
+  </div>
+</div>
+
+<% if (typeof error !== 'undefined' && error) { %>
+  <div class="alert alert-danger alert-dismissible fade show"><%= error %><button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>
+<% } %>
+<% if (typeof success !== 'undefined' && success) { %>
+  <div class="alert alert-success alert-dismissible fade show"><%= success %><button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>
+<% } %>
+
+<div class="admin-card-modern">
+  <div class="table-responsive">
+    <table class="table-custom">
+      <thead>
+        <tr>
+          <th style="width:40px">#</th>
+          <th style="width:160px">Preview</th>
+          <th>Title</th>
+          <th>Animation</th>
+          <th>Speed</th>
+          <th>Status</th>
+          <th style="width:180px">Actions</th>
+        </tr>
+      </thead>
+      <tbody id="slideTableBody">
+        <% if (slides.length === 0) { %>
+          <tr><td colspan="7"><div class="empty-state"><i class="bi bi-film"></i><h5>No slides yet</h5><p>Create your first hero slide to get started.</p></div></td></tr>
+        <% } %>
+        <% slides.forEach(function(slide) { %>
+          <tr id="slide-<%= slide.id %>" data-order="<%= slide.display_order %>">
+            <td class="handle" style="cursor:grab;font-size:18px;color:var(--text-muted);"><i class="bi bi-grip-vertical"></i></td>
+            <td>
+              <img src="<%= slide.image_path || slide.image_path_resolved || 'https://via.placeholder.com/120x68?text=No+Image' %>"
+                style="width:120px;height:68px;object-fit:cover;border-radius:6px;background:var(--bg-surface);"
+                onerror="this.src='https://via.placeholder.com/120x68?text=No+Image'">
+            </td>
+            <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">
+              <strong><%= slide.title || '(no title)' %></strong>
+              <% if (slide.description) { %>
+                <div class="small text-muted" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"><%= slide.description %></div>
+              <% } %>
+            </td>
+            <td><span class="badge badge-custom info"><%= slide.animation || 'fade' %></span></td>
+            <td><span class="badge badge-custom secondary"><%= slide.transition_speed || 5000 %>ms</span></td>
+            <td><span class="badge badge-custom <%= slide.is_active ? 'success' : 'danger' %>"><%= slide.is_active ? 'Active' : 'Inactive' %></span></td>
+            <td>
+              <div class="action-btns">
+                <button class="btn-sm-custom btn-toggle-custom" onclick="toggleSlide(<%= slide.id %>)" title="Toggle active"><i class="bi bi-eye<%= slide.is_active ? '' : '-slash' %>"></i></button>
+                <button class="btn-sm-custom btn-edit-custom" onclick="editSlide(<%= slide.id %>)" title="Edit"><i class="bi bi-pencil"></i></button>
+                <button class="btn-sm-custom btn-delete-custom" onclick="deleteSlide(<%= slide.id %>)" title="Delete"><i class="bi bi-trash"></i></button>
+                <button class="btn-sm-custom btn-view-custom" onclick="previewSlide(<%= slide.id %>)" title="Preview"><i class="bi bi-eye-fill"></i></button>
+              </div>
+            </td>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  </div>
+  <div id="slideOrderStatus" class="mt-3 small text-muted d-none"></div>
+  <% if (slides.length > 1) { %>
+    <div class="mt-3 pt-3" style="border-top:1px solid var(--border-primary);">
+      <small class="text-muted"><i class="bi bi-arrows-move me-1"></i> Drag rows to reorder slides</small>
+    </div>
+  <% } %>
+</div>
+
+<!-- Slide Form Modal -->
+<div class="modal" id="slideModal" tabindex="-1" style="display:none;background:rgba(0,0,0,0.5);position:fixed;inset:0;z-index:1055;">
+  <div class="modal-dialog modal-lg" style="margin:2rem auto;">
+    <div class="modal-content" style="background:var(--bg-card);border:1px solid var(--border-primary);">
+      <div class="modal-header" style="border-bottom:1px solid var(--border-primary);">
+        <h5 class="modal-title fw-bold" id="slideModalTitle"><i class="bi bi-film me-2"></i>New Slide</h5>
+        <button type="button" class="btn-close" onclick="closeSlideModal()"></button>
+      </div>
+      <form id="slideForm" onsubmit="saveSlide(event)">
+        <div class="modal-body">
+          <input type="hidden" id="slideId" value="">
+          <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+          <div class="row g-3">
+            <div class="col-md-8">
+              <label class="form-label small fw-semibold">Title</label>
+              <input type="text" id="slideTitle" class="form-control" placeholder="Enter slide title" maxlength="255">
+            </div>
+            <div class="col-md-4">
+              <label class="form-label small fw-semibold">Display Order</label>
+              <input type="number" id="slideOrder" class="form-control" value="0" min="0" max="999">
+            </div>
+            <div class="col-12">
+              <label class="form-label small fw-semibold">Description</label>
+              <textarea id="slideDescription" class="form-control" rows="2" placeholder="Slide description (optional)" maxlength="500"></textarea>
+            </div>
+            <div class="col-md-4">
+              <label class="form-label small fw-semibold">Animation</label>
+              <select id="slideAnimation" class="form-select">
+                <option value="fade">Fade</option>
+                <option value="slide">Slide</option>
+                <option value="zoom">Zoom</option>
+                <option value="slide-up">Slide Up</option>
+              </select>
+            </div>
+            <div class="col-md-4">
+              <label class="form-label small fw-semibold">Transition Speed (ms)</label>
+              <input type="number" id="slideSpeed" class="form-control" value="5000" min="1000" max="30000" step="500">
+            </div>
+            <div class="col-md-4">
+              <label class="form-label small fw-semibold">&nbsp;</label>
+              <div class="d-flex gap-3 pt-2">
+                <div class="form-check">
+                  <input type="checkbox" id="slideActive" class="form-check-input" checked>
+                  <label class="form-check-label small">Active</label>
+                </div>
+                <div class="form-check">
+                  <input type="checkbox" id="slideAutoPlay" class="form-check-input" checked>
+                  <label class="form-check-label small">Auto Play</label>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label small fw-semibold">Link URL (optional)</label>
+              <input type="text" id="slideLink" class="form-control" placeholder="https://example.com/page">
+            </div>
+            <div class="col-md-3">
+              <label class="form-label small fw-semibold">Button Text</label>
+              <input type="text" id="slideBtnText" class="form-control" placeholder="Learn More">
+            </div>
+            <div class="col-md-3">
+              <label class="form-label small fw-semibold">&nbsp;</label>
+              <div>
+                <button type="button" class="btn btn-outline-primary btn-sm w-100" onclick="openImagePicker()">
+                  <i class="bi bi-image me-1"></i> Pick Image
+                </button>
+              </div>
+            </div>
+            <div class="col-12">
+              <div id="slideImagePreview" class="d-none" style="position:relative;display:inline-block;border-radius:8px;overflow:hidden;border:1px solid var(--border-primary);">
+                <img id="slideImagePreviewImg" src="" style="width:100%;max-height:180px;object-fit:cover;display:block;">
+                <button type="button" class="btn btn-sm btn-dark" style="position:absolute;top:4px;right:4px;border-radius:50%;padding:2px 6px;font-size:12px;opacity:0.8;" onclick="clearSlideImage()" title="Remove image">&times;</button>
+              </div>
+              <input type="hidden" id="slideImageId" value="">
+              <input type="hidden" id="slideImagePath" value="">
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer" style="border-top:1px solid var(--border-primary);">
+          <button type="button" class="btn btn-secondary" onclick="closeSlideModal()">Cancel</button>
+          <button type="submit" class="btn btn-primary" id="slideSaveBtn"><i class="bi bi-check-lg me-1"></i> Save Slide</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Image Picker Modal -->
+<div class="modal" id="imagePickerModal" tabindex="-1" style="display:none;background:rgba(0,0,0,0.5);position:fixed;inset:0;z-index:1056;">
+  <div class="modal-dialog modal-lg" style="margin:2rem auto;">
+    <div class="modal-content" style="background:var(--bg-card);border:1px solid var(--border-primary);">
+      <div class="modal-header" style="border-bottom:1px solid var(--border-primary);">
+        <h5 class="modal-title fw-bold"><i class="bi bi-images me-2"></i>Choose Image</h5>
+        <button type="button" class="btn-close" onclick="closeImagePicker()"></button>
+      </div>
+      <div class="modal-body">
+        <div class="d-flex gap-2 mb-3">
+          <button type="button" class="btn btn-sm btn-outline-primary" onclick="openImageUpload()">
+            <i class="bi bi-cloud-upload me-1"></i> Upload New Image
+          </button>
+          <button type="button" class="btn btn-sm btn-outline-secondary" onclick="setSlideImageUrl()">
+            <i class="bi bi-link me-1"></i> Use URL
+          </button>
+        </div>
+        <div id="imagePickerUpload" class="d-none mb-3">
+          <div id="pickerDropZone" style="border:2px dashed var(--border-primary);border-radius:12px;padding:30px;text-align:center;cursor:pointer;background:var(--bg-surface);"
+            onmouseover="this.style.borderColor='#0891b2';this.style.background='rgba(8,145,178,0.05)'"
+            onmouseout="this.style.borderColor='var(--border-primary)';this.style.background='var(--bg-surface)'">
+            <i class="bi bi-cloud-arrow-up" style="font-size:36px;color:#0891b2;"></i>
+            <h6 class="mt-2 fw-bold">Upload Hero Image</h6>
+            <p class="text-muted small mb-2">JPG, PNG, WEBP — max 5MB</p>
+            <input type="file" id="pickerFileInput" accept=".jpg,.jpeg,.png,.webp" style="display:none;" onchange="pickerUpload(this.files)">
+            <button class="btn btn-outline-primary btn-sm" onclick="document.getElementById('pickerFileInput').click()"><i class="bi bi-folder2-open me-1"></i> Browse</button>
+          </div>
+          <div id="pickerUploadProgress" class="mt-2 d-none">
+            <div class="progress" style="height:4px;">
+              <div id="pickerProgressBar" class="progress-bar" style="width:0%;background:linear-gradient(135deg,#0891b2,#06b6d4);"></div>
+            </div>
+            <small id="pickerProgressText" class="text-muted mt-1 d-block">Uploading...</small>
+          </div>
+        </div>
+        <div id="pickerUrlInput" class="d-none mb-3">
+          <div class="input-group">
+            <input type="text" id="pickerImageUrl" class="form-control" placeholder="https://example.com/image.jpg">
+            <button class="btn btn-primary" onclick="applyImageUrl()">Apply</button>
+          </div>
+        </div>
+        <div id="imagePickerGrid" class="row g-2">
+          <% if (images.length === 0) { %>
+            <div class="col-12">
+              <div class="text-center text-muted py-4">
+                <i class="bi bi-image" style="font-size:32px;opacity:0.3;"></i>
+                <p class="mt-2 small">No hero images yet. Upload one above.</p>
+              </div>
+            </div>
+          <% } %>
+          <% images.forEach(function(img) { %>
+            <div class="col-4 col-md-3">
+              <div class="picker-img-card" data-id="<%= img.id %>" data-path="<%= img.path %>" onclick="selectPickerImage(this)"
+                style="border:2px solid transparent;border-radius:8px;overflow:hidden;cursor:pointer;transition:all 0.15s;background:var(--bg-surface);"
+                onmouseover="this.style.borderColor='#0891b2'"
+                onmouseout="this.style.borderColor='transparent'">
+                <img src="<%= img.path %>" alt="<%= img.alt_text || img.original_name %>"
+                  style="width:100%;height:100px;object-fit:cover;display:block;"
+                  onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22200%22 height=%22100%22><rect fill=%22%23333%22 width=%22200%22 height=%22100%22/><text fill=%22%23999%22 font-size=%2212%22 x=%2250%%22 y=%2250%%22 text-anchor=%22middle%22 dy=%22.3em%22>No Preview</text></svg>'">
+                <div class="p-1 text-center small" style="font-size:10px;color:var(--text-muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">
+                  <%= img.original_name || img.filename %>
+                </div>
+              </div>
+            </div>
+          <% }) %>
+        </div>
+      </div>
+      <div class="modal-footer" style="border-top:1px solid var(--border-primary);">
+        <button type="button" class="btn btn-secondary" onclick="closeImagePicker()">Cancel</button>
+        <button type="button" class="btn btn-primary" id="pickerSelectBtn" disabled onclick="confirmPickerImage()">
+          <i class="bi bi-check-lg me-1"></i> Select
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+var CSRF_TOKEN = '<%= csrfToken %>';
+var slideData = <%- JSON.stringify(slides) %>;
+var selectedPickerImg = null;
+
+function closeSlideModal() {
+  var m = document.getElementById('slideModal');
+  m.style.display = 'none';
+  m.classList.remove('show');
+}
+
+function openSlideForm() {
+  document.getElementById('slideModalTitle').innerHTML = '<i class="bi bi-film me-2"></i>New Slide';
+  document.getElementById('slideId').value = '';
+  document.getElementById('slideTitle').value = '';
+  document.getElementById('slideDescription').value = '';
+  document.getElementById('slideAnimation').value = 'fade';
+  document.getElementById('slideSpeed').value = '5000';
+  document.getElementById('slideLink').value = '';
+  document.getElementById('slideBtnText').value = '';
+  document.getElementById('slideOrder').value = '0';
+  document.getElementById('slideActive').checked = true;
+  document.getElementById('slideAutoPlay').checked = true;
+  clearSlideImage();
+  var m = document.getElementById('slideModal');
+  m.style.display = 'block';
+  m.classList.add('show');
+  setTimeout(function() { document.getElementById('slideTitle').focus(); }, 100);
+}
+
+function editSlide(id) {
+  var s = slideData.find(function(x) { return x.id === id; });
+  if (!s) return;
+  document.getElementById('slideModalTitle').innerHTML = '<i class="bi bi-film me-2"></i>Edit Slide';
+  document.getElementById('slideId').value = s.id;
+  document.getElementById('slideTitle').value = s.title || '';
+  document.getElementById('slideDescription').value = s.description || '';
+  document.getElementById('slideAnimation').value = s.animation || 'fade';
+  document.getElementById('slideSpeed').value = s.transition_speed || 5000;
+  document.getElementById('slideLink').value = s.link_url || '';
+  document.getElementById('slideBtnText').value = s.btn_text || '';
+  document.getElementById('slideOrder').value = s.display_order || 0;
+  document.getElementById('slideActive').checked = !!s.is_active;
+  document.getElementById('slideAutoPlay').checked = s.auto_play !== 0;
+
+  var imgSrc = s.image_path || s.image_path_resolved || '';
+  if (imgSrc) {
+    document.getElementById('slideImagePreview').classList.remove('d-none');
+    document.getElementById('slideImagePreviewImg').src = imgSrc;
+    document.getElementById('slideImageId').value = s.image_id || '';
+    document.getElementById('slideImagePath').value = s.image_path || '';
+  } else {
+    clearSlideImage();
+  }
+
+  var m = document.getElementById('slideModal');
+  m.style.display = 'block';
+  m.classList.add('show');
+}
+
+function clearSlideImage() {
+  document.getElementById('slideImagePreview').classList.add('d-none');
+  document.getElementById('slideImagePreviewImg').src = '';
+  document.getElementById('slideImageId').value = '';
+  document.getElementById('slideImagePath').value = '';
+}
+
+async function saveSlide(e) {
+  e.preventDefault();
+  var btn = document.getElementById('slideSaveBtn');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Saving...';
+
+  var id = document.getElementById('slideId').value;
+  var data = {
+    _csrf: CSRF_TOKEN,
+    title: document.getElementById('slideTitle').value,
+    description: document.getElementById('slideDescription').value,
+    animation: document.getElementById('slideAnimation').value,
+    transition_speed: document.getElementById('slideSpeed').value,
+    link_url: document.getElementById('slideLink').value,
+    btn_text: document.getElementById('slideBtnText').value,
+    display_order: document.getElementById('slideOrder').value,
+    image_id: document.getElementById('slideImageId').value,
+    image_path: document.getElementById('slideImagePath').value,
+    is_active: document.getElementById('slideActive').checked ? '1' : '0',
+    auto_play: document.getElementById('slideAutoPlay').checked ? '1' : '0'
+  };
+  var body = Object.entries(data).map(function(kv) {
+    return encodeURIComponent(kv[0]) + '=' + encodeURIComponent(kv[1] || '');
+  }).join('&');
+  var url = id ? '/admin/slides/' + id : '/admin/slides';
+
+  try {
+    var resp = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded', 'X-Requested-With': 'XMLHttpRequest' },
+      body: body
+    });
+    var result = await resp.json();
+    if (result.success) {
+      closeSlideModal();
+      location.reload();
+    } else {
+      alert(result.error || 'Failed to save slide');
+    }
+  } catch (err) {
+    alert('Network error. Please try again.');
+  }
+  btn.disabled = false;
+  btn.innerHTML = '<i class="bi bi-check-lg me-1"></i> Save Slide';
+}
+
+async function toggleSlide(id) {
+  try {
+    var resp = await fetch('/admin/slides/' + id + '/toggle', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: '_csrf=' + encodeURIComponent(CSRF_TOKEN)
+    });
+    var data = await resp.json();
+    if (data.success) { location.reload(); }
+    else { alert(data.error || 'Failed to toggle'); }
+  } catch (err) {
+    alert('Network error');
+  }
+}
+
+async function deleteSlide(id) {
+  if (!confirm('Delete this slide permanently?')) return;
+  try {
+    var resp = await fetch('/admin/slides/' + id + '/delete', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: '_csrf=' + encodeURIComponent(CSRF_TOKEN)
+    });
+    var data = await resp.json();
+    if (data.success) {
+      var el = document.getElementById('slide-' + id);
+      if (el) el.remove();
+    } else {
+      alert(data.error || 'Failed to delete');
+    }
+  } catch (err) {
+    alert('Network error');
+  }
+}
+
+function previewSlide(id) {
+  var s = slideData.find(function(x) { return x.id === id; });
+  if (!s) return;
+  var img = s.image_path || s.image_path_resolved || '';
+  var html = '<div style="text-align:center;padding:20px;">';
+  if (img) {
+    html += '<img src="' + img + '" style="max-width:100%;max-height:400px;border-radius:12px;object-fit:cover;margin-bottom:16px;" onerror="this.style.display=\'none\'">';
+  }
+  html += '<h4>' + (s.title || '') + '</h4>';
+  if (s.description) html += '<p class="text-muted">' + s.description + '</p>';
+  html += '<div class="d-flex justify-content-center gap-3 mt-2"><span class="badge badge-custom info">' + (s.animation || 'fade') + '</span><span class="badge badge-custom secondary">' + (s.transition_speed || 5000) + 'ms</span></div>';
+  if (s.link_url) html += '<a href="' + s.link_url + '" class="btn btn-primary btn-sm mt-3" target="_blank">' + (s.btn_text || 'Learn More') + '</a>';
+  html += '</div>';
+  showPreviewModal(html);
+}
+
+function showPreviewModal(html) {
+  var existing = document.getElementById('previewModalOverlay');
+  if (existing) existing.remove();
+  var overlay = document.createElement('div');
+  overlay.id = 'previewModalOverlay';
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:1060;display:flex;align-items:center;justify-content:center;';
+  overlay.innerHTML = '<div style="background:var(--bg-card);border:1px solid var(--border-primary);border-radius:16px;max-width:700px;width:90%;max-height:90vh;overflow:auto;">' +
+    '<div style="display:flex;justify-content:space-between;align-items:center;padding:16px 20px;border-bottom:1px solid var(--border-primary);">' +
+    '<h5 class="fw-bold mb-0"><i class="bi bi-eye-fill me-2"></i>Slide Preview</h5>' +
+    '<button class="btn-close" onclick="this.closest(\'#previewModalOverlay\').remove()"></button></div>' +
+    '<div style="padding:20px;">' + html + '</div></div>';
+  overlay.addEventListener('click', function(e) { if (e.target === overlay) overlay.remove(); });
+  document.body.appendChild(overlay);
+}
+
+// ── Image Picker ──
+function openImagePicker() {
+  selectedPickerImg = null;
+  document.getElementById('pickerSelectBtn').disabled = true;
+  document.getElementById('imagePickerUpload').classList.add('d-none');
+  document.getElementById('pickerUrlInput').classList.add('d-none');
+  var currentId = document.getElementById('slideImageId').value;
+  if (currentId) {
+    var cards = document.querySelectorAll('.picker-img-card');
+    for (var i = 0; i < cards.length; i++) {
+      if (cards[i].dataset.id == currentId) {
+        selectPickerImage(cards[i]);
+        break;
+      }
+    }
+  }
+  var m = document.getElementById('imagePickerModal');
+  m.style.display = 'block';
+  m.classList.add('show');
+}
+
+function closeImagePicker() {
+  var m = document.getElementById('imagePickerModal');
+  m.style.display = 'none';
+  m.classList.remove('show');
+  selectedPickerImg = null;
+}
+
+function selectPickerImage(el) {
+  var all = document.querySelectorAll('.picker-img-card');
+  for (var i = 0; i < all.length; i++) {
+    all[i].style.borderColor = 'transparent';
+    all[i].style.background = 'var(--bg-surface)';
+  }
+  el.style.borderColor = '#06b6d4';
+  el.style.background = 'rgba(6,182,212,0.08)';
+  selectedPickerImg = { id: el.dataset.id, path: el.dataset.path };
+  document.getElementById('pickerSelectBtn').disabled = false;
+}
+
+function confirmPickerImage() {
+  if (!selectedPickerImg) return;
+  document.getElementById('slideImageId').value = selectedPickerImg.id;
+  document.getElementById('slideImagePath').value = '';
+  var preview = document.getElementById('slideImagePreview');
+  preview.classList.remove('d-none');
+  document.getElementById('slideImagePreviewImg').src = selectedPickerImg.path;
+  closeImagePicker();
+}
+
+function setSlideImageUrl() {
+  var pickerUrl = document.getElementById('pickerUrlInput');
+  pickerUrl.classList.toggle('d-none');
+  if (!pickerUrl.classList.contains('d-none')) {
+    document.getElementById('pickerImageUrl').focus();
+  }
+}
+
+function applyImageUrl() {
+  var url = document.getElementById('pickerImageUrl').value.trim();
+  if (!url) return;
+  document.getElementById('slideImageId').value = '';
+  document.getElementById('slideImagePath').value = url;
+  var preview = document.getElementById('slideImagePreview');
+  preview.classList.remove('d-none');
+  document.getElementById('slideImagePreviewImg').src = url;
+  closeImagePicker();
+}
+
+function openImageUpload() {
+  var pu = document.getElementById('imagePickerUpload');
+  pu.classList.toggle('d-none');
+  if (!pu.classList.contains('d-none')) {
+    document.getElementById('pickerFileInput').click();
+  }
+}
+
+async function pickerUpload(files) {
+  if (!files.length) return;
+  var file = files[0];
+  var pb = document.getElementById('pickerUploadProgress');
+  var bar = document.getElementById('pickerProgressBar');
+  var txt = document.getElementById('pickerProgressText');
+  pb.classList.remove('d-none');
+  txt.textContent = 'Uploading...';
+
+  var fd = new FormData();
+  fd.append('image', file);
+  fd.append('section', 'hero');
+  fd.append('_csrf', CSRF_TOKEN);
+
+  try {
+    var resp = await fetch('/admin/images/upload', {
+      method: 'POST',
+      headers: { 'X-CSRF-Token': CSRF_TOKEN },
+      body: fd
+    });
+    var data = await resp.json();
+    if (data.success) {
+      var grid = document.getElementById('imagePickerGrid');
+      grid.insertAdjacentHTML('afterbegin',
+        '<div class="col-4 col-md-3"><div class="picker-img-card" data-id="' + data.image.id + '" data-path="' + data.image.path + '" onclick="selectPickerImage(this)" style="border:2px solid #06b6d4;border-radius:8px;overflow:hidden;cursor:pointer;background:rgba(6,182,212,0.08);"><img src="' + data.image.path + '" style="width:100%;height:100px;object-fit:cover;display:block;"><div class="p-1 text-center small" style="font-size:10px;color:var(--text-muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">' + file.name + '</div></div></div>'
+      );
+      selectedPickerImg = { id: data.image.id, path: data.image.path };
+      document.getElementById('pickerSelectBtn').disabled = false;
+      txt.textContent = 'Upload complete!';
+      setTimeout(function() { pb.classList.add('d-none'); }, 1500);
+    } else {
+      txt.textContent = 'Upload failed: ' + (data.error || 'Unknown error');
+    }
+  } catch (err) {
+    txt.textContent = 'Upload failed: Network error';
+  }
+}
+
+// ── Drag & Drop Reorder ──
+var dragSrcRow = null;
+
+function initDragDrop() {
+  var tbody = document.getElementById('slideTableBody');
+  if (!tbody) return;
+  var rows = tbody.querySelectorAll('tr');
+  for (var i = 0; i < rows.length; i++) {
+    var tr = rows[i];
+    if (tr.querySelector('td')) {
+      tr.draggable = true;
+      tr.addEventListener('dragstart', function(e) {
+        dragSrcRow = this;
+        this.style.opacity = '0.4';
+        e.dataTransfer.effectAllowed = 'move';
+      });
+      tr.addEventListener('dragend', function(e) {
+        this.style.opacity = '1';
+      });
+      tr.addEventListener('dragover', function(e) {
+        e.preventDefault();
+        this.style.borderBottom = '2px solid #0891b2';
+      });
+      tr.addEventListener('dragleave', function() {
+        this.style.borderBottom = '';
+      });
+      tr.addEventListener('drop', function(e) {
+        e.preventDefault();
+        this.style.borderBottom = '';
+        if (dragSrcRow !== this && dragSrcRow.parentNode === this.parentNode) {
+          var rows = [...tbody.querySelectorAll('tr')];
+          var fromIdx = rows.indexOf(dragSrcRow);
+          var toIdx = rows.indexOf(this);
+          if (fromIdx < toIdx) {
+            this.after(dragSrcRow);
+          } else {
+            this.before(dragSrcRow);
+          }
+          saveSlideOrder();
+        }
+      });
+    }
+  }
+}
+
+async function saveSlideOrder() {
+  var rows = [...document.getElementById('slideTableBody').querySelectorAll('tr')];
+  var ids = rows.filter(function(r) { return r.id; }).map(function(r) { return parseInt(r.id.replace('slide-', '')); });
+  if (ids.length === 0) return;
+  try {
+    var resp = await fetch('/admin/slides/reorder', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': CSRF_TOKEN },
+      body: JSON.stringify({ ids: ids, _csrf: CSRF_TOKEN })
+    });
+    var data = await resp.json();
+    var status = document.getElementById('slideOrderStatus');
+    if (data.success) {
+      status.classList.remove('d-none');
+      status.innerHTML = '<i class="bi bi-check-circle text-success me-1"></i> Order saved';
+      setTimeout(function() { status.classList.add('d-none'); }, 3000);
+    }
+  } catch (err) {
+    console.error('Reorder failed', err);
+  }
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  initDragDrop();
+});
+</script>
+
+<style>
+.modal { overflow-y: auto; }
+.modal-dialog { pointer-events: auto; }
+.form-control, .form-select {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-primary);
+  color: var(--text-primary);
+  font-size: 14px;
+  padding: 9px 12px;
+  border-radius: 8px;
+}
+.form-control:focus, .form-select:focus {
+  border-color: #0891b2;
+  box-shadow: 0 0 0 3px rgba(8,145,178,0.1);
+  outline: none;
+}
+.form-label { margin-bottom: 4px; color: var(--text-secondary); }
+.btn-primary { background: linear-gradient(135deg,#0891b2,#06b6d4); border: none; }
+.btn-primary:hover { background: linear-gradient(135deg,#067a96,#0891b2); }
+</style>

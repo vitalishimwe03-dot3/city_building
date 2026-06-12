@@ -46,8 +46,15 @@
 
         <div class="mb-3">
             <label for="image" class="form-label">Image URL</label>
-            <input type="url" class="form-control" id="image" name="image" 
+            <input type="text" class="form-control" id="image" name="image" 
                    value="<%= course?.image || '' %>" placeholder="/images/course.svg">
+        </div>
+
+        <div class="mb-3">
+            <label for="subCategory" class="form-label">Sub Category</label>
+            <input type="text" class="form-control" id="subCategory" name="subCategory" 
+                   value="<%= course?.sub_category || '' %>" placeholder="e.g., Architectural Design">
+            <small class="form-text text-muted">Grouping label within the main category</small>
         </div>
 
         <div class="d-flex gap-2">

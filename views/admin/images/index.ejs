@@ -1,0 +1,193 @@
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <div>
+    <h4 class="fw-bold mb-1">Site Images</h4>
+    <p class="text-muted mb-0 small">Manage all website background images and banners</p>
+  </div>
+  <div>
+    <button class="btn btn-primary" onclick="document.getElementById('uploadModal').classList.add('show');document.getElementById('uploadModal').style.display='block'" style="background:linear-gradient(135deg,#0891b2,#06b6d4);border:none;">
+      <i class="bi bi-cloud-upload me-1"></i> Upload Images
+    </button>
+  </div>
+</div>
+
+<div class="admin-card-modern">
+  <form method="GET" action="/admin/images" class="search-box-custom">
+    <select name="section" class="form-select" style="max-width:220px;background:var(--bg-surface);border:1px solid var(--border-primary);color:var(--text-primary);">
+      <option value="">All Sections</option>
+      <% sections.forEach(s => { %>
+        <option value="<%= s.value %>" <%= activeSection === s.value ? 'selected' : '' %>><%= s.label %></option>
+      <% }) %>
+    </select>
+    <input type="text" name="search" placeholder="Search images..." value="<%= search %>" style="flex:1;padding:10px 16px;border:1px solid var(--border-primary);border-radius:8px;background:var(--bg-surface);color:var(--text-primary);">
+    <button type="submit" class="btn btn-primary"><i class="bi bi-search"></i></button>
+  </form>
+</div>
+
+<div class="row g-3" id="imageGrid">
+  <% if (images.length === 0) { %>
+    <div class="col-12">
+      <div class="empty-state">
+        <i class="bi bi-images"></i>
+        <h5>No images found</h5>
+        <p>Upload your first image to get started.</p>
+        <button class="btn btn-primary" onclick="document.getElementById('uploadModal').classList.add('show');document.getElementById('uploadModal').style.display='block'"><i class="bi bi-cloud-upload me-1"></i> Upload Image</button>
+      </div>
+    </div>
+  <% } %>
+  <% images.forEach(img => { %>
+    <div class="col-6 col-md-4 col-lg-3" id="img-<%= img.id %>">
+      <div class="admin-card-modern text-center" style="padding:12px;margin-bottom:0;position:relative;">
+        <div style="position:absolute;top:8px;right:8px;z-index:2;display:flex;gap:4px;">
+          <span class="badge badge-custom <%= img.is_active ? 'success' : 'secondary' %>" style="font-size:9px;"><%= img.is_active ? 'Active' : 'Inactive' %></span>
+        </div>
+        <img src="<%= img.path %>" alt="<%= img.alt_text || img.original_name %>" style="width:100%;height:140px;object-fit:cover;border-radius:8px;background:var(--bg-surface);"
+          onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22200%22 height=%22140%22><rect fill=%22%23333%22 width=%22200%22 height=%22140%22/><text fill=%22%23999%22 font-size=%2214%22 x=%2250%%22 y=%2250%%22 text-anchor=%22middle%22 dy=%22.3em%22>No Preview</text></svg>'">
+        <div class="mt-2 text-start small">
+          <div style="font-size:12px;font-weight:600;color:var(--text-primary);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"><%= img.original_name || img.filename %></div>
+          <div style="font-size:11px;color:var(--text-muted);"><%= sections.find(s => s.value === img.section)?.label || img.section %></div>
+          <div style="font-size:10px;color:var(--text-muted);"><%= new Date(img.created_at).toLocaleDateString() %></div>
+        </div>
+        <div class="action-btns mt-2 justify-content-center">
+          <button class="btn-sm-custom btn-toggle-custom" onclick="toggleImage(<%= img.id %>)"><i class="bi bi-eye<%= img.is_active ? '' : '-slash' %>"></i></button>
+          <button class="btn-sm-custom btn-edit-custom" onclick="editImage(<%= img.id %>,'<%= img.alt_text ? img.alt_text.replace(/'/g,"\\'") : '' %>','<%= img.section %>')"><i class="bi bi-pencil"></i></button>
+          <button class="btn-sm-custom btn-delete-custom" onclick="deleteImage(<%= img.id %>)"><i class="bi bi-trash"></i></button>
+        </div>
+      </div>
+    </div>
+  <% }) %>
+</div>
+
+<!-- Upload Modal -->
+<div class="modal" id="uploadModal" tabindex="-1" style="display:none;background:rgba(0,0,0,0.5);position:fixed;inset:0;z-index:1055;">
+  <div class="modal-dialog modal-lg" style="margin:2rem auto;">
+    <div class="modal-content" style="background:var(--bg-card);border:1px solid var(--border-primary);">
+      <div class="modal-header" style="border-bottom:1px solid var(--border-primary);">
+        <h5 class="modal-title fw-bold"><i class="bi bi-cloud-upload me-2"></i>Upload Images</h5>
+        <button type="button" class="btn-close" onclick="closeUploadModal()"></button>
+      </div>
+      <div class="modal-body">
+        <div id="dropZone" style="border:2px dashed var(--border-primary);border-radius:12px;padding:40px;text-align:center;cursor:pointer;transition:all 0.2s;background:var(--bg-surface);"
+          onmouseover="this.style.borderColor='#0891b2';this.style.background='rgba(8,145,178,0.05)'"
+          onmouseout="this.style.borderColor='var(--border-primary)';this.style.background='var(--bg-surface)'">
+          <i class="bi bi-cloud-arrow-up" style="font-size:48px;color:#0891b2;"></i>
+          <h6 class="mt-3 fw-bold">Drag & drop images here</h6>
+          <p class="text-muted small mb-3">or click to browse (JPG, PNG, WEBP — max 5MB each)</p>
+          <input type="file" id="fileInput" accept=".jpg,.jpeg,.png,.webp" multiple style="display:none;" onchange="handleFiles(this.files)">
+          <button class="btn btn-outline-primary btn-sm" onclick="document.getElementById('fileInput').click()"><i class="bi bi-folder2-open me-1"></i> Browse Files</button>
+        </div>
+        <div class="mt-3">
+          <label class="form-label small fw-semibold">Section</label>
+          <select id="uploadSection" class="form-select" style="background:var(--bg-surface);border:1px solid var(--border-primary);color:var(--text-primary);">
+            <% sections.forEach(s => { %>
+              <option value="<%= s.value %>" <%= activeSection === s.value ? 'selected' : '' %>><%= s.label %></option>
+            <% }) %>
+          </select>
+        </div>
+        <div id="uploadPreview" class="row g-2 mt-3"></div>
+        <div id="uploadProgress" class="mt-3 d-none">
+          <div class="progress" style="height:6px;">
+            <div id="progressBar" class="progress-bar" style="width:0%;background:linear-gradient(135deg,#0891b2,#06b6d4);"></div>
+          </div>
+          <small id="progressText" class="text-muted mt-1 d-block">Uploading...</small>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Edit Modal -->
+<div class="modal" id="editModal" tabindex="-1" style="display:none;background:rgba(0,0,0,0.5);position:fixed;inset:0;z-index:1055;">
+  <div class="modal-dialog" style="margin:2rem auto;">
+    <div class="modal-content" style="background:var(--bg-card);border:1px solid var(--border-primary);">
+      <div class="modal-header" style="border-bottom:1px solid var(--border-primary);">
+        <h5 class="modal-title fw-bold"><i class="bi bi-pencil me-2"></i>Edit Image</h5>
+        <button type="button" class="btn-close" onclick="closeEditModal()"></button>
+      </div>
+      <form id="editForm" onsubmit="submitEdit(event)">
+        <div class="modal-body">
+          <input type="hidden" id="editId">
+          <div class="mb-3">
+            <label class="form-label small fw-semibold">Alt Text</label>
+            <input type="text" id="editAlt" class="form-control" style="background:var(--bg-surface);border:1px solid var(--border-primary);color:var(--text-primary);">
+          </div>
+          <div class="mb-3">
+            <label class="form-label small fw-semibold">Section</label>
+            <select id="editSection" class="form-select" style="background:var(--bg-surface);border:1px solid var(--border-primary);color:var(--text-primary);">
+              <% sections.forEach(s => { %>
+                <option value="<%= s.value %>"><%= s.label %></option>
+              <% }) %>
+            </select>
+          </div>
+        </div>
+        <div class="modal-footer" style="border-top:1px solid var(--border-primary);">
+          <button type="button" class="btn btn-secondary" onclick="closeEditModal()">Cancel</button>
+          <button type="submit" class="btn btn-primary">Save</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+function closeUploadModal() { const m = document.getElementById('uploadModal'); m.style.display = 'none'; m.classList.remove('show'); }
+function closeEditModal() { const m = document.getElementById('editModal'); m.style.display = 'none'; m.classList.remove('show'); }
+function handleFiles(files) {
+  const preview = document.getElementById('uploadPreview');
+  preview.innerHTML = '';
+  Array.from(files).forEach((f, i) => {
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      preview.innerHTML += '<div class="col-4 col-md-3"><div class="p-2" style="border:1px solid var(--border-primary);border-radius:8px;"><img src="' + e.target.result + '" style="width:100%;height:80px;object-fit:cover;border-radius:4px;"><div class="small text-muted mt-1" style="font-size:10px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">' + f.name + '</div></div></div>';
+    };
+    reader.readAsDataURL(f);
+  });
+  if (files.length) uploadFiles(files);
+}
+async function uploadFiles(files) {
+  const pb = document.getElementById('uploadProgress'); pb.classList.remove('d-none');
+  const bar = document.getElementById('progressBar'); const txt = document.getElementById('progressText');
+  const section = document.getElementById('uploadSection').value;
+  let completed = 0;
+  for (const file of files) {
+    const fd = new FormData(); fd.append('image', file); fd.append('section', section);
+    try {
+      const resp = await fetch('/admin/images/upload', { method: 'POST', body: fd });
+      const data = await resp.json();
+      if (data.success) {
+        document.getElementById('imageGrid').insertAdjacentHTML('afterbegin',
+          '<div class="col-6 col-md-4 col-lg-3" id="img-' + data.image.id + '"><div class="admin-card-modern text-center" style="padding:12px;margin-bottom:0;position:relative;"><div style="position:absolute;top:8px;right:8px;z-index:2;display:flex;gap:4px;"><span class="badge badge-custom success" style="font-size:9px;">Active</span></div><img src="' + data.image.path + '" alt="' + file.name + '" style="width:100%;height:140px;object-fit:cover;border-radius:8px;"><div class="mt-2 text-start small"><div style="font-size:12px;font-weight:600;color:var(--text-primary);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">' + file.name + '</div><div style="font-size:11px;color:var(--text-muted);">' + section + '</div><div style="font-size:10px;color:var(--text-muted);">' + new Date().toLocaleDateString() + '</div></div><div class="action-btns mt-2 justify-content-center"><button class="btn-sm-custom btn-toggle-custom"><i class="bi bi-eye"></i></button><button class="btn-sm-custom btn-edit-custom"><i class="bi bi-pencil"></i></button><button class="btn-sm-custom btn-delete-custom"><i class="bi bi-trash"></i></button></div></div></div>'
+        );
+      }
+    } catch (e) { console.error(e); txt.textContent = 'Upload failed: ' + file.name; }
+    completed++; bar.style.width = Math.round((completed / files.length) * 100) + '%';
+    txt.textContent = completed + ' of ' + files.length + ' uploaded';
+  }
+  setTimeout(() => { pb.classList.add('d-none'); bar.style.width = '0%'; }, 2000);
+}
+async function toggleImage(id) {
+  const resp = await fetch('/admin/images/' + id + '/toggle', { method: 'POST' });
+  const data = await resp.json();
+  if (data.success) location.reload();
+}
+async function deleteImage(id) {
+  if (!confirm('Delete this image?')) return;
+  const resp = await fetch('/admin/images/' + id + '/delete', { method: 'POST' });
+  const data = await resp.json();
+  if (data.success) { document.getElementById('img-' + id)?.remove(); }
+}
+function editImage(id, alt, section) {
+  document.getElementById('editId').value = id;
+  document.getElementById('editAlt').value = alt;
+  document.getElementById('editSection').value = section;
+  const m = document.getElementById('editModal'); m.style.display = 'block'; m.classList.add('show');
+}
+async function submitEdit(e) {
+  e.preventDefault();
+  const id = document.getElementById('editId').value;
+  const alt_text = document.getElementById('editAlt').value;
+  const section = document.getElementById('editSection').value;
+  const resp = await fetch('/admin/images/' + id + '/update', { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: 'alt_text=' + encodeURIComponent(alt_text) + '&section=' + encodeURIComponent(section) });
+  const data = await resp.json();
+  if (data.success) { closeEditModal(); location.reload(); }
+}
+</script>

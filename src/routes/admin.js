@@ -405,12 +405,12 @@ router.get('/courses/create', async (req, res, next) => {
 
 router.post('/courses', async (req, res, next) => {
   try {
-    const { categoryId, name, slug, description, image } = req.body;
+    const { categoryId, name, slug, description, image, subCategory } = req.body;
     if (!categoryId || !name || !slug) {
       const categories = await Admin.getAllCategories();
       return res.status(400).render('admin/courses/form', { title: 'Create Course', course: null, categories, error: 'Category, name and slug are required.' });
     }
-    await Admin.createSubcourse(categoryId, name, slug, description || '', image || '');
+    await Admin.createSubcourse(categoryId, name, slug, description || '', image || '', subCategory);
     await Admin.logActivity(
       req.session.adminUser.id, req.session.adminUser.full_name || req.session.adminUser.username,
       'Created course', 'course', null,
@@ -436,8 +436,8 @@ router.get('/courses/:id/edit', async (req, res, next) => {
 
 router.post('/courses/:id', async (req, res, next) => {
   try {
-    const { categoryId, name, slug, description, image } = req.body;
-    await Admin.updateSubcourse(req.params.id, categoryId, name, slug, description || '', image || '');
+    const { categoryId, name, slug, description, image, subCategory } = req.body;
+    await Admin.updateSubcourse(req.params.id, categoryId, name, slug, description || '', image || '', subCategory);
     await Admin.logActivity(
       req.session.adminUser.id, req.session.adminUser.full_name || req.session.adminUser.username,
       'Updated course', 'course', parseInt(req.params.id),

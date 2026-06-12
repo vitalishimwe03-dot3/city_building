@@ -15,6 +15,7 @@ CREATE TABLE IF NOT EXISTS subcourses (
   slug VARCHAR(255) UNIQUE,
   description TEXT,
   image VARCHAR(1024),
+  sub_category VARCHAR(255),
   created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
   updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE CASCADE
@@ -50,9 +51,13 @@ CREATE TABLE IF NOT EXISTS users (
   full_name VARCHAR(255) NOT NULL,
   email VARCHAR(255) UNIQUE NOT NULL,
   phone VARCHAR(50),
-  password_hash VARCHAR(255) NOT NULL,
+  password_hash VARCHAR(255),
+  google_id VARCHAR(255) UNIQUE,
+  avatar VARCHAR(512),
   language VARCHAR(10) DEFAULT 'en',
   is_active BOOLEAN DEFAULT true,
+  is_verified BOOLEAN DEFAULT false,
+  verification_token VARCHAR(255),
   created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
   updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
@@ -137,4 +142,41 @@ CREATE TABLE IF NOT EXISTS course_progress (
   FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
   FOREIGN KEY (module_id) REFERENCES course_modules(id) ON DELETE CASCADE,
   UNIQUE(user_id, module_id)
+);
+
+-- Site images for section backgrounds and banners
+CREATE TABLE IF NOT EXISTS site_images (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  section VARCHAR(100) NOT NULL,
+  filename VARCHAR(255) NOT NULL,
+  original_name VARCHAR(255),
+  path VARCHAR(512) NOT NULL,
+  alt_text VARCHAR(255),
+  file_size INTEGER DEFAULT 0,
+  mime_type VARCHAR(50),
+  is_active BOOLEAN DEFAULT true,
+  sort_order INTEGER DEFAULT 0,
+  uploaded_by INTEGER,
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (uploaded_by) REFERENCES admin_users(id) ON DELETE SET NULL
+);
+
+-- Hero slideshow slides
+CREATE TABLE IF NOT EXISTS hero_slides (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  title VARCHAR(255),
+  description TEXT,
+  image_id INTEGER,
+  image_path VARCHAR(512),
+  link_url VARCHAR(512),
+  btn_text VARCHAR(100),
+  animation VARCHAR(50) DEFAULT 'fade',
+  display_order INTEGER DEFAULT 0,
+  is_active BOOLEAN DEFAULT true,
+  auto_play BOOLEAN DEFAULT true,
+  transition_speed INTEGER DEFAULT 5000,
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (image_id) REFERENCES site_images(id) ON DELETE SET NULL
 );

@@ -3,10 +3,11 @@ const router = express.Router();
 const rateLimit = require('express-rate-limit');
 const bcrypt = require('bcrypt');
 const crypto = require('crypto');
+const passport = require('../config/passport');
 const pool = require('../db');
 const SiteUser = require('../models/SiteUser');
 const User = require('../models/User');
-const { sendNewStudentNotification, sendUserPasswordResetEmail, sendAdminPasswordResetEmail } = require('../email');
+const { sendNewStudentNotification, sendUserPasswordResetEmail, sendAdminPasswordResetEmail, sendOtpEmail } = require('../email');
 
 const loginLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
@@ -24,12 +25,19 @@ const signupLimiter = rateLimit({
   legacyHeaders: false,
 });
 
+const otpLimiter = rateLimit({
+  windowMs: 10 * 60 * 1000,
+  max: 5,
+  message: { error: 'Too many OTP attempts, please try again later.' }
+});
+
 const accountDashboardNews = [
   { title: 'New course launch', summary: 'Explore our latest Structural and Rendering courses now available.', date: 'June 1, 2026' },
   { title: 'Internship program open', summary: 'Applications are open for the July internship cohort. Submit your profile today.', date: 'May 25, 2026' },
   { title: 'Security tip', summary: 'Always update your password regularly and keep your contact details current.', date: 'May 20, 2026' }
 ];
 
+// ── Signup ──
 router.get('/signup', (req, res) => {
   res.render('signup', { title: 'Sign up' });
 });
@@ -45,20 +53,57 @@ router.post('/signup', signupLimiter, async (req, res, next) => {
 
     await SiteUser.createUser(fullName, email, phone, password);
 
+    const otp = SiteUser.generateOtp();
+    await SiteUser.createOtp(email, otp);
+    sendOtpEmail(email, otp).catch(e => console.error('Failed to send OTP email:', e));
+
     sendNewStudentNotification({ fullName, email, phone }).catch(e => {
       console.error('Failed to send new-student notification:', e);
     });
 
-    res.render('thankyou', {
-      title: 'Welcome',
-      name: fullName,
-      message: 'Your account has been created successfully. You can now log in and explore courses.'
-    });
+    res.redirect(`/verify-email?email=${encodeURIComponent(email)}`);
   } catch (err) {
     return res.status(503).render('signup', { title: 'Sign up', error: 'Signup service is temporarily unavailable. Please try again later.' });
   }
 });
 
+// ── Email Verification ──
+router.get('/verify-email', (req, res) => {
+  const { email, pending } = req.query;
+  if (!email) return res.redirect('/signup');
+  res.render('verify-email', { title: 'Verify Email', email, pending, error: null, success: null });
+});
+
+router.post('/verify-email', otpLimiter, async (req, res, next) => {
+  try {
+    const { email, otp } = req.body;
+    if (!email || !otp) {
+      return res.render('verify-email', { title: 'Verify Email', email, error: 'Missing email or verification code.', success: null });
+    }
+    const valid = await SiteUser.verifyOtp(email, otp);
+    if (!valid) {
+      return res.render('verify-email', { title: 'Verify Email', email, error: 'Invalid or expired verification code.', success: null });
+    }
+    res.render('verify-email', { title: 'Verify Email', email, error: null, success: 'Email verified successfully! You can now log in.' });
+  } catch (err) {
+    next(err);
+  }
+});
+
+router.post('/resend-otp', async (req, res, next) => {
+  try {
+    const { email } = req.body;
+    if (!email) return res.status(400).json({ error: 'Email required' });
+    const otp = await SiteUser.resendOtp(email);
+    if (!otp) return res.status(400).json({ error: 'Email not found or already verified' });
+    sendOtpEmail(email, otp).catch(e => console.error('Failed to resend OTP:', e));
+    res.json({ success: true, message: 'Verification code resent.' });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// ── Login ──
 router.get('/login', (req, res) => {
   res.render('login', { title: 'Login' });
 });
@@ -91,6 +136,20 @@ router.post('/login', loginLimiter, async (req, res, next) => {
     // 2. Try student authentication
     const user = await SiteUser.verifyUser(email, password);
     if (!user) return res.status(401).render('login', { title: 'Login', error: 'Invalid credentials.' });
+
+    if (user.googleOnly) {
+      return res.status(401).render('login', { title: 'Login', error: 'This account uses Google sign-in. Please click "Continue with Gmail" below to log in.' });
+    }
+
+    if (!user.is_verified) {
+      await SiteUser.resendOtp(email).catch(() => {});
+      return res.redirect(`/verify-email?email=${encodeURIComponent(email)}&pending=true`);
+    }
+
+    if (!user.is_active) {
+      return res.status(403).render('login', { title: 'Login', error: 'This account has been deactivated.' });
+    }
+
     req.session.siteUser = { id: user.id, email: user.email, full_name: user.full_name };
     req.session.userLanguage = user.language || 'en';
     res.redirect('/');
@@ -99,11 +158,28 @@ router.post('/login', loginLimiter, async (req, res, next) => {
   }
 });
 
+// ── Google OAuth (only if configured) ──
+if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET) {
+  router.get('/auth/google', passport.authenticate('google', { scope: ['profile', 'email'], session: false }));
+
+  router.get('/auth/google/callback',
+    passport.authenticate('google', { failureRedirect: '/login', session: false }),
+    (req, res) => {
+      if (!req.user) return res.redirect('/login');
+      req.session.siteUser = { id: req.user.id, email: req.user.email, full_name: req.user.full_name };
+      req.session.userLanguage = req.user.language || 'en';
+      res.redirect('/');
+    }
+  );
+}
+
+// ── Logout ──
 router.get('/logout', (req, res) => {
   if (req.session) req.session.siteUser = null;
   res.redirect('/');
 });
 
+// ── Account ──
 router.get('/account', async (req, res) => {
   if (!req.session.siteUser) return res.redirect('/login');
   const user = await SiteUser.getUserById(req.session.siteUser.id);
@@ -149,6 +225,10 @@ router.post('/account/change-password', async (req, res, next) => {
       const user = await SiteUser.getUserById(req.session.siteUser.id);
       return res.status(404).render('account', { title: 'Account Settings', user, error: 'User not found.', success: null, dashboardNews: accountDashboardNews });
     }
+    if (!fullUser.password_hash) {
+      const user = await SiteUser.getUserById(req.session.siteUser.id);
+      return res.status(400).render('account', { title: 'Account Settings', user, error: 'Cannot change password for Google-linked accounts. Use Google sign-in.', success: null, dashboardNews: accountDashboardNews });
+    }
     const verified = await SiteUser.verifyUser(fullUser.email, currentPassword);
     if (!verified) {
       const user = await SiteUser.getUserById(req.session.siteUser.id);
@@ -162,6 +242,7 @@ router.post('/account/change-password', async (req, res, next) => {
   }
 });
 
+// ── Password Reset ──
 router.get('/forgot-password', (req, res) => {
   res.render('forgot-password', { title: 'Forgot Password', error: null });
 });
@@ -211,7 +292,5 @@ router.post('/reset-password', async (req, res, next) => {
     next(err);
   }
 });
-
-// Email verification removed. Signup now creates accounts directly.
 
 module.exports = router;

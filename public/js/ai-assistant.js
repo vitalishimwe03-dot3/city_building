@@ -18,27 +18,27 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   const courses = [
-    { name: 'Revit', category: 'Architectural Software', catSlug: 'architectural', desc: 'BIM and architectural design' },
-    { name: 'ArchiCAD', category: 'Architectural Software', catSlug: 'architectural', desc: 'Architectural modeling' },
-    { name: 'SketchUp', category: 'Architectural Software', catSlug: 'architectural', desc: '3D modeling' },
-    { name: 'AutoCAD', category: 'Architectural Software', catSlug: 'architectural', desc: '2D/3D drafting' },
-    { name: 'Prostructure', category: 'Structural Software', catSlug: 'structural', desc: 'Structural modeling' },
-    { name: 'CSI Etabs', category: 'Structural Software', catSlug: 'structural', desc: 'Structural analysis' },
-    { name: 'Prokon', category: 'Structural Software', catSlug: 'structural', desc: 'Structural design' },
-    { name: 'Robot Structure', category: 'Structural Software', catSlug: 'structural', desc: 'Structural analysis' },
-    { name: 'CSI Safe', category: 'Structural Software', catSlug: 'structural', desc: 'Slab design' },
-    { name: 'CSI Detailer', category: 'Structural Software', catSlug: 'structural', desc: 'Structural detailing' },
-    { name: 'CSI Bridge', category: 'Structural Software', catSlug: 'structural', desc: 'Bridge engineering' },
-    { name: 'Plaxis 2D', category: 'Geotechnical Software', catSlug: 'geotechnical', desc: 'Geotechnical modeling' },
-    { name: 'Plaxis 3D', category: 'Geotechnical Software', catSlug: 'geotechnical', desc: 'Geotechnical analysis' },
-    { name: 'Lumion', category: 'Rendering Software', catSlug: 'rendering', desc: 'Architectural rendering' },
-    { name: 'Twin Motion', category: 'Rendering Software', catSlug: 'rendering', desc: 'Real-time visualization' },
-    { name: 'Enscape', category: 'Rendering Software', catSlug: 'rendering', desc: 'Real-time rendering' },
-    { name: 'V-Ray', category: 'Rendering Software', catSlug: 'rendering', desc: 'Photorealistic rendering' },
-    { name: 'ArcGIS', category: 'Water & Road Design', catSlug: 'water-road', desc: 'GIS and mapping' },
-    { name: 'Civil 3D', category: 'Water & Road Design', catSlug: 'water-road', desc: 'Civil engineering design' },
-    { name: 'WaterCAD', category: 'Water & Road Design', catSlug: 'water-road', desc: 'Water distribution modeling' },
-    { name: 'WaterGEM', category: 'Water & Road Design', catSlug: 'water-road', desc: 'Hydraulic modeling' }
+    { name: 'Revit', category: 'Architecture', catSlug: 'architecture', desc: 'BIM and architectural design' },
+    { name: 'ArchiCAD', category: 'Architecture', catSlug: 'architecture', desc: 'Building design and documentation' },
+    { name: 'SketchUp', category: 'Architecture', catSlug: 'architecture', desc: '3D modeling and conceptual design' },
+    { name: 'AutoCAD', category: 'Architecture', catSlug: 'architecture', desc: 'Technical drafting and drawing' },
+    { name: 'ProtaStructure', category: 'Structural Engineering', catSlug: 'structural-engineering', desc: 'Structural design and analysis' },
+    { name: 'CSI ETABS', category: 'Structural Engineering', catSlug: 'structural-engineering', desc: 'Analysis and design of buildings' },
+    { name: 'Prokon', category: 'Structural Engineering', catSlug: 'structural-engineering', desc: 'Structural calculations and design' },
+    { name: 'Robot Structural Analysis', category: 'Structural Engineering', catSlug: 'structural-engineering', desc: 'Structural modeling and analysis' },
+    { name: 'CSI Safe', category: 'Structural Engineering', catSlug: 'structural-engineering', desc: 'Foundation and slab design' },
+    { name: 'CSI Detailer', category: 'Structural Engineering', catSlug: 'structural-engineering', desc: 'Reinforcement detailing' },
+    { name: 'CSI Bridge', category: 'Structural Engineering', catSlug: 'structural-engineering', desc: 'Bridge analysis and design' },
+    { name: 'Plaxis 2D', category: 'Geotechnical Engineering', catSlug: 'geotechnical-engineering', desc: 'Soil and foundation analysis' },
+    { name: 'Plaxis 3D', category: 'Geotechnical Engineering', catSlug: 'geotechnical-engineering', desc: 'Soil and foundation analysis' },
+    { name: 'Lumion', category: 'Visualization & Rendering', catSlug: 'visualization-rendering', desc: 'Realistic rendering and animations' },
+    { name: 'Twinmotion', category: 'Visualization & Rendering', catSlug: 'visualization-rendering', desc: 'Real-time visualization' },
+    { name: 'Enscape', category: 'Visualization & Rendering', catSlug: 'visualization-rendering', desc: 'Interactive rendering' },
+    { name: 'V-Ray', category: 'Visualization & Rendering', catSlug: 'visualization-rendering', desc: 'High-quality rendering' },
+    { name: 'Civil 3D', category: 'Civil Engineering', catSlug: 'civil-engineering', desc: 'Road and infrastructure design' },
+    { name: 'ArcGIS', category: 'Civil Engineering', catSlug: 'civil-engineering', desc: 'Geographic Information Systems (GIS)' },
+    { name: 'WaterCAD', category: 'Water Engineering', catSlug: 'water-engineering', desc: 'Water network design' },
+    { name: 'WaterGEMS', category: 'Water Engineering', catSlug: 'water-engineering', desc: 'Water system modeling and management' }
   ];
 
   var knowledge = {

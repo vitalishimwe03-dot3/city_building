@@ -13,13 +13,14 @@
         <div class="table-responsive">
             <table class="table-custom">
                 <thead>
-                    <tr><th>Course Name</th><th>Category</th><th>Slug</th><th>Image</th><th>Created</th><th>Actions</th></tr>
+                    <tr><th>Course Name</th><th>Category</th><th>Sub Category</th><th>Slug</th><th>Image</th><th>Created</th><th>Actions</th></tr>
                 </thead>
                 <tbody>
                     <% courses.forEach(course => { %>
                         <tr>
                             <td><strong><%= course.name %></strong></td>
                             <td><%= course.category_name %></td>
+                            <td><small><%= course.sub_category || '-' %></small></td>
                             <td><code><%= course.slug %></code></td>
                             <td><small><%= course.image ? 'Has image' : 'No image' %></small></td>
                             <td><small><%= new Date(course.created_at).toLocaleDateString() %></small></td>

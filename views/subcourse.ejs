@@ -52,8 +52,11 @@
       <!-- Content Column -->
       <div class="col-12 col-lg-7">
         <div class="hero-content">
-          <div class="mb-3">
+          <div class="mb-3 d-flex gap-2 flex-wrap">
             <span class="badge bg-info text-white"><%= course.category_name %></span>
+            <% if (course.sub_category) { %>
+              <span class="badge" style="background: var(--accent-primary-light); color: #fff;"><%= course.sub_category %></span>
+            <% } %>
           </div>
           <h1 class="display-5 fw-bold mb-3">
             <%= course.name %>
