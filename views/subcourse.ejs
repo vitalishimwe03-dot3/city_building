@@ -43,6 +43,7 @@
             <% } else if (course.image) { %>
               <img src="/images/<%= course.image %>" alt="<%= course.name %> training" class="w-100 h-100" style="object-fit: contain; background: var(--bg-secondary); padding: 20px; border: 1px solid var(--border);">
             <% } else { %>
+              <% const defaultCourseImage = getToolImage(course.name) || 'https://images.pexels.com/photos/238622/pexels-photo-238622.jpeg?auto=compress&cs=tinysrgb&w=800'; %>
               <img src="<%= defaultCourseImage %>" alt="<%= course.name %> training" class="w-100 h-100" style="object-fit: cover;">
             <% } %>
           </div>
