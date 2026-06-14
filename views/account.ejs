@@ -42,6 +42,9 @@
                 <button class="nav-link" id="password-tab" data-bs-toggle="tab" data-bs-target="#password" type="button" role="tab">Password</button>
               </li>
               <li class="nav-item" role="presentation">
+                <button class="nav-link" id="wishlist-tab" data-bs-toggle="tab" data-bs-target="#wishlist" type="button" role="tab">Wishlist</button>
+              </li>
+              <li class="nav-item" role="presentation">
                 <button class="nav-link" id="language-tab" data-bs-toggle="tab" data-bs-target="#language" type="button" role="tab">Language</button>
               </li>
             </ul>
@@ -256,6 +259,14 @@
                 </form>
               </div>
 
+              <div class="tab-pane fade" id="wishlist" role="tabpanel" aria-labelledby="wishlist-tab">
+                <div id="wishlistContainer">
+                  <div class="text-center py-4 text-muted">
+                    <div class="spinner-border spinner-border-sm me-2" role="status"></div> Loading your wishlist...
+                  </div>
+                </div>
+              </div>
+
               <div class="tab-pane fade" id="language" role="tabpanel" aria-labelledby="language-tab">
                 <form method="post" action="/account/language" class="row g-3">
                   <div class="col-md-6">
@@ -314,6 +325,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
   document.getElementById('courses-tab')?.addEventListener('shown.bs.tab', function() { loadCourses(); });
   document.getElementById('dashboard-tab')?.addEventListener('shown.bs.tab', function() { loadProgress(); });
+  document.getElementById('wishlist-tab')?.addEventListener('shown.bs.tab', function() { loadWishlist(); });
 });
 
 async function loadProgress() {
@@ -336,6 +348,10 @@ async function loadProgress() {
     courses.forEach(c => {
       const pct = c.total_modules > 0 ? Math.round((c.completed_modules / c.total_modules) * 100) : 0;
       const badge = pct === 100 ? '<span class="badge bg-success">Completed</span>' : (pct > 0 ? '<span class="badge bg-info">In Progress</span>' : '<span class="badge bg-secondary">Not Started</span>');
+      var certLink = '';
+      if (pct === 100) {
+        certLink = '<div class="mt-2"><a href="/api/course/' + c.subcourse_id + '/certificate" class="btn btn-sm btn-success" target="_blank"><i class="bi bi-award-fill"></i> Certificate</a></div>';
+      }
       container.insertAdjacentHTML('beforeend',
         '<div class="col-md-6 progress-card-wrap">' +
           '<div class="progress-card">' +
@@ -343,6 +359,7 @@ async function loadProgress() {
             '<div class="course-category">' + escHtml(c.category_name) + ' — ' + badge + '</div>' +
             '<div class="progress-wrap"><div class="progress-fill" style="width:' + pct + '%"></div></div>' +
             '<div class="progress-stats"><span>' + c.completed_modules + '/' + c.total_modules + ' modules</span><span>' + pct + '%</span></div>' +
+            certLink +
           '</div>' +
         '</div>'
       );
@@ -373,6 +390,10 @@ async function loadCourses() {
       const statusBadge = pct === 100 ? 'bg-success' : (pct > 0 ? 'bg-info' : 'bg-secondary');
       const statusText = pct === 100 ? 'Completed' : (pct > 0 ? 'In Progress' : 'Not Started');
 
+      var certHtml = '';
+      if (pct === 100) {
+        certHtml = '<div class="mt-2"><a href="/api/course/' + reg.subcourse_id + '/certificate" class="btn btn-sm btn-success" target="_blank"><i class="bi bi-award-fill"></i> Download Certificate</a></div>';
+      }
       html += '<div class="card mb-3">' +
         '<div class="card-body">' +
           '<div class="d-flex justify-content-between align-items-start mb-2">' +
@@ -386,6 +407,7 @@ async function loadCourses() {
             '</div>' +
           '</div>' +
           '<div class="progress mb-3" style="height:6px;"><div class="progress-bar" style="width:' + pct + '%;background:linear-gradient(90deg,#0891b2,#06b6d4);"></div></div>' +
+          certHtml +
           '<div class="modules-list">';
 
       modules.forEach(m => {
@@ -426,6 +448,42 @@ async function loadCourses() {
   } catch (e) {
     console.error('Failed to load courses:', e);
     container.innerHTML = '<div class="alert alert-danger">Failed to load your courses. Please try again later.</div>';
+  }
+}
+
+async function loadWishlist() {
+  var container = document.getElementById('wishlistContainer');
+  if (!container) return;
+  try {
+    var res = await fetch('/api/my-wishlist');
+    var items = await res.json();
+    if (!items || items.length === 0) {
+      container.innerHTML = '<div class="text-center py-4 text-muted"><i class="bi bi-bookmark-heart" style="font-size:48px;display:block;margin-bottom:12px;opacity:0.3;"></i><p>Your wishlist is empty.</p><a href="/" class="btn btn-primary">Browse Courses</a></div>';
+      return;
+    }
+    var html = '<div class="row g-3">';
+    items.forEach(function(item) {
+      var stars = '';
+      var avg = parseFloat(item.avg_rating) || 0;
+      for (var i = 1; i <= 5; i++) {
+        stars += '<i class="bi ' + (i <= Math.round(avg) ? 'bi-star-fill' : 'bi-star') + '" style="color:#f59e0b;font-size:0.8rem;"></i>';
+      }
+      html += '<div class="col-md-6">' +
+        '<div class="card h-100">' +
+          '<div class="card-body">' +
+            '<h5 class="card-title">' + escHtml(item.course_name) + '</h5>' +
+            '<p class="text-muted small mb-2">' + escHtml(item.category_name) + ' &middot; ' + stars + ' <span class="ms-1">' + (avg > 0 ? avg.toFixed(1) : 'No ratings') + '</span></p>' +
+            '<p class="card-text small text-muted">' + escHtml((item.course_desc || '').substring(0, 120)) + '</p>' +
+            '<a href="/course/' + item.subcourse_id + '" class="btn btn-sm btn-outline-primary">View Course <i class="bi bi-arrow-right"></i></a>' +
+          '</div>' +
+        '</div>' +
+      '</div>';
+    });
+    html += '</div>';
+    container.innerHTML = html;
+  } catch (e) {
+    console.error('Failed to load wishlist:', e);
+    container.innerHTML = '<div class="alert alert-danger">Failed to load wishlist.</div>';
   }
 }
 

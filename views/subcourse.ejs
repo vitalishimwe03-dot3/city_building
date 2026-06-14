@@ -101,9 +101,21 @@
             </a>
           </div>
           <div id="registerMessage"></div>
-          <button class="btn btn-success btn-lg px-4 register-course-btn" data-course-id="<%= course.id %>">
-            <i class="bi bi-journal-plus"></i> Register for this Course
-          </button>
+          <div class="d-flex flex-wrap gap-2 mb-3">
+            <button class="btn btn-success btn-lg px-4 register-course-btn" data-course-id="<%= course.id %>">
+              <i class="bi bi-journal-plus"></i> Register for this Course
+            </button>
+            <button class="btn btn-outline-warning btn-lg px-4 wishlist-btn" data-course-id="<%= course.id %>">
+              <i class="bi bi-bookmark-heart"></i> <span id="wishlistText">Save to Wishlist</span>
+            </button>
+          </div>
+          <div class="mb-3" id="reviewSummary">
+            <div class="d-flex align-items-center gap-2">
+              <span class="star-rating" id="avgStars"></span>
+              <span class="fw-bold" id="avgRatingText">0.0</span>
+              <span class="text-muted" id="reviewCountText">(0 reviews)</span>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -141,6 +153,46 @@
           <i class="bi bi-award-fill fs-3 mb-2" style="color: var(--accent-primary-light);"></i>
           <h4 class="h6 fw-bold">Certification</h4>
           <p class="small text-muted mb-0">Recognized credential</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Reviews Section -->
+<section class="py-5" style="background: var(--bg-secondary);">
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-12 col-lg-10">
+        <h2 class="h3 fw-bold mb-4"><i class="bi bi-star-fill" style="color: #f59e0b;"></i> Student Reviews</h2>
+        <div id="reviewsContainer">
+          <div class="text-center py-4 text-muted">
+            <div class="spinner-border spinner-border-sm me-2" role="status"></div> Loading reviews...
+          </div>
+        </div>
+
+        <div class="mt-4 p-4" style="background: var(--bg-card); border-radius: 12px; border: 1px solid var(--border);">
+          <h3 class="h5 fw-bold mb-3"><i class="bi bi-pencil-square"></i> Write a Review</h3>
+          <div id="reviewLoginMessage">
+            <p class="text-muted"><a href="/login">Log in</a> to leave a review.</p>
+          </div>
+          <div id="reviewFormContainer" style="display:none;">
+            <div class="mb-3">
+              <label class="form-label fw-semibold">Your Rating</label>
+              <div class="star-input" id="starInput">
+                <% for (let i = 1; i <= 5; i++) { %>
+                  <i class="bi bi-star star-btn" data-value="<%= i %>" style="font-size: 1.8rem; cursor: pointer; color: var(--text-muted); transition: color 0.2s;"></i>
+                <% } %>
+              </div>
+              <input type="hidden" id="reviewRating" value="0">
+            </div>
+            <div class="mb-3">
+              <label for="reviewText" class="form-label">Your Review</label>
+              <textarea id="reviewText" class="form-control" rows="3" placeholder="Share your experience with this course..."></textarea>
+            </div>
+            <button id="submitReview" class="btn btn-primary"><i class="bi bi-send"></i> Submit Review</button>
+            <div id="reviewMessage" class="mt-2"></div>
+          </div>
         </div>
       </div>
     </div>
@@ -196,3 +248,171 @@
     </div>
   </div>
 </section>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  var courseId = '<%= course.id %>';
+  loadReviews(courseId);
+  loadWishlistStatus(courseId);
+
+  // Wishlist toggle
+  document.querySelector('.wishlist-btn')?.addEventListener('click', async function() {
+    var text = document.getElementById('wishlistText');
+    try {
+      var res = await fetch('/api/course/' + courseId + '/wishlist', { method: 'POST' });
+      var data = await res.json();
+      if (data.success) {
+        text.textContent = data.bookmarked ? 'Saved ✓' : 'Save to Wishlist';
+        this.classList.toggle('btn-outline-warning');
+        this.classList.toggle('btn-warning');
+      } else {
+        alert(data.error || 'Please log in first.');
+      }
+    } catch (e) {
+      console.error('Wishlist error:', e);
+    }
+  });
+
+  // Star rating input
+  var starBtns = document.querySelectorAll('.star-btn');
+  var ratingInput = document.getElementById('reviewRating');
+  starBtns.forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      var val = parseInt(this.dataset.value);
+      ratingInput.value = val;
+      starBtns.forEach(function(s, i) {
+        s.className = (i < val) ? 'bi bi-star-fill star-btn' : 'bi bi-star star-btn';
+        s.style.color = (i < val) ? '#f59e0b' : 'var(--text-muted)';
+      });
+    });
+    btn.addEventListener('mouseenter', function() {
+      var val = parseInt(this.dataset.value);
+      starBtns.forEach(function(s, i) {
+        s.style.color = (i < val) ? '#f59e0b' : 'var(--text-muted)';
+      });
+    });
+    btn.addEventListener('mouseleave', function() {
+      var val = parseInt(ratingInput.value);
+      starBtns.forEach(function(s, i) {
+        s.style.color = (i < val) ? '#f59e0b' : 'var(--text-muted)';
+      });
+    });
+  });
+
+  // Submit review
+  document.getElementById('submitReview')?.addEventListener('click', async function() {
+    var rating = document.getElementById('reviewRating').value;
+    var review = document.getElementById('reviewText').value.trim();
+    var msg = document.getElementById('reviewMessage');
+    if (!rating || parseInt(rating) < 1) {
+      msg.innerHTML = '<div class="alert alert-warning">Please select a rating.</div>';
+      return;
+    }
+    try {
+      var res = await fetch('/api/course/' + courseId + '/review', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ rating: parseInt(rating), review: review })
+      });
+      var data = await res.json();
+      if (data.success) {
+        msg.innerHTML = '<div class="alert alert-success">' + data.message + '</div>';
+        loadReviews(courseId);
+      } else {
+        msg.innerHTML = '<div class="alert alert-warning">' + (data.error || 'Please log in.') + '</div>';
+      }
+    } catch (e) {
+      msg.innerHTML = '<div class="alert alert-danger">Failed to submit review.</div>';
+    }
+  });
+});
+
+async function loadReviews(courseId) {
+  var container = document.getElementById('reviewsContainer');
+  var summary = document.getElementById('reviewSummary');
+  try {
+    var res = await fetch('/api/course/' + courseId + '/reviews');
+    var data = await res.json();
+
+    // Update summary
+    if (summary && data.stats) {
+      var avg = parseFloat(data.stats.avg_rating) || 0;
+      var count = data.stats.count || 0;
+      document.getElementById('avgRatingText').textContent = avg.toFixed(1);
+      document.getElementById('reviewCountText').textContent = '(' + count + ' review' + (count !== 1 ? 's' : '') + ')';
+      var starsHtml = '';
+      for (var i = 1; i <= 5; i++) {
+        starsHtml += '<i class="bi ' + (i <= Math.round(avg) ? 'bi-star-fill' : 'bi-star') + '" style="color:#f59e0b;font-size:1.1rem;"></i>';
+      }
+      document.getElementById('avgStars').innerHTML = starsHtml;
+    }
+
+    // Check if user can review
+    var loginMsg = document.getElementById('reviewLoginMessage');
+    var formContainer = document.getElementById('reviewFormContainer');
+    if (loginMsg && formContainer) {
+      var siteUser = '<%= siteUser ? "true" : "" %>';
+      if (siteUser) {
+        loginMsg.style.display = 'none';
+        formContainer.style.display = 'block';
+        if (data.myReview) {
+          document.getElementById('reviewRating').value = data.myReview.rating;
+          document.getElementById('reviewText').value = data.myReview.review || '';
+          var btns = document.querySelectorAll('.star-btn');
+          btns.forEach(function(s, i) {
+            s.className = (i < data.myReview.rating) ? 'bi bi-star-fill star-btn' : 'bi bi-star star-btn';
+            s.style.color = (i < data.myReview.rating) ? '#f59e0b' : 'var(--text-muted)';
+          });
+        }
+      } else {
+        loginMsg.style.display = 'block';
+        formContainer.style.display = 'none';
+      }
+    }
+
+    // Render reviews
+    if (!data.reviews || data.reviews.length === 0) {
+      container.innerHTML = '<div class="text-center py-4 text-muted"><i class="bi bi-chat-square-text" style="font-size:2rem;display:block;margin-bottom:8px;opacity:0.4;"></i>No reviews yet. Be the first to review!</div>';
+      return;
+    }
+    var html = '';
+    data.reviews.forEach(function(r) {
+      var starHtml = '';
+      for (var i = 1; i <= 5; i++) {
+        starHtml += '<i class="bi ' + (i <= r.rating ? 'bi-star-fill' : 'bi-star') + '" style="color:#f59e0b;font-size:0.9rem;"></i>';
+      }
+      html += '<div class="review-item p-3 mb-3" style="background:var(--bg-surface);border-radius:10px;border:1px solid var(--border);">' +
+        '<div class="d-flex justify-content-between align-items-start mb-1">' +
+          '<strong>' + escHtml(r.user_name) + '</strong>' +
+          '<small class="text-muted">' + new Date(r.created_at).toLocaleDateString() + '</small>' +
+        '</div>' +
+        '<div class="mb-1">' + starHtml + '</div>' +
+        (r.review ? '<p class="mb-0 text-muted small">' + escHtml(r.review) + '</p>' : '<p class="mb-0 text-muted small fst-italic">No written review.</p>') +
+      '</div>';
+    });
+    container.innerHTML = html;
+  } catch (e) {
+    container.innerHTML = '<div class="alert alert-danger">Failed to load reviews.</div>';
+  }
+}
+
+async function loadWishlistStatus(courseId) {
+  var btn = document.querySelector('.wishlist-btn');
+  var text = document.getElementById('wishlistText');
+  if (!btn) return;
+  try {
+    var res = await fetch('/api/course/' + courseId + '/wishlist-status');
+    var data = await res.json();
+    if (data.bookmarked) {
+      text.textContent = 'Saved ✓';
+      btn.classList.remove('btn-outline-warning');
+      btn.classList.add('btn-warning');
+    }
+  } catch (e) {}
+}
+
+function escHtml(str) {
+  if (!str) return '';
+  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+</script>

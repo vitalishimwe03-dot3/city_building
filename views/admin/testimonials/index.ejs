@@ -1,0 +1,50 @@
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h4 style="margin:0;font-weight:700;"><i class="bi bi-chat-quote"></i> Testimonials</h4>
+        <small style="color:var(--text-muted);">Manage student testimonials displayed on the homepage</small>
+    </div>
+    <a href="/admin/testimonials/create" class="btn btn-sm-custom btn-edit-custom"><i class="bi bi-plus-circle"></i> Add Testimonial</a>
+</div>
+
+<div class="admin-card-modern">
+    <% if (testimonials.length === 0) { %>
+        <div class="empty-state"><i class="bi bi-chat-quote"></i><h5>No testimonials found</h5><p>Add your first testimonial to display on the homepage.</p></div>
+    <% } else { %>
+        <div class="table-responsive">
+            <table class="table-custom">
+                <thead>
+                    <tr><th>Student</th><th>Rating</th><th>Content</th><th>Status</th><th>Order</th><th>Created</th><th>Actions</th></tr>
+                </thead>
+                <tbody>
+                    <% testimonials.forEach(t => { %>
+                        <tr>
+                            <td><strong><%= t.student_name %></strong><br><small class="text-muted"><%= t.student_title || '' %></small></td>
+                            <td>
+                                <% for (let i = 1; i <= 5; i++) { %>
+                                    <i class="bi <%= i <= t.rating ? 'bi-star-fill' : 'bi-star' %>" style="color:#f59e0b;font-size:0.8rem;"></i>
+                                <% } %>
+                            </td>
+                            <td><small><%= (t.content || '').substring(0, 80) %><%= t.content && t.content.length > 80 ? '...' : '' %></small></td>
+                            <td><span class="badge-custom <%= t.is_active ? 'success' : 'secondary' %>"><%= t.is_active ? 'Active' : 'Inactive' %></span></td>
+                            <td><%= t.display_order %></td>
+                            <td><small><%= new Date(t.created_at).toLocaleDateString() %></small></td>
+                            <td>
+                                <div class="action-btns">
+                                    <a href="/admin/testimonials/<%= t.id %>/edit" class="btn btn-sm-custom btn-edit-custom"><i class="bi bi-pencil"></i></a>
+                                    <form action="/admin/testimonials/<%= t.id %>/toggle" method="POST" style="display:inline;">
+                                        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                                        <button type="submit" class="btn btn-sm-custom btn-toggle-custom"><i class="bi <%= t.is_active ? 'bi-eye-slash' : 'bi-eye' %>"></i></button>
+                                    </form>
+                                    <form action="/admin/testimonials/<%= t.id %>/delete" method="POST" style="display:inline;" onsubmit="return confirm('Delete this testimonial?')">
+                                        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                                        <button type="submit" class="btn btn-sm-custom btn-delete-custom"><i class="bi bi-trash"></i></button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    <% }) %>
+                </tbody>
+            </table>
+        </div>
+    <% } %>
+</div>

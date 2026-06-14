@@ -51,11 +51,21 @@ INSERT OR IGNORE INTO subcourses (category_id,name,slug,image,description,sub_ca
 ((SELECT id FROM categories WHERE slug='career-development'),'Designers','designers','designer-icon.svg','Design profession','Career Pathways'),
 ((SELECT id FROM categories WHERE slug='career-development'),'Surveyors','surveyors','surveyor-icon.svg','Surveying profession','Career Pathways');
 
--- Hero slideshow seed data
+-- Hero slideshow seed data — building & architecture themed
 INSERT OR IGNORE INTO hero_slides (title, description, image_path, link_url, btn_text, animation, display_order, is_active, auto_play, transition_speed) VALUES
-('Welcome to City Building Engineering', 'Professional software training for architecture, engineering, and design careers in Kigali, Rwanda.', 'https://images.unsplash.com/photo-1487958449943-2429e8be8625?w=1400&q=80', '/about', 'Learn More', 'fade', 1, 1, 1, 6000),
-('Master Industry Software', 'Hands-on training in Revit, AutoCAD, ETABS, Lumion, and more. Build your career with us.', 'https://images.unsplash.com/photo-1504917595217-d4dc5ebe6122?w=1400&q=80', '/services', 'Explore Courses', 'slide', 2, 1, 1, 6000),
-('Join Our Community', 'Career-ready training with recognized certificates. Enroll today and shape your future.', 'https://images.unsplash.com/photo-1523240795612-9a054b0db644?w=1400&q=80', '/contact', 'Contact Us', 'zoom', 3, 1, 1, 6000);
+('Welcome to City Building Engineering', 'Professional software training for architecture, engineering, and design careers in Kigali, Rwanda.', 'https://images.unsplash.com/photo-1487958449943-2429e8be8625?w=1400&q=80', '/about', 'Learn More', 'fade', 1, 1, 1, 6500),
+('Build Rwanda''s Future', 'Hands-on training in Revit, AutoCAD, ETABS, Lumion, and more. Design tomorrow''s skyline today.', 'https://images.unsplash.com/photo-1486325212027-8081e485255e?w=1400&q=80', '/services', 'Explore Courses', 'slide', 2, 1, 1, 6500),
+('Master Structural Design', 'From foundations to skyscrapers — learn the software that engineers trust worldwide.', 'https://images.unsplash.com/photo-1503387762519-52582b8ba3f0?w=1400&q=80', '/category/structural-engineering', 'View Courses', 'zoom', 3, 1, 1, 6500),
+('Design with Confidence', 'Professional BIM, CAD, and rendering courses taught by industry experts in Kigali.', 'https://images.unsplash.com/photo-1518005020951-eccb494ad742?w=1400&q=80', '/category/architecture', 'Get Started', 'fade', 4, 1, 1, 6500),
+('Shape Your Engineering Career', 'Career-ready training with recognized certificates. Enroll today and build your future.', 'https://images.unsplash.com/photo-1541888946425-d81bb218711f?w=1400&q=80', '/contact', 'Contact Us', 'slide', 5, 1, 1, 6500);
+
+-- Student testimonials
+INSERT OR IGNORE INTO testimonials (student_name, student_title, content, rating, is_active, display_order) VALUES
+('Jean-Pierre Habimana', 'Revit Architecture Graduate', 'City Building Engineering gave me the practical Revit skills I needed to start my career in architectural design. The hands-on approach and industry-focused curriculum made all the difference.', 5, 1, 1),
+('Alice Mukamana', 'ETABS & Structural Design Student', 'The structural engineering courses are top-notch. I went from knowing nothing about ETABS to confidently analyzing building structures. Highly recommend for any aspiring engineer.', 5, 1, 2),
+('David Niyonzima', 'AutoCAD & Civil 3D Trainee', 'I completed the AutoCAD and Civil 3D training and immediately got an internship. The instructors are knowledgeable and the projects are real-world relevant.', 5, 1, 3),
+('Grace Uwimana', 'Lumion & Rendering Graduate', 'The visualization courses completely transformed my portfolio. I can now create stunning architectural renders that impress clients. Thank you City Building!', 4, 1, 4),
+('Patrick Mugisha', 'Full Stack Engineering Student', 'From Revit to Lumion, every course I''ve taken here has been practical and career-focused. The internship placement support is the cherry on top.', 5, 1, 5);
 
 -- Course modules for progress tracking
 INSERT OR IGNORE INTO course_modules (subcourse_id, title, description, order_index) VALUES

@@ -162,6 +162,46 @@ CREATE TABLE IF NOT EXISTS site_images (
   FOREIGN KEY (uploaded_by) REFERENCES admin_users(id) ON DELETE SET NULL
 );
 
+-- Course reviews & ratings
+CREATE TABLE IF NOT EXISTS course_reviews (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  user_id INT NOT NULL,
+  subcourse_id INT NOT NULL,
+  rating INT NOT NULL CHECK(rating >= 1 AND rating <= 5),
+  review TEXT,
+  is_approved BOOLEAN DEFAULT false,
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+  FOREIGN KEY (subcourse_id) REFERENCES subcourses(id) ON DELETE CASCADE,
+  UNIQUE(user_id, subcourse_id)
+);
+
+-- Course wishlist / bookmarks
+CREATE TABLE IF NOT EXISTS course_wishlist (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  user_id INT NOT NULL,
+  subcourse_id INT NOT NULL,
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+  FOREIGN KEY (subcourse_id) REFERENCES subcourses(id) ON DELETE CASCADE,
+  UNIQUE(user_id, subcourse_id)
+);
+
+-- Student testimonials
+CREATE TABLE IF NOT EXISTS testimonials (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  user_id INT,
+  student_name VARCHAR(255) NOT NULL,
+  student_title VARCHAR(255),
+  content TEXT NOT NULL,
+  rating INT DEFAULT 5,
+  avatar_url VARCHAR(512),
+  is_active BOOLEAN DEFAULT true,
+  display_order INTEGER DEFAULT 0,
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL
+);
+
 -- Hero slideshow slides
 CREATE TABLE IF NOT EXISTS hero_slides (
   id INTEGER PRIMARY KEY AUTOINCREMENT,

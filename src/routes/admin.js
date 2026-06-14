@@ -508,6 +508,92 @@ router.get('/activity', async (req, res, next) => {
   }
 });
 
+// ========== TESTIMONIALS MANAGEMENT ==========
+
+router.get('/testimonials', async (req, res, next) => {
+  try {
+    const [testimonials] = await pool.query(
+      `SELECT t.*, u.full_name as user_full_name FROM testimonials t LEFT JOIN users u ON t.user_id = u.id ORDER BY t.display_order ASC, t.created_at DESC`
+    );
+    res.render('admin/testimonials/index', { title: 'Testimonials', testimonials: testimonials || [] });
+  } catch (err) {
+    next(err);
+  }
+});
+
+router.get('/testimonials/create', (req, res) => {
+  res.render('admin/testimonials/form', { title: 'Create Testimonial', testimonial: null, error: null });
+});
+
+router.post('/testimonials', async (req, res, next) => {
+  try {
+    const { student_name, student_title, content, rating, display_order } = req.body;
+    if (!student_name || !content) {
+      return res.status(400).render('admin/testimonials/form', { title: 'Create Testimonial', testimonial: null, error: 'Student name and content are required.' });
+    }
+    await pool.query(
+      'INSERT INTO testimonials (student_name, student_title, content, rating, display_order) VALUES (?, ?, ?, ?, ?)',
+      [student_name, student_title || '', content, parseInt(rating) || 5, parseInt(display_order) || 0]
+    );
+    await Admin.logActivity(
+      req.session.adminUser.id, req.session.adminUser.full_name || req.session.adminUser.username,
+      'Created testimonial', 'testimonial', null,
+      `Created testimonial for "${student_name}"`,
+      req.ip
+    );
+    res.redirect('/admin/testimonials');
+  } catch (err) {
+    next(err);
+  }
+});
+
+router.get('/testimonials/:id/edit', async (req, res, next) => {
+  try {
+    const [[testimonial]] = await pool.query('SELECT * FROM testimonials WHERE id = ?', [req.params.id]);
+    if (!testimonial) return res.status(404).render('404', { title: 'Not found', message: 'Testimonial not found' });
+    res.render('admin/testimonials/form', { title: 'Edit Testimonial', testimonial });
+  } catch (err) {
+    next(err);
+  }
+});
+
+router.post('/testimonials/:id', async (req, res, next) => {
+  try {
+    const { student_name, student_title, content, rating, is_active, display_order } = req.body;
+    await pool.query(
+      'UPDATE testimonials SET student_name=?, student_title=?, content=?, rating=?, is_active=?, display_order=?, updated_at=CURRENT_TIMESTAMP WHERE id=?',
+      [student_name, student_title || '', content, parseInt(rating) || 5, is_active === 'on' ? 1 : 0, parseInt(display_order) || 0, req.params.id]
+    );
+    await Admin.logActivity(req.session.adminUser.id, req.session.adminUser.full_name || req.session.adminUser.username,
+      'Updated testimonial', 'testimonial', parseInt(req.params.id),
+      `Updated testimonial #${req.params.id}`, req.ip);
+    res.redirect('/admin/testimonials');
+  } catch (err) {
+    next(err);
+  }
+});
+
+router.post('/testimonials/:id/delete', async (req, res, next) => {
+  try {
+    await pool.query('DELETE FROM testimonials WHERE id = ?', [req.params.id]);
+    res.redirect('/admin/testimonials');
+  } catch (err) {
+    next(err);
+  }
+});
+
+router.post('/testimonials/:id/toggle', async (req, res, next) => {
+  try {
+    const [[t]] = await pool.query('SELECT is_active FROM testimonials WHERE id = ?', [req.params.id]);
+    if (t) {
+      await pool.query('UPDATE testimonials SET is_active = ? WHERE id = ?', [t.is_active ? 0 : 1, req.params.id]);
+    }
+    res.redirect('/admin/testimonials');
+  } catch (err) {
+    next(err);
+  }
+});
+
 // ========== SETTINGS ==========
 
 router.get('/settings', async (req, res, next) => {

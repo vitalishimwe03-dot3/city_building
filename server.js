@@ -9,6 +9,7 @@ const initDb = require('./src/models/initDb');
 const { setAdminLocals } = require('./src/middleware/auth');
 const { localizationMiddleware } = require('./src/localization');
 const adConfig = require('./src/config/ads');
+const logger = require('./src/logger');
 require('dotenv').config();
 
 const app = express();
@@ -22,9 +23,21 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
+const cspDirectives = {
+  defaultSrc: ["'self'"],
+  scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'", 'https://pagead2.googlesyndication.com', 'https://www.googletagmanager.com'],
+  styleSrc: ["'self'", "'unsafe-inline'", 'https://cdn.jsdelivr.net', 'https://fonts.googleapis.com'],
+  fontSrc: ["'self'", 'https://cdn.jsdelivr.net', 'https://fonts.gstatic.com'],
+  imgSrc: ["'self'", 'data:', 'blob:', 'https://images.unsplash.com', 'https://pagead2.googlesyndication.com'],
+  connectSrc: ["'self'", 'https://pagead2.googlesyndication.com'],
+  frameSrc: ["'self'", 'https://www.google.com'],
+  objectSrc: ["'none'"]
+};
+
 app.use(helmet({
-  contentSecurityPolicy: false,
+  contentSecurityPolicy: { directives: cspDirectives },
   crossOriginEmbedderPolicy: false,
+  referrerPolicy: { policy: 'strict-origin-when-cross-origin' }
 }));
 
 app.use(session({
@@ -85,10 +98,9 @@ app.use((req, res) => {
 
 app.use((err, req, res, next) => {
   if (err && Array.isArray(err.errors)) {
-    console.error('AggregateError with inner errors:');
-    err.errors.forEach((inner, i) => console.error(`#${i}:`, inner));
+    logger.error({ err: { message: 'AggregateError', errors: err.errors.map(e => e.message) } }, 'Request failed with aggregate errors');
   } else {
-    console.error(err);
+    logger.error({ err }, 'Unhandled request error');
   }
   if (process.env.NODE_ENV !== 'production') {
     const details = (err && Array.isArray(err.errors)) ? err.errors.map(e => e.stack || e.message).join('\n---\n') : (err.stack || err.message || String(err));
@@ -100,19 +112,15 @@ app.use((err, req, res, next) => {
 
 const port = process.env.PORT || 3000;
 
-console.log('Starting server...');
-console.log('__dirname:', __dirname);
-console.log('projectRoot (from initDb):', require('path').resolve(__dirname, 'src', 'models', '..', '..'));
+logger.info({ dir: __dirname }, 'Starting server...');
 initDb.init()
   .then(() => {
     app.listen(port, function() {
-      console.log('Server listening on http://localhost:' + port);
+      logger.info({ port }, 'Server listening');
     });
   })
   .catch(function(err) {
-    console.error('Failed to initialize database, exiting.');
-    console.error('Error:', err.message);
-    console.error('Stack:', err.stack);
+    logger.fatal({ err }, 'Failed to initialize database, exiting.');
     process.exit(1);
   });
 
