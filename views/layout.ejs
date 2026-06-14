@@ -18,6 +18,9 @@
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="City Building Engineering - Professional Software Training">
     <meta name="twitter:description" content="Professional software training for architecture, engineering, design, and construction careers in Kigali, Rwanda.">
+    <% if (adConfig && adConfig.adsenseEnabled) { %>
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-<%= adConfig.adsensePublisherId %>" crossorigin="anonymous"></script>
+    <% } %>
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
@@ -178,7 +181,9 @@
     </nav>
 
     <main>
+      <%- include('partials/ads', { slot: 'topBanner' }) %>
       <%- body %>
+      <%- include('partials/ads', { slot: 'footerBanner' }) %>
     </main>
 
     <footer class="site-footer">

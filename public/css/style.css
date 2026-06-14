@@ -1529,3 +1529,14 @@ a:hover { color: var(--accent); }
 
 .auth-role-indicator { margin-top: 16px; padding: 10px; border-radius: 8px; background: rgba(16,185,129,0.08); text-align: center; font-size: 13px; color: var(--text-secondary); }
 .auth-role-indicator .badge { font-size: 10px; text-transform: uppercase; letter-spacing: 0.05em; }
+
+.ad-container { overflow: hidden; max-width: 100%; }
+.ad-container ins.adsbygoogle { background: transparent; }
+[data-theme="light"] .ad-container .ad-placeholder { background: #f8f9fa; border-color: #dee2e6; }
+.ad-banner { min-height: 90px; }
+.ad-footer { min-height: 90px; }
+.ad-in-content { min-height: 90px; }
+.affiliate-card a { color: var(--accent-light); text-decoration: none; }
+.affiliate-card a:hover { text-decoration: underline; }
+[data-theme="light"] .affiliate-card a { color: #0284c7; }
+[data-theme="light"] .affiliate-card { background: #f8fafc; }

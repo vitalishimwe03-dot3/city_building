@@ -8,6 +8,7 @@ const pool = require('./src/db');
 const initDb = require('./src/models/initDb');
 const { setAdminLocals } = require('./src/middleware/auth');
 const { localizationMiddleware } = require('./src/localization');
+const adConfig = require('./src/config/ads');
 require('dotenv').config();
 
 const app = express();
@@ -46,6 +47,7 @@ app.use((req, res, next) => {
   req.pool = pool;
   res.locals.canonicalUrl = `${req.protocol}://${req.get('host')}${req.originalUrl}`;
   res.locals.metaDescription = 'City Building Engineering Company Ltd offers professional software training in Revit, AutoCAD, ETABS, Lumion and more. Enroll in Kigali, Rwanda for career-ready engineering and design courses.';
+  res.locals.adConfig = adConfig;
   next();
 });
 

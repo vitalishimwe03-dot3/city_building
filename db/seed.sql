@@ -24,9 +24,9 @@ INSERT OR IGNORE INTO subcourses (category_id,name,slug,image,description,sub_ca
 ((SELECT id FROM categories WHERE slug='structural-engineering'),'CSI Bridge','csibridge','csi-logo.svg','Bridge analysis and design','Bridge Design');
 
 INSERT OR IGNORE INTO subcourses (category_id,name,slug,image,description,sub_category) VALUES
-((SELECT id FROM categories WHERE slug='geotechnical-engineering'),'Plaxis 2D','plaxis-2d','bentley-logo.svg','Soil and foundation analysis','Soil Analysis'),
-((SELECT id FROM categories WHERE slug='geotechnical-engineering'),'Plaxis 3D','plaxis-3d','bentley-logo.svg','Soil and foundation analysis','Soil Analysis');
+((SELECT id FROM categories WHERE slug='geotechnical-engineering'),'Plaxis 2D','plaxis-2d','plaxis-logo.png','Soil and foundation analysis','Soil Analysis'),
 
+  ((SELECT id FROM categories WHERE slug='geotechnical-engineering'),'Plaxis 3D','plaxis-3d','plaxis-logo.png','Soil and foundation analysis','Soil Analysis');
 INSERT OR IGNORE INTO subcourses (category_id,name,slug,image,description,sub_category) VALUES
 ((SELECT id FROM categories WHERE slug='visualization-rendering'),'Lumion','lumion','lumion-logo.svg','Realistic rendering and animations','Architectural Visualization'),
 ((SELECT id FROM categories WHERE slug='visualization-rendering'),'Twinmotion','twinmotion','twinmotion-logo.svg','Real-time visualization','Architectural Visualization'),

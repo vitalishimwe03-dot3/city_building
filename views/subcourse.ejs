@@ -1,3 +1,5 @@
+<%- include('partials/ads', { slot: 'topBanner' }) %>
+
 <section class="subcourse-hero py-5">
   <div class="container">
     <% 
@@ -105,6 +107,11 @@
         </div>
       </div>
     </div>
+
+    <%- include('partials/ads', { slot: 'inContent' }) %>
+    <%- include('partials/ads', { slot: 'affiliate' }) %>
+    <%- include('partials/ads', { slot: 'sponsored' }) %>
+    <%- include('partials/ads', { slot: 'leadGen' }) %>
 
     <!-- Course Overview -->
     <div class="row g-4 mb-5">

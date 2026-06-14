@@ -1,3 +1,5 @@
+<%- include('partials/ads', { slot: 'topBanner' }) %>
+
 <section class="pb-4">
   <div class="container">
     <% 
@@ -48,6 +50,9 @@
       let currentSubCat = '';
       const sortedCourses = [...subcourses];
     %>
+    <%- include('partials/ads', { slot: 'inContent' }) %>
+    <%- include('partials/ads', { slot: 'affiliate' }) %>
+
     <div id="courses" class="row g-4">
       <% if (subcourses.length === 0) { %>
         <div class="col-12"><div class="alert alert-warning">No softwares are available for this category yet.</div></div>

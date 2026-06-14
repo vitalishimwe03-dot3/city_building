@@ -1,0 +1,169 @@
+<%
+// Ad slot partial - action-based earning
+// Usage:
+//   <%- include('partials/ads', { slot: 'topBanner' }) %>
+//   <%- include('partials/ads', { slot: 'inContent' }) %>
+//   <%- include('partials/ads', { slot: 'affiliate' }) %>
+//   <%- include('partials/ads', { slot: 'sponsored' }) %>
+//   <%- include('partials/ads', { slot: 'leadGen' }) %>
+%>
+<% if (adConfig) { %>
+
+  <%# ==================== TOP BANNER (AdSense PPC or CPC network) ==================== %>
+  <% if (slot === 'topBanner' && adConfig.showTopBanner) { %>
+    <div class="ad-container ad-banner text-center my-3">
+      <div style="background: var(--bg-secondary); border: 1px solid var(--border-primary); border-radius: 8px; padding: 16px; min-height: 90px; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+        <% if (adConfig.adsenseEnabled) { %>
+          <ins class="adsbygoogle"
+            style="display:block"
+            data-ad-client="ca-pub-<%= adConfig.adsensePublisherId %>"
+            data-ad-slot="<%= adConfig.adSlots.topBanner %>"
+            data-ad-format="auto"
+            data-full-width-responsive="true"></ins>
+          <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+        <% } else { %>
+          <a href="<%= adConfig.softwareAffiliates.autodesk.url %>" target="_blank" rel="nofollow sponsored" style="display: block; width: 100%; text-decoration: none;">
+            <div style="display: flex; align-items: center; justify-content: center; gap: 12px; flex-wrap: wrap;">
+              <span style="background: var(--accent); color: #fff; padding: 4px 10px; border-radius: 4px; font-size: 11px; font-weight: 700; text-transform: uppercase;">Ad</span>
+              <span style="font-weight: 600;"><%= adConfig.softwareAffiliates.autodesk.label %></span>
+              <span style="font-size: 13px; color: var(--text-muted);"><%= adConfig.softwareAffiliates.autodesk.promo %></span>
+              <span style="background: var(--accent-light); color: #fff; padding: 6px 16px; border-radius: 6px; font-weight: 600; font-size: 13px;">Learn More →</span>
+            </div>
+          </a>
+        <% } %>
+      </div>
+    </div>
+  <% } %>
+
+  <%# ==================== IN-CONTENT (AdSense PPC or affiliate CTA) ==================== %>
+  <% if (slot === 'inContent' && adConfig.showInContent) { %>
+    <div class="ad-container ad-in-content text-center my-4">
+      <div style="background: var(--bg-secondary); border: 1px solid var(--border-primary); border-radius: 8px; padding: 20px; min-height: 90px; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+        <% if (adConfig.adsenseEnabled) { %>
+          <ins class="adsbygoogle"
+            style="display:block"
+            data-ad-client="ca-pub-<%= adConfig.adsensePublisherId %>"
+            data-ad-slot="<%= adConfig.adSlots.inContent %>"
+            data-ad-format="auto"
+            data-full-width-responsive="true"></ins>
+          <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+        <% } else if (adConfig.affiliateEnabled) { %>
+          <a href="<%= adConfig.softwareAffiliates.amazonBooks.url %>" target="_blank" rel="nofollow sponsored" style="display: flex; align-items: center; justify-content: center; gap: 10px; flex-wrap: wrap; text-decoration: none; width: 100%;">
+            <span style="background: #f59e0b; color: #000; padding: 2px 8px; border-radius: 4px; font-size: 10px; font-weight: 700; text-transform: uppercase;">Sponsored</span>
+            <span style="font-weight: 600;">Find Engineering Books on Amazon</span>
+            <span style="font-size: 13px; color: var(--text-muted);">Revit, AutoCAD, ETABS & more</span>
+            <span style="background: #f59e0b; color: #000; padding: 4px 14px; border-radius: 6px; font-weight: 600; font-size: 12px;">Shop Now →</span>
+          </a>
+          <small style="font-size: 9px; color: var(--text-muted); margin-top: 4px;">We earn commission on qualifying purchases</small>
+        <% } else { %>
+          <small class="text-muted">— Ad Space —</small>
+        <% } %>
+      </div>
+    </div>
+  <% } %>
+
+  <%# ==================== AFFILIATE SIDEBAR (Commission per sale) ==================== %>
+  <% if (slot === 'affiliate' && adConfig.showAffiliate) { %>
+    <div class="affiliate-card my-3 p-3" style="background: var(--bg-secondary); border-radius: 8px; border: 1px solid var(--border-primary);">
+      <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 12px;">
+        <span style="background: var(--accent); color: #fff; padding: 2px 8px; border-radius: 4px; font-size: 10px; font-weight: 700;">Affiliate</span>
+        <small class="text-uppercase fw-bold" style="color: var(--accent-light);">Recommended Tools</small>
+      </div>
+      <ul class="list-unstyled mb-0 small">
+        <% if (adConfig.softwareAffiliates.autodesk) { %>
+          <li class="mb-2">
+            <a href="<%= adConfig.softwareAffiliates.autodesk.url %>" target="_blank" rel="nofollow sponsored" style="display: flex; align-items: center; gap: 8px; text-decoration: none; padding: 8px; border-radius: 6px; background: var(--bg-surface);">
+              <i class="bi bi-download" style="color: var(--accent-light);"></i>
+              <div>
+                <div style="font-weight: 600;"><%= adConfig.softwareAffiliates.autodesk.label %></div>
+                <div style="font-size: 11px; color: var(--text-muted);"><%= adConfig.softwareAffiliates.autodesk.promo %></div>
+              </div>
+            </a>
+          </li>
+        <% } %>
+        <% if (adConfig.softwareAffiliates.udemy) { %>
+          <li class="mb-2">
+            <a href="<%= adConfig.softwareAffiliates.udemy.url %>" target="_blank" rel="nofollow sponsored" style="display: flex; align-items: center; gap: 8px; text-decoration: none; padding: 8px; border-radius: 6px; background: var(--bg-surface);">
+              <i class="bi bi-play-circle" style="color: #a855f7;"></i>
+              <div>
+                <div style="font-weight: 600;"><%= adConfig.softwareAffiliates.udemy.label %></div>
+                <div style="font-size: 11px; color: var(--text-muted);"><%= adConfig.softwareAffiliates.udemy.promo %></div>
+              </div>
+            </a>
+          </li>
+        <% } %>
+        <% if (adConfig.softwareAffiliates.amazonBooks) { %>
+          <li class="mb-0">
+            <a href="<%= adConfig.softwareAffiliates.amazonBooks.url %>" target="_blank" rel="nofollow sponsored" style="display: flex; align-items: center; gap: 8px; text-decoration: none; padding: 8px; border-radius: 6px; background: var(--bg-surface);">
+              <i class="bi bi-book" style="color: #f59e0b;"></i>
+              <div>
+                <div style="font-weight: 600;"><%= adConfig.softwareAffiliates.amazonBooks.label %></div>
+                <div style="font-size: 11px; color: var(--text-muted);"><%= adConfig.softwareAffiliates.amazonBooks.promo %></div>
+              </div>
+            </a>
+          </li>
+        <% } %>
+      </ul>
+      <small class="text-muted" style="font-size: 9px; display: block; margin-top: 8px;">We earn commission when you purchase through these links.</small>
+    </div>
+  <% } %>
+
+  <%# ==================== SPONSORED COURSE (Pay per enrollment) ==================== %>
+  <% if (slot === 'sponsored' && adConfig.showSponsored && adConfig.sponsoredCourses && adConfig.sponsoredCourses.length > 0) { %>
+    <% adConfig.sponsoredCourses.forEach(function(course) { %>
+      <div class="affiliate-card my-3 p-3" style="background: var(--bg-secondary); border-radius: 8px; border: 1px solid var(--border-primary);">
+        <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 8px;">
+          <span style="background: #f59e0b; color: #000; padding: 2px 8px; border-radius: 4px; font-size: 10px; font-weight: 700;"><%= course.badge || 'Sponsored' %></span>
+          <small class="text-uppercase fw-bold" style="color: var(--warm);">Featured Course</small>
+        </div>
+        <div style="font-weight: 600; margin-bottom: 4px;"><%= course.name %></div>
+        <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 8px;"><%= course.payout %></div>
+        <a href="<%= course.url %>" target="_blank" rel="nofollow sponsored" class="btn btn-sm btn-warning" style="font-weight: 600;">Enroll Now →</a>
+      </div>
+    <% }); %>
+  <% } %>
+
+  <%# ==================== LEAD GENERATION (Pay per form submit) ==================== %>
+  <% if (slot === 'leadGen' && adConfig.leadGenEnabled) { %>
+    <div class="affiliate-card my-3 p-3" style="background: var(--bg-secondary); border-radius: 8px; border: 1px solid var(--border-primary);">
+      <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 8px;">
+        <span style="background: var(--accent); color: #fff; padding: 2px 8px; border-radius: 4px; font-size: 10px; font-weight: 700;">Partner</span>
+        <small class="text-uppercase fw-bold" style="color: var(--accent-light);">Free Consultation</small>
+      </div>
+      <p style="font-size: 13px; margin-bottom: 8px;">Get a free career consultation from our engineering partners.</p>
+      <form action="<%= process.env.LEADGEN_FORM_URL || '#' %>" method="POST" target="_blank">
+        <div class="d-flex gap-2">
+          <input type="email" name="email" class="form-control form-control-sm" placeholder="Your email" required>
+          <button type="submit" class="btn btn-sm btn-primary" style="font-weight: 600;">Get Started</button>
+        </div>
+        <small style="font-size: 9px; color: var(--text-muted); display: block; margin-top: 4px;">We earn a commission for each qualified lead.</small>
+      </form>
+    </div>
+  <% } %>
+
+  <%# ==================== FOOTER BANNER ==================== %>
+  <% if (slot === 'footerBanner' && adConfig.showFooterBanner) { %>
+    <div class="ad-container ad-footer text-center mt-4 mb-2">
+      <div style="background: var(--bg-secondary); border: 1px solid var(--border-primary); border-radius: 8px; padding: 12px; min-height: 60px; display: flex; align-items: center; justify-content: center;">
+        <% if (adConfig.adsenseEnabled) { %>
+          <ins class="adsbygoogle"
+            style="display:block"
+            data-ad-client="ca-pub-<%= adConfig.adsensePublisherId %>"
+            data-ad-slot="<%= adConfig.adSlots.footerBanner %>"
+            data-ad-format="auto"
+            data-full-width-responsive="true"></ins>
+          <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+        <% } else if (adConfig.affiliateEnabled) { %>
+          <a href="<%= adConfig.softwareAffiliates.udemy.url %>" target="_blank" rel="nofollow sponsored" style="text-decoration: none; display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+            <span style="background: #a855f7; color: #fff; padding: 2px 8px; border-radius: 4px; font-size: 10px;">Learn Online</span>
+            <span style="font-weight: 600;"><%= adConfig.softwareAffiliates.udemy.label %></span>
+            <span style="color: var(--text-muted); font-size: 13px;">Starts at $12.99</span>
+          </a>
+        <% } else { %>
+          <small class="text-muted">Ad Space</small>
+        <% } %>
+      </div>
+    </div>
+  <% } %>
+
+<% } %>
