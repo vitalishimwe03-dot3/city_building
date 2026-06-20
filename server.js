@@ -49,7 +49,7 @@ app.use(session({
     secure: process.env.NODE_ENV === 'production',
     httpOnly: true,
     sameSite: 'lax',
-    maxAge: 2 * 60 * 60 * 1000
+    maxAge: 4 * 60 * 60 * 1000
   }
 }));
 
@@ -61,6 +61,8 @@ app.use((req, res, next) => {
   res.locals.canonicalUrl = `${req.protocol}://${req.get('host')}${req.originalUrl}`;
   res.locals.metaDescription = 'City Building Engineering Company Ltd offers professional software training in Revit, AutoCAD, ETABS, Lumion and more. Enroll in Kigali, Rwanda for career-ready engineering and design courses.';
   res.locals.adConfig = adConfig;
+  const gId = process.env.GOOGLE_CLIENT_ID;
+  res.locals.googleAuthEnabled = !!(gId && gId !== 'your-google-client-id.apps.googleusercontent.com' && process.env.GOOGLE_CLIENT_SECRET);
   next();
 });
 

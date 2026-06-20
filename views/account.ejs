@@ -116,6 +116,7 @@
 
               <div class="tab-pane fade" id="profile" role="tabpanel" aria-labelledby="profile-tab">
                 <form method="post" action="/account/profile" class="row g-3">
+                  <input type="hidden" name="_csrf" value="<%= csrfToken %>">
                   <div class="col-md-6">
                     <label class="form-label">Full Name</label>
                     <input type="text" name="fullName" class="form-control" value="<%= user.full_name %>" required>
@@ -241,6 +242,7 @@
 
               <div class="tab-pane fade" id="password" role="tabpanel" aria-labelledby="password-tab">
                 <form method="post" action="/account/change-password" class="row g-3">
+                  <input type="hidden" name="_csrf" value="<%= csrfToken %>">
                   <div class="col-12">
                     <label class="form-label">Current Password</label>
                     <input type="password" name="currentPassword" class="form-control" required>
@@ -269,6 +271,7 @@
 
               <div class="tab-pane fade" id="language" role="tabpanel" aria-labelledby="language-tab">
                 <form method="post" action="/account/language" class="row g-3">
+                  <input type="hidden" name="_csrf" value="<%= csrfToken %>">
                   <div class="col-md-6">
                     <label class="form-label">Preferred language</label>
                     <select name="language" class="form-select">

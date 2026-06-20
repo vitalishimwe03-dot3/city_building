@@ -2,7 +2,7 @@
 const nodemailer = require('nodemailer');
 
 const emailUser = process.env.EMAIL_USER ? process.env.EMAIL_USER.trim() : undefined;
-const emailPass = process.env.EMAIL_PASS ? process.env.EMAIL_PASS.replace(/\s+/g, '').trim() : undefined;
+const emailPass = process.env.EMAIL_PASS ? process.env.EMAIL_PASS.trim() : undefined;
 const emailService = process.env.EMAIL_SERVICE || 'gmail';
 const emailTransport = process.env.EMAIL_TRANSPORT || emailService;
 const emailHost = process.env.EMAIL_HOST;
@@ -155,6 +155,7 @@ async function sendUserPasswordResetEmail(user, resetToken, baseUrl) {
 }
 
 async function sendOtpEmail(email, otp) {
+  console.log(`[DEV] OTP for ${email}: ${otp}`);
   const mailOptions = {
     from: emailUser,
     to: email,

@@ -31,6 +31,47 @@ const otpLimiter = rateLimit({
   message: { error: 'Too many OTP attempts, please try again later.' }
 });
 
+const forgotPasswordLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000,
+  max: 5,
+  message: { error: 'Too many password reset requests, please try again after an hour.' },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
+const resendOtpLimiter = rateLimit({
+  windowMs: 10 * 60 * 1000,
+  max: 3,
+  message: { error: 'Too many OTP resend requests, please try again later.' },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
+function validateCsrfToken(req) {
+  if (['POST', 'PUT', 'PATCH', 'DELETE'].includes(req.method)) {
+    const token = req.body._csrf || req.headers['x-csrf-token'];
+    return token && req.session?.csrfToken && token === req.session.csrfToken;
+  }
+  return true;
+}
+
+function csrfProtection(req, res, next) {
+  if (!validateCsrfToken(req)) {
+    return res.status(403).render('login', { title: 'Login', error: 'Invalid form token. Please try again.' });
+  }
+  next();
+}
+
+function validatePasswordStrength(password) {
+  const errors = [];
+  if (!password || password.length < 8) errors.push('at least 8 characters');
+  if (!/[a-z]/.test(password)) errors.push('one lowercase letter');
+  if (!/[A-Z]/.test(password)) errors.push('one uppercase letter');
+  if (!/\d/.test(password)) errors.push('one number');
+  if (!/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password)) errors.push('one special character');
+  return errors;
+}
+
 const accountDashboardNews = [
   { title: 'New course launch', summary: 'Explore our latest Structural and Rendering courses now available.', date: 'June 1, 2026' },
   { title: 'Internship program open', summary: 'Applications are open for the July internship cohort. Submit your profile today.', date: 'May 25, 2026' },
@@ -47,6 +88,10 @@ router.post('/signup', signupLimiter, async (req, res, next) => {
     const { fullName, email, phone, password, confirmPassword } = req.body;
     if (!fullName || !email || !password || password !== confirmPassword) {
       return res.status(400).render('signup', { title: 'Sign up', error: 'Please provide valid details and matching passwords.' });
+    }
+    const strengthErrors = validatePasswordStrength(password);
+    if (strengthErrors.length > 0) {
+      return res.status(400).render('signup', { title: 'Sign up', error: 'Password must include: ' + strengthErrors.join(', ') + '.' });
     }
     const exists = await SiteUser.getUserByEmail(email);
     if (exists) return res.status(400).render('signup', { title: 'Sign up', error: 'Email already registered.' });
@@ -90,7 +135,7 @@ router.post('/verify-email', otpLimiter, async (req, res, next) => {
   }
 });
 
-router.post('/resend-otp', async (req, res, next) => {
+router.post('/resend-otp', resendOtpLimiter, async (req, res, next) => {
   try {
     const { email } = req.body;
     if (!email) return res.status(400).json({ error: 'Email required' });
@@ -152,6 +197,7 @@ router.post('/login', loginLimiter, async (req, res, next) => {
 
     req.session.siteUser = { id: user.id, email: user.email, full_name: user.full_name };
     req.session.userLanguage = user.language || 'en';
+    if (!req.session.csrfToken) req.session.csrfToken = crypto.randomBytes(32).toString('hex');
     res.redirect('/');
   } catch (err) {
     return res.status(503).render('login', { title: 'Login', error: 'Login service is temporarily unavailable. Please try again later.' });
@@ -159,7 +205,7 @@ router.post('/login', loginLimiter, async (req, res, next) => {
 });
 
 // ── Google OAuth (only if configured) ──
-if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET) {
+if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET && !process.env.GOOGLE_CLIENT_ID.includes('your-google-client-id')) {
   router.get('/auth/google', passport.authenticate('google', { scope: ['profile', 'email'], session: false }));
 
   router.get('/auth/google/callback',
@@ -168,25 +214,33 @@ if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET) {
       if (!req.user) return res.redirect('/login');
       req.session.siteUser = { id: req.user.id, email: req.user.email, full_name: req.user.full_name };
       req.session.userLanguage = req.user.language || 'en';
+      if (!req.session.csrfToken) req.session.csrfToken = crypto.randomBytes(32).toString('hex');
       res.redirect('/');
     }
   );
+} else {
+  router.get('/auth/google', (req, res) => {
+    res.render('login', { title: 'Login', error: 'Google sign-in is not configured yet. Please sign in with email and password.' });
+  });
 }
 
 // ── Logout ──
 router.get('/logout', (req, res) => {
-  if (req.session) req.session.siteUser = null;
-  res.redirect('/');
+  if (req.session) {
+    req.session.destroy(() => { res.redirect('/'); });
+  } else {
+    res.redirect('/');
+  }
 });
 
 // ── Account ──
 router.get('/account', async (req, res) => {
   if (!req.session.siteUser) return res.redirect('/login');
   const user = await SiteUser.getUserById(req.session.siteUser.id);
-  res.render('account', { title: 'Account Settings', user, error: null, success: null, dashboardNews: accountDashboardNews });
+  res.render('account', { title: 'Account Settings', user, error: null, success: null, dashboardNews: accountDashboardNews, csrfToken: req.session?.csrfToken });
 });
 
-router.post('/account/profile', async (req, res, next) => {
+router.post('/account/profile', csrfProtection, async (req, res, next) => {
   try {
     if (!req.session.siteUser) return res.redirect('/login');
     const { fullName, phone } = req.body;
@@ -199,7 +253,7 @@ router.post('/account/profile', async (req, res, next) => {
   }
 });
 
-router.post('/account/language', async (req, res, next) => {
+router.post('/account/language', csrfProtection, async (req, res, next) => {
   try {
     if (!req.session.siteUser) return res.redirect('/login');
     const { language } = req.body;
@@ -212,13 +266,18 @@ router.post('/account/language', async (req, res, next) => {
   }
 });
 
-router.post('/account/change-password', async (req, res, next) => {
+router.post('/account/change-password', csrfProtection, async (req, res, next) => {
   try {
     if (!req.session.siteUser) return res.redirect('/login');
     const { currentPassword, newPassword, confirmPassword } = req.body;
     if (!currentPassword || !newPassword || newPassword !== confirmPassword) {
       const user = await SiteUser.getUserById(req.session.siteUser.id);
       return res.status(400).render('account', { title: 'Account Settings', user, error: 'Password mismatch or missing fields.', success: null, dashboardNews: accountDashboardNews });
+    }
+    const strengthErrors = validatePasswordStrength(newPassword);
+    if (strengthErrors.length > 0) {
+      const user = await SiteUser.getUserById(req.session.siteUser.id);
+      return res.status(400).render('account', { title: 'Account Settings', user, error: 'Password must include: ' + strengthErrors.join(', ') + '.', success: null, dashboardNews: accountDashboardNews });
     }
     const fullUser = await SiteUser.getUserByEmail(req.session.siteUser.email);
     if (!fullUser) {
@@ -247,7 +306,7 @@ router.get('/forgot-password', (req, res) => {
   res.render('forgot-password', { title: 'Forgot Password', error: null });
 });
 
-router.post('/forgot-password', async (req, res, next) => {
+router.post('/forgot-password', forgotPasswordLimiter, async (req, res, next) => {
   try {
     const { email } = req.body;
     if (!email) {
@@ -282,6 +341,10 @@ router.post('/reset-password', async (req, res, next) => {
     const { token, password, confirmPassword } = req.body;
     if (!token || !password || password !== confirmPassword) {
       return res.status(400).render('reset-password', { title: 'Reset Password', token, error: 'Password mismatch or token missing.' });
+    }
+    const strengthErrors = validatePasswordStrength(password);
+    if (strengthErrors.length > 0) {
+      return res.status(400).render('reset-password', { title: 'Reset Password', token, error: 'Password must include: ' + strengthErrors.join(', ') + '.' });
     }
     const user = await SiteUser.resetPasswordWithToken(token, password);
     if (!user) {

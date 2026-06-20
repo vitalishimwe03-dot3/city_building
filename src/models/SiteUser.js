@@ -122,7 +122,7 @@ async function requestPasswordReset(email) {
   if (!user.is_verified) return null;
 
   const resetToken = generateResetToken();
-  const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000);
+  const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString();
 
   await pool.query(
     'INSERT INTO user_password_resets (user_id, reset_token, expires_at) VALUES (?, ?, ?)',

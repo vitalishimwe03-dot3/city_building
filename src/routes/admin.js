@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const crypto = require('crypto');
+const rateLimit = require('express-rate-limit');
 const pool = require('../db');
 const User = require('../models/User');
 const Admin = require('../models/Admin');
@@ -9,8 +10,16 @@ const initDb = require('../models/initDb');
 const { isAdminAuthenticated } = require('../middleware/auth');
 const { sendAdminPasswordResetEmail } = require('../email');
 
+const adminForgotPasswordLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000,
+  max: 5,
+  message: { error: 'Too many password reset requests, please try again after an hour.' },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
 function getClientIp(req) {
-  return req.headers['x-forwarded-for']?.split(',')[0]?.trim() || req.connection?.remoteAddress || req.ip;
+  return req.headers['x-forwarded-for']?.split(',')[0]?.trim() || req.socket?.remoteAddress || req.ip;
 }
 
 function generateCsrfToken() {
@@ -105,7 +114,7 @@ router.get('/dashboard', async (req, res, next) => {
     res.render('admin/dashboard', {
       title: 'Dashboard',
       admin,
-      clientIp: req.ip || req.connection?.remoteAddress || 'unknown',
+      clientIp: req.ip || req.socket?.remoteAddress || 'unknown',
       sessionCreatedAt: req.session?.createdAt,
       stats: {
         enquiries: enquiries[0] || { total: 0, new: 0 },
@@ -644,7 +653,7 @@ router.get('/forgot-password', (req, res) => {
   res.render('admin/forgot-password', { title: 'Admin Forgot Password', layout: false, error: null });
 });
 
-router.post('/forgot-password', async (req, res, next) => {
+router.post('/forgot-password', adminForgotPasswordLimiter, async (req, res, next) => {
   try {
     const { email } = req.body;
     if (!email) {
@@ -677,6 +686,10 @@ router.post('/reset-password', async (req, res, next) => {
     const { token, password, confirmPassword } = req.body;
     if (!token || !password || password !== confirmPassword) {
       return res.status(400).render('admin/reset-password', { title: 'Reset Password', layout: false, token, error: 'Password mismatch or token missing.' });
+    }
+    const strengthErrors = validatePasswordStrength(password);
+    if (strengthErrors.length > 0) {
+      return res.status(400).render('admin/reset-password', { title: 'Reset Password', layout: false, token, error: 'Password must include: ' + strengthErrors.join(', ') + '.' });
     }
     const user = await User.resetPasswordWithToken(token, password);
     if (!user) {
