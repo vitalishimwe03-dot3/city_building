@@ -9,6 +9,14 @@ const SiteUser = require('../models/SiteUser');
 const initDb = require('../models/initDb');
 const { isAdminAuthenticated } = require('../middleware/auth');
 const { sendAdminPasswordResetEmail } = require('../email');
+const multer = require('multer');
+const path = require('path');
+
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => cb(null, 'public/uploads'),
+  filename: (req, file, cb) => cb(null, Date.now() + '-' + Math.round(Math.random() * 1E9) + path.extname(file.originalname))
+});
+const upload = multer({ storage, limits: { fileSize: 5 * 1024 * 1024 } });
 
 const adminForgotPasswordLimiter = rateLimit({
   windowMs: 60 * 60 * 1000,
