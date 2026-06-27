@@ -1,0 +1,78 @@
+<%- include('partials/ads', { slot: 'topBanner' }) %>
+
+<section class="py-5">
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-12 col-lg-10">
+        <div class="text-center mb-5">
+          <p class="text-uppercase small fw-semibold mb-2" style="color: var(--accent-primary-light);">FAQ</p>
+          <h1 class="display-5 fw-bold mb-3">Frequently Asked Questions</h1>
+          <p class="lead text-muted mx-auto" style="max-width: 700px;">Find answers to common questions about our software training courses, enrollment, fees, certificates, and more at City Building Engineering Company Ltd in Kigali, Rwanda.</p>
+        </div>
+
+        <div class="mb-4">
+          <input type="text" id="faqSearch" class="form-control form-control-lg" placeholder="Search questions..." autocomplete="off">
+        </div>
+
+        <div class="accordion" id="faqAccordion">
+          <% if (typeof faqs !== 'undefined' && faqs && faqs.length > 0) { %>
+            <% faqs.forEach(function(faq, i) { %>
+              <div class="accordion-item faq-item mb-3 border-0" style="background: var(--bg-surface); border-radius: 12px !important; overflow: hidden; border: 1px solid var(--border);">
+                <h2 class="accordion-header">
+                  <button class="accordion-button <%= i > 0 ? 'collapsed' : '' %>" type="button" data-bs-toggle="collapse" data-bs-target="#faq<%= i %>" aria-expanded="<%= i === 0 ? 'true' : 'false' %>" aria-controls="faq<%= i %>" style="font-weight: 600; font-size: 1.05rem;">
+                    <%= faq.question %>
+                  </button>
+                </h2>
+                <div id="faq<%= i %>" class="accordion-collapse collapse <%= i === 0 ? 'show' : '' %>" data-bs-parent="#faqAccordion">
+                  <div class="accordion-body text-muted">
+                    <%= faq.answer %>
+                  </div>
+                </div>
+              </div>
+            <% }); %>
+          <% } else { %>
+            <div class="text-center py-5 text-muted">
+              <i class="bi bi-question-circle" style="font-size: 3rem; display: block; margin-bottom: 1rem; opacity: 0.4;"></i>
+              <p>No FAQs available yet. Please <a href="/contact">contact us</a> with your questions.</p>
+            </div>
+          <% } %>
+        </div>
+
+        <div class="text-center mt-5 p-5" style="background: var(--bg-secondary); border-radius: 16px;">
+          <i class="bi bi-chat-dots" style="font-size: 2.5rem; color: var(--accent-primary-light); display: block; margin-bottom: 1rem;"></i>
+          <h2 class="h4 fw-bold mb-2">Still have questions?</h2>
+          <p class="text-muted mb-4">We are here to help. Reach out to us anytime.</p>
+          <div class="d-flex flex-wrap gap-3 justify-content-center">
+            <a href="https://wa.me/250789257758?text=Hello%20City%20Building!%20I%20have%20a%20question%20about%20your%20courses." target="_blank" rel="noreferrer" class="btn btn-success btn-lg">
+              <i class="bi bi-whatsapp"></i> WhatsApp Us
+            </a>
+            <a href="/contact" class="btn btn-primary btn-lg">
+              <i class="bi bi-envelope"></i> Contact Form
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  var searchInput = document.getElementById('faqSearch');
+  var faqItems = document.querySelectorAll('.faq-item');
+  if (searchInput) {
+    searchInput.addEventListener('input', function() {
+      var term = this.value.toLowerCase().trim();
+      faqItems.forEach(function(item) {
+        var question = item.querySelector('.accordion-button').textContent.toLowerCase();
+        var answer = item.querySelector('.accordion-body').textContent.toLowerCase();
+        if (!term || question.includes(term) || answer.includes(term)) {
+          item.style.display = '';
+        } else {
+          item.style.display = 'none';
+        }
+      });
+    });
+  }
+});
+</script>

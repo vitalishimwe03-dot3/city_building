@@ -24,23 +24,127 @@
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
-      "@type": "Organization",
+      "@type": ["Organization", "LocalBusiness", "EducationalOrganization"],
+      "@id": "<%= canonicalUrl ? canonicalUrl.split('?')[0].replace(/\/+$/, '') : 'https://citybuilding.rw' %>/#organization",
       "name": "City Building Engineering Company Ltd",
-      "url": "https://citybuilding.rw",
-      "logo": "/images/logo.png",
+      "url": "<%= canonicalUrl ? canonicalUrl.split('?')[0].replace(/\/+$/, '') : 'https://citybuilding.rw' %>",
+      "logo": { "@type": "ImageObject", "url": "<%= reqProtocol || 'https' %>://<%= reqHost || 'citybuilding.rw' %>/images/logo.png" },
+      "image": "<%= reqProtocol || 'https' %>://<%= reqHost || 'citybuilding.rw' %>/images/logo.png",
+      "description": "Professional software training for architecture, engineering, design, and construction careers in Kigali, Rwanda.",
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": "KG 123 Street, Kigali",
+        "addressLocality": "Kigali",
+        "addressRegion": "Kigali",
+        "addressCountry": "RW"
+      },
+      "telephone": "+250-789-257-758",
+      "email": "citybuildingengineeringcompany@gmail.com",
       "contactPoint": {
         "@type": "ContactPoint",
         "telephone": "+250-789-257-758",
         "contactType": "enrollment",
         "availableLanguage": ["English", "French", "Kinyarwanda"]
       },
-      "address": {
-        "@type": "PostalAddress",
-        "addressLocality": "Kigali",
-        "addressCountry": "RW"
+      "areaServed": "RW",
+      "sameAs": [
+        "https://wa.me/250789257758",
+        "https://www.instagram.com/city_building_engineering_cltd/"
+      ]
+    }
+    </script>
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "@id": "<%= canonicalUrl ? canonicalUrl.split('?')[0].replace(/\/+$/, '') : 'https://citybuilding.rw' %>/#website",
+      "url": "<%= canonicalUrl ? canonicalUrl.split('?')[0].replace(/\/+$/, '') : 'https://citybuilding.rw' %>",
+      "name": "City Building Engineering - Professional Software Training in Kigali, Rwanda",
+      "description": "Enroll in professional software training courses in Kigali, Rwanda. Learn Revit, AutoCAD, ETABS, Lumion and more at City Building Engineering Company Ltd.",
+      "potentialAction": {
+        "@type": "SearchAction",
+        "target": {
+          "@type": "EntryPoint",
+          "urlTemplate": "<%= reqProtocol || 'https' %>://<%= reqHost || 'citybuilding.rw' %>/?search={search_term_string}"
+        },
+        "query-input": "required name=search_term_string"
       }
     }
     </script>
+    <% if (typeof breadcrumbs !== 'undefined' && breadcrumbs && breadcrumbs.length > 0) { %>
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        <% breadcrumbs.forEach(function(crumb, i) { %>
+        {
+          "@type": "ListItem",
+          "position": <%= i + 1 %>,
+          "name": "<%= crumb.name %>",
+          "item": "<%= crumb.url %>"
+        }<%= i < breadcrumbs.length - 1 ? ',' : '' %>
+        <% }) %>
+      ]
+    }
+    </script>
+    <% } %>
+    <% if (typeof courseSchema !== 'undefined' && courseSchema) { %>
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Course",
+      "name": "<%= courseSchema.name %>",
+      "description": "<%= courseSchema.description %>",
+      "provider": {
+        "@type": "Organization",
+        "name": "City Building Engineering Company Ltd",
+        "sameAs": "<%= reqProtocol || 'https' %>://<%= reqHost || 'citybuilding.rw' %>"
+      },
+      "educationalCredentialAwarded": "Certificate of Completion",
+      "coursePrerequisites": "None",
+      "teaches": "<%= courseSchema.teaches || courseSchema.name %>",
+      "inLanguage": ["en", "fr", "rw"],
+      "audience": {
+        "@type": "Audience",
+        "audienceType": "<%= courseSchema.audience || 'Architects, Engineers, Designers, Surveyors' %>"
+      },
+      "hasCourseInstance": {
+        "@type": "CourseInstance",
+        "courseMode": "BlendedLearning",
+        "location": {
+          "@type": "Place",
+          "name": "City Building Engineering Training Center",
+          "address": {
+            "@type": "PostalAddress",
+            "addressLocality": "Kigali",
+            "addressCountry": "RW"
+          }
+        }
+      }
+    }
+    </script>
+    <% } %>
+    <% if (typeof faqSchema !== 'undefined' && faqSchema && faqSchema.length > 0) { %>
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [
+        <% faqSchema.forEach(function(faq, i) { %>
+        {
+          "@type": "Question",
+          "name": "<%= faq.question %>",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "<%= faq.answer %>"
+          }
+        }<%= i < faqSchema.length - 1 ? ',' : '' %>
+        <% }) %>
+      ]
+    }
+    </script>
+    <% } %>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="icon" type="image/png" href="/images/logo.png">
@@ -123,6 +227,18 @@
               <a class="nav-link px-2 px-lg-3" href="/career">
                 <i class="bi bi-briefcase"></i>
                 <span class="d-inline"><%- t('nav.career') %></span>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link px-2 px-lg-3" href="/faq">
+                <i class="bi bi-question-circle"></i>
+                <span class="d-inline">FAQ</span>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link px-2 px-lg-3" href="/internship">
+                <i class="bi bi-mortarboard"></i>
+                <span class="d-inline">Internship</span>
               </a>
             </li>
             <li class="nav-item d-lg-none my-2">
@@ -217,6 +333,7 @@
               <li><a href="/">Home</a></li>
               <li><a href="/about">About Us</a></li>
               <li><a href="/services">Services</a></li>
+              <li><a href="/faq">FAQ</a></li>
               <li><a href="/certificate">Certificate</a></li>
             </ul>
           </div>
@@ -224,6 +341,7 @@
             <h3 class="h6 text-uppercase fw-bold mb-3">Quick Links</h3>
             <ul class="list-unstyled footer-links small">
               <li><a href="/career">Career</a></li>
+              <li><a href="/internship">Internship</a></li>
               <li><a href="/signup">Join Us</a></li>
               <li><a href="/contact">Contact Us</a></li>
               <li><a href="/login">Login</a></li>

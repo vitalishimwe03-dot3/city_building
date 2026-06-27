@@ -60,7 +60,11 @@ app.use(localizationMiddleware);
 
 app.use((req, res, next) => {
   req.pool = pool;
-  res.locals.canonicalUrl = `${req.protocol}://${req.get('host')}${req.originalUrl}`;
+  const proto = req.protocol;
+  const host = req.get('host');
+  res.locals.canonicalUrl = `${proto}://${host}${req.originalUrl}`;
+  res.locals.reqProtocol = proto;
+  res.locals.reqHost = host;
   res.locals.metaDescription = 'City Building Engineering Company Ltd offers professional software training in Revit, AutoCAD, ETABS, Lumion and more. Enroll in Kigali, Rwanda for career-ready engineering and design courses.';
   res.locals.adConfig = adConfig;
   const gId = process.env.GOOGLE_CLIENT_ID;
@@ -69,16 +73,17 @@ app.use((req, res, next) => {
 });
 
 app.get('/robots.txt', (req, res) => {
-  res.type('text/plain').send('User-agent: *\nAllow: /\nSitemap: https://citybuilding.rw/sitemap.xml\n');
+  const base = `${req.protocol}://${req.get('host')}`;
+  res.type('text/plain').send(`User-agent: *\nAllow: /\nSitemap: ${base}/sitemap.xml\n`);
 });
 
 app.get('/sitemap.xml', async (req, res, next) => {
   try {
     const [cats] = await pool.query('SELECT slug FROM categories');
-    const [courses] = await pool.query('SELECT id FROM subcourses');
+    const [courses] = await pool.query('SELECT id, slug FROM subcourses');
     let urls = '';
-    const base = 'https://citybuilding.rw';
-    const pages = ['', '/about', '/services', '/contact', '/certificate', '/career', '/login', '/signup'];
+    const base = `${req.protocol}://${req.get('host')}`;
+    const pages = ['', '/about', '/services', '/contact', '/certificate', '/career', '/faq', '/internship', '/login', '/signup'];
     pages.forEach(p => { urls += `<url><loc>${base}${p}</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>\n`; });
     (cats || []).forEach(c => { urls += `<url><loc>${base}/category/${c.slug}</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>\n`; });
     (courses || []).forEach(c => { urls += `<url><loc>${base}/course/${c.id}</loc><changefreq>weekly</changefreq><priority>0.6</priority></url>\n`; });

@@ -319,9 +319,33 @@
     <div class="section-label justify-content-center">Testimonials</div>
     <h2 class="section-title mb-5">What Our Students Say</h2>
     <div id="testimonialsCarousel" class="row g-4 justify-content-center">
-      <div class="col-12 text-center py-4 text-muted">
-        <div class="spinner-border spinner-border-sm me-2" role="status"></div> Loading testimonials...
-      </div>
+      <% if (typeof testimonials !== 'undefined' && testimonials && testimonials.length > 0) { %>
+        <% testimonials.forEach(function(t) { %>
+          <div class="col-md-6 col-lg-4">
+            <div class="card h-100 border-0" style="background:var(--bg-card);border:1px solid var(--border);">
+              <div class="card-body p-4 d-flex flex-column">
+                <div class="mb-2">
+                  <% for (var si = 1; si <= 5; si++) { %>
+                    <i class="bi <%= si <= (t.rating || 5) ? 'bi-star-fill' : 'bi-star' %>" style="color:#f59e0b;font-size:0.9rem;"></i>
+                  <% } %>
+                </div>
+                <p class="card-text flex-grow-1 fst-italic" style="color:var(--text-secondary);">"<%= t.content?.replace(/"/g, '&quot;') || '' %>"</p>
+                <div class="d-flex align-items-center gap-3 mt-3 pt-3" style="border-top:1px solid var(--border);">
+                  <div style="width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent-light));display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:1.2rem;flex-shrink:0;"><%= (t.student_name || 'S').charAt(0).toUpperCase() %></div>
+                  <div class="text-start">
+                    <strong class="d-block"><%= t.student_name || '' %></strong>
+                    <% if (t.student_title) { %><small class="text-muted"><%= t.student_title %></small><% } %>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        <% }); %>
+      <% } else { %>
+        <div class="col-12 text-center py-4 text-muted">
+          <p>Testimonials coming soon. Enroll today and share your experience!</p>
+        </div>
+      <% } %>
     </div>
   </div>
 </section>
@@ -367,23 +391,13 @@
   </div>
 </section>
 
-<section class="section" style="background: var(--bg-secondary);">
-  <div class="container text-center">
-    <div class="section-label justify-content-center">Testimonials</div>
-    <h2 class="section-title mb-5">What Our Students Say</h2>
-    <div id="testimonialsCarousel" class="row g-4 justify-content-center">
-      <div class="col-12 text-center py-4 text-muted">
-        <div class="spinner-border spinner-border-sm me-2" role="status"></div> Loading testimonials...
-      </div>
-    </div>
-  </div>
-</section>
-
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+  var container = document.getElementById('testimonialsCarousel');
+  if (!container) return;
+  var hasServerContent = container.querySelector('.card');
+  if (hasServerContent) return;
   fetch('/api/testimonials').then(function(r) { return r.json(); }).then(function(data) {
-    var container = document.getElementById('testimonialsCarousel');
-    if (!container) return;
     if (!data || data.length === 0) {
       container.innerHTML = '<div class="col-12 text-center py-4 text-muted"><p>Testimonials coming soon. Enroll today and share your experience!</p></div>';
       return;
@@ -412,8 +426,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
     container.innerHTML = html;
   }).catch(function() {
-    var container = document.getElementById('testimonialsCarousel');
-    if (container) {
+    if (container && !container.querySelector('.card')) {
       container.innerHTML = '<div class="col-12 text-center py-4 text-muted"><p>Testimonials coming soon.</p></div>';
     }
   });
