@@ -28,7 +28,7 @@ async function createUser(fullName, email, phone, password) {
 }
 
 async function createOtp(email, otp) {
-  const expiresAt = new Date(Date.now() + 10 * 60 * 1000).toISOString();
+  const expiresAt = new Date(Date.now() + 10 * 60 * 1000).toISOString().replace('T', ' ').replace(/\.\d+Z$/, '');
   await pool.query(
     'INSERT OR REPLACE INTO user_otps (email, otp, expires_at) VALUES (?, ?, ?)',
     [email, otp, expiresAt]
@@ -122,7 +122,7 @@ async function requestPasswordReset(email) {
   if (!user.is_verified) return null;
 
   const resetToken = generateResetToken();
-  const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString();
+  const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString().replace('T', ' ').replace(/\.\d+Z$/, '');
 
   await pool.query(
     'INSERT INTO user_password_resets (user_id, reset_token, expires_at) VALUES (?, ?, ?)',

@@ -125,7 +125,7 @@ async function requestPasswordReset(email) {
   if (!user) return null;
 
   const resetToken = generateResetToken();
-  const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(); // 24 hours
+  const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString().replace('T', ' ').replace(/\.\d+Z$/, ''); // 24 hours
 
   await pool.query(
     'INSERT INTO admin_password_resets (admin_user_id, reset_token, expires_at) VALUES (?, ?, ?)',
