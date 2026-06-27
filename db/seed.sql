@@ -51,18 +51,21 @@ INSERT OR IGNORE INTO subcourses (category_id,name,slug,image,description,sub_ca
 ((SELECT id FROM categories WHERE slug='career-development'),'Designers','designers','designer-icon.svg','Design profession','Career Pathways'),
 ((SELECT id FROM categories WHERE slug='career-development'),'Surveyors','surveyors','surveyor-icon.svg','Surveying profession','Career Pathways');
 
--- Hero slideshow seed data — building & architecture themed
-INSERT OR IGNORE INTO hero_slides (title, description, image_path, link_url, btn_text, animation, display_order, is_active, auto_play, transition_speed) VALUES
-('Welcome to City Building Engineering', 'Professional software training for architecture, engineering, and design careers in Kigali, Rwanda.', 'https://images.unsplash.com/photo-1487958449943-2429e8be8625?w=1400&q=80', '/about', 'Learn More', 'fade', 1, 1, 1, 6500),
-('Build Rwanda''s Future', 'Hands-on training in Revit, AutoCAD, ETABS, Lumion, and more. Design tomorrow''s skyline today.', 'https://images.unsplash.com/photo-1486325212027-8081e485255e?w=1400&q=80', '/services', 'Explore Courses', 'slide', 2, 1, 1, 6500),
-('Master Structural Design', 'From foundations to skyscrapers — learn the software that engineers trust worldwide.', 'https://images.unsplash.com/photo-1503387762519-52582b8ba3f0?w=1400&q=80', '/category/structural-engineering', 'View Courses', 'zoom', 3, 1, 1, 6500),
-('Design with Confidence', 'Professional BIM, CAD, and rendering courses taught by industry experts in Kigali.', 'https://images.unsplash.com/photo-1518005020951-eccb494ad742?w=1400&q=80', '/category/architecture', 'Get Started', 'fade', 4, 1, 1, 6500),
-('Shape Your Engineering Career', 'Career-ready training with recognized certificates. Enroll today and build your future.', 'https://images.unsplash.com/photo-1541888946425-d81bb218711f?w=1400&q=80', '/contact', 'Contact Us', 'slide', 5, 1, 1, 6500),
-('Modern Architecture & Design', 'Explore contemporary building design with our professional BIM and rendering courses.', 'https://images.unsplash.com/photo-1464146072230-91cabc968266?w=1400&q=80', '/category/architecture', 'View Courses', 'fade', 6, 1, 1, 6500),
-('Engineering the Future', 'Learn ETABS, ProtaStructure, and CSI Safe for world-class structural engineering.', 'https://images.unsplash.com/photo-1513828583688-c52646db42da?w=1400&q=80', '/category/structural-engineering', 'Start Learning', 'zoom', 7, 1, 1, 6500),
-('Night Cityscapes', 'Bring your architectural visions to life with our Lumion and Twinmotion rendering courses.', 'https://images.unsplash.com/photo-1519501025264-65ba15a82390?w=1400&q=80', '/services', 'Explore Courses', 'slide', 8, 1, 1, 6500),
-('Bridges & Infrastructure', 'Master civil infrastructure design with Civil 3D, ArcGIS, and water engineering software.', 'https://images.unsplash.com/photo-1533547271690-6b6c1f4ea06b?w=1400&q=80', '/category/civil-engineering', 'Learn More', 'fade', 9, 1, 1, 6500),
-('Sustainable Building Design', 'Join the green building revolution. Training in sustainable design and energy-efficient construction.', 'https://images.unsplash.com/photo-1479839672679-a46483c0e7c8?w=1400&q=80', '/about', 'Read More', 'zoom', 10, 1, 1, 6500);
+-- Hero slideshow seed data — professional building & architecture imagery
+DELETE FROM hero_slides;
+INSERT INTO hero_slides (title, description, image_path, link_url, btn_text, animation, display_order, is_active, auto_play, transition_speed) VALUES
+('Welcome to City Building Engineering', 'Professional software training for architecture, engineering, and design careers in Kigali, Rwanda.', 'https://images.unsplash.com/photo-1487958449943-2429e8be8625?w=1920&q=85', '/about', 'Learn More', 'fade', 1, 1, 1, 6000),
+('Build Rwanda''s Future', 'Hands-on training in Revit, AutoCAD, ETABS, Lumion, and more. Design tomorrow''s skyline today.', 'https://images.unsplash.com/photo-1486325212027-8081e485255e?w=1920&q=85', '/services', 'Explore Courses', 'slide', 2, 1, 1, 6000),
+('Master Structural Design', 'From foundations to skyscrapers — learn the software that engineers trust worldwide.', 'https://images.unsplash.com/photo-1503387762519-52582b8ba3f0?w=1920&q=85', '/category/structural-engineering', 'View Courses', 'zoom', 3, 1, 1, 6000),
+('Design with Confidence', 'Professional BIM, CAD, and rendering courses taught by industry experts in Kigali.', 'https://images.unsplash.com/photo-1518005020951-eccb494ad742?w=1920&q=85', '/category/architecture', 'Get Started', 'fade', 4, 1, 1, 6000),
+('Shape Your Engineering Career', 'Career-ready training with recognized certificates. Enroll today and build your future.', 'https://images.unsplash.com/photo-1541888946425-d81bb218711f?w=1920&q=85', '/contact', 'Contact Us', 'slide', 5, 1, 1, 6000),
+('Modern Architecture & Design', 'Explore contemporary building design with our professional BIM and rendering courses.', 'https://images.unsplash.com/photo-1464146072230-91cabc968266?w=1920&q=85', '/category/architecture', 'View Courses', 'fade', 6, 1, 1, 6000),
+('Engineering the Future', 'Learn ETABS, ProtaStructure, and CSI Safe for world-class structural engineering.', 'https://images.unsplash.com/photo-1513828583688-c52646db42da?w=1920&q=85', '/category/structural-engineering', 'Start Learning', 'zoom', 7, 1, 1, 6000),
+('Night Cityscapes', 'Bring your architectural visions to life with our Lumion and Twinmotion rendering courses.', 'https://images.unsplash.com/photo-1519501025264-65ba15a82390?w=1920&q=85', '/services', 'Explore Courses', 'slide', 8, 1, 1, 6000),
+('Bridges & Infrastructure', 'Master civil infrastructure design with Civil 3D, ArcGIS, and water engineering software.', 'https://images.unsplash.com/photo-1533547271690-6b6c1f4ea06b?w=1920&q=85', '/category/civil-engineering', 'Learn More', 'fade', 9, 1, 1, 6000),
+('Skyscraper Engineering', 'Learn high-rise building design and analysis with industry-standard structural software.', 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=1920&q=85', '/category/structural-engineering', 'Explore', 'zoom', 10, 1, 1, 6000),
+('Modern Workspaces', 'Discover the intersection of architecture and technology with our professional training.', 'https://images.unsplash.com/photo-1497366754035-f200968a6e72?w=1920&q=85', '/about', 'Learn More', 'fade', 11, 1, 1, 6000),
+('Urban Development', 'Master the tools shaping tomorrow''s cities — from concept to construction.', 'https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=1920&q=85', '/services', 'View Courses', 'slide', 12, 1, 1, 6000);
 
 -- Student testimonials
 INSERT OR IGNORE INTO testimonials (student_name, student_title, content, rating, is_active, display_order) VALUES

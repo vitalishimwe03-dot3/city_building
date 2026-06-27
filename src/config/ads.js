@@ -17,7 +17,7 @@ const config = {
   // --- 2. AFFILIATE MARKETING (Commission per sale) ---
   // Pays when users buy through your links
   amazonAffiliateId: process.env.AMAZON_AFFILIATE_ID || '',
-  affiliateEnabled: !!(process.env.AMAZON_AFFILIATE_ID),
+  affiliateEnabled: process.env.ADSENSE_PUBLISHER_ID ? false : true,
 
   // --- 3. SOFTWARE AFFILIATE PROGRAMS (Commission per signup/purchase) ---
   // Many engineering software companies have affiliate programs
