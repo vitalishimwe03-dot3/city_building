@@ -189,10 +189,10 @@
       </div>
     </div>
     <% } %>
-    <nav class="navbar navbar-expand-lg sticky-top" id="mainNavbar">
-      <div class="container-fluid px-3 px-lg-4 navbar-inner">
-        <a class="navbar-brand d-flex align-items-center gap-2" href="/" aria-label="City Building Engineering Company Ltd">
-          <img src="/images/logo.png" srcset="/images/logo.png 1x" alt="City Building Engineering Logo" class="navbar-logo" loading="eager" decoding="sync" onerror="this.style.display='none'; this.nextElementSibling.classList.remove('d-none');">
+    <nav class="navbar navbar-expand-xl sticky-top" id="mainNavbar">
+      <div class="container-fluid px-2 px-xl-3 navbar-inner">
+        <a class="navbar-brand d-flex align-items-center gap-1" href="/" aria-label="City Building Engineering Company Ltd" style="flex-shrink:0;">
+          <img src="/images/logo.png" alt="City Building Engineering Logo" class="navbar-logo" style="height:32px;width:auto;" loading="eager" decoding="sync" onerror="this.style.display='none'; this.nextElementSibling.classList.remove('d-none');">
           <span class="navbar-brand-text d-none">
             <span class="brand-main">City Building</span>
             <span class="brand-sub">ENGINEERING COMPANY LTD</span>
@@ -202,75 +202,59 @@
           <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="mainNav">
-          <ul class="navbar-nav ms-auto align-items-center gap-1 gap-lg-2">
+          <ul class="navbar-nav ms-auto align-items-center gap-0 gap-xl-1 nav-compact">
             <li class="nav-item">
-              <a class="nav-link px-2 px-lg-3" href="/">
-                <i class="bi bi-house-door"></i>
-                <span class="d-inline"><%- t('nav.home') %></span>
+              <a class="nav-link px-2" href="/">
+                <span class="nav-label"><%- t('nav.home') %></span>
               </a>
             </li>
             <li class="nav-item">
-              <a class="nav-link px-2 px-lg-3" href="/about">
-                <i class="bi bi-info-circle"></i>
-                <span class="d-inline"><%- t('nav.about') %></span>
+              <a class="nav-link px-2" href="/about">
+                <span class="nav-label"><%- t('nav.about') %></span>
               </a>
             </li>
             <li class="nav-item">
-              <a class="nav-link px-2 px-lg-3" href="/services">
-                <i class="bi bi-briefcase"></i>
-                <span class="d-inline"><%- t('nav.services') %></span>
+              <a class="nav-link px-2" href="/services">
+                <span class="nav-label"><%- t('nav.services') %></span>
               </a>
             </li>
             <li class="nav-item">
-              <a class="nav-link px-2 px-lg-3" href="/contact">
-                <i class="bi bi-envelope"></i>
-                <span class="d-inline"><%- t('nav.contact') %></span>
+              <a class="nav-link px-2" href="/contact">
+                <span class="nav-label"><%- t('nav.contact') %></span>
               </a>
             </li>
             <li class="nav-item">
-              <a class="nav-link px-2 px-lg-3" href="/certificate">
-                <i class="bi bi-award"></i>
-                <span class="d-inline"><%- t('nav.certificate') %></span>
+              <a class="nav-link px-2" href="/certificate">
+                <span class="nav-label"><%- t('nav.certificate') %></span>
               </a>
             </li>
             <li class="nav-item">
-              <a class="nav-link px-2 px-lg-3" href="/career">
-                <i class="bi bi-briefcase"></i>
-                <span class="d-inline"><%- t('nav.career') %></span>
+              <a class="nav-link px-2" href="/career">
+                <span class="nav-label"><%- t('nav.career') %></span>
               </a>
             </li>
-            <li class="nav-item">
-              <a class="nav-link px-2 px-lg-3" href="/faq">
-                <i class="bi bi-question-circle"></i>
-                <span class="d-inline">FAQ</span>
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle px-2" href="#" id="moreDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                <span class="nav-label">More</span>
               </a>
+              <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="moreDropdown">
+                <li><a class="dropdown-item" href="/faq"><i class="bi bi-question-circle"></i> FAQ</a></li>
+                <li><a class="dropdown-item" href="/internship"><i class="bi bi-mortarboard"></i> Internship</a></li>
+                <li><a class="dropdown-item" href="/gallery"><i class="bi bi-images"></i> Gallery</a></li>
+                <li><a class="dropdown-item" href="/quiz"><i class="bi bi-compass"></i> Quiz</a></li>
+                <li><a class="dropdown-item" href="/alumni"><i class="bi bi-people"></i> Alumni</a></li>
+                <li><a class="dropdown-item" href="/free-course"><i class="bi bi-gift"></i> Free Course</a></li>
+                <li><a class="dropdown-item" href="/verify-certificate"><i class="bi bi-shield-check"></i> Verify Certificate</a></li>
+              </ul>
             </li>
-            <li class="nav-item">
-              <a class="nav-link px-2 px-lg-3" href="/internship">
-                <i class="bi bi-mortarboard"></i>
-                <span class="d-inline">Internship</span>
-              </a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link px-2 px-lg-3" href="/gallery">
-                <i class="bi bi-images"></i>
-                <span class="d-inline">Gallery</span>
-              </a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link px-2 px-lg-3" href="/quiz">
-                <i class="bi bi-compass"></i>
-                <span class="d-inline">Quiz</span>
-              </a>
-            </li>
-            <li class="nav-item d-lg-none my-2">
+            <li class="nav-item d-xl-none my-1">
               <hr class="dropdown-divider">
             </li>
             <% if (siteUser) { %>
               <li class="nav-item dropdown">
-                <a class="nav-link dropdown-toggle px-2 px-lg-3" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                <a class="nav-link dropdown-toggle px-2" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                   <i class="bi bi-person-circle"></i>
-                  <span class="d-lg-inline"><%= siteUser.full_name || siteUser.email %></span>
+                  <span class="nav-label"><%= siteUser.full_name || siteUser.email %></span>
                 </a>
                 <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
                   <li><a class="dropdown-item" href="/account"><i class="bi bi-person"></i> <%- t('nav.account') %></a></li>
@@ -280,22 +264,20 @@
               </li>
             <% } else { %>
               <li class="nav-item">
-                <a class="nav-link px-2 px-lg-3" href="/login">
-                  <i class="bi bi-box-arrow-in-right"></i>
-                  <span class="d-lg-inline"><%- t('nav.login') %></span>
+                <a class="nav-link px-2" href="/login">
+                  <span class="nav-label"><%- t('nav.login') %></span>
                 </a>
               </li>
               <li class="nav-item">
-                <a class="nav-link px-2 px-lg-3" href="/signup">
-                  <i class="bi bi-person-plus"></i>
-                  <span class="d-lg-inline"><%- t('nav.signup') %></span>
+                <a class="nav-link px-2" href="/signup">
+                  <span class="nav-label"><%- t('nav.signup') %></span>
                 </a>
               </li>
             <% } %>
             <li class="nav-item dropdown">
-              <a class="nav-link dropdown-toggle px-2 px-lg-3" href="#" id="langDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+              <a class="nav-link dropdown-toggle px-2" href="#" id="langDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false" style="min-width:auto;">
                 <i class="bi bi-globe"></i>
-                <span id="currentLang" class="d-lg-inline"><%= currentLanguage.toUpperCase() %></span>
+                <span class="nav-label" id="currentLang"><%= currentLanguage.toUpperCase() %></span>
               </a>
               <ul class="dropdown-menu dropdown-menu-end lang-dropdown-menu" aria-labelledby="langDropdown">
                 <% supportedLanguages.forEach(lang => { %>
