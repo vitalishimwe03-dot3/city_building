@@ -1,0 +1,46 @@
+<%- include('partials/ads', { slot: 'topBanner' }) %>
+
+<section class="py-5">
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-12 col-lg-8">
+        <div class="text-center mb-5">
+          <p class="text-uppercase small fw-semibold mb-2" style="color: var(--accent-primary-light);">Find Your Path</p>
+          <h1 class="display-5 fw-bold mb-3">Which Course Fits You?</h1>
+          <p class="lead text-muted">Answer 5 quick questions and we will recommend the perfect training track for your goals.</p>
+        </div>
+        <div class="p-4 p-lg-5" style="background: var(--bg-card); border-radius: 20px; border: 1px solid var(--border);">
+          <form id="quizForm" action="/quiz/result" method="POST">
+            <% if (typeof questions !== 'undefined' && questions) { %>
+              <% questions.forEach(function(q, i) { %>
+                <div class="mb-4 quiz-question" data-q="<%= i %>">
+                  <h3 class="h5 fw-bold mb-3"><span class="badge me-2" style="background: var(--accent-primary-light);"><%= i + 1 %></span><%= q.question %></h3>
+                  <div class="row g-2">
+                    <% q.options.forEach(function(opt, j) { %>
+                      <div class="col-12 col-sm-6">
+                        <div class="form-check quiz-option">
+                          <input class="form-check-input" type="radio" name="answers[<%= i %>]" id="q<%= i %>o<%= j %>" value="<%= j %>" required>
+                          <label class="form-check-label w-100 p-3 rounded-3" for="q<%= i %>o<%= j %>" style="border: 2px solid var(--border); cursor: pointer; transition: all 0.2s;">
+                            <%= opt %>
+                          </label>
+                        </div>
+                      </div>
+                    <% }); %>
+                  </div>
+                </div>
+              <% }); %>
+            <% } %>
+            <button type="submit" class="btn btn-primary btn-lg w-100 mt-3">
+              <i class="bi bi-compass"></i> Find My Course
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+.quiz-option input:checked + label { border-color: #0891b2 !important; background: rgba(8,145,178,0.08); }
+.quiz-option label:hover { border-color: #0891b2; background: rgba(8,145,178,0.04); }
+</style>

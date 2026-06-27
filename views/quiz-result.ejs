@@ -1,0 +1,37 @@
+<%- include('partials/ads', { slot: 'topBanner' }) %>
+
+<section class="py-5">
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-12 col-lg-8 text-center">
+        <div class="p-5" style="background: var(--bg-card); border-radius: 20px; border: 1px solid var(--border);">
+          <div class="mb-4">
+            <div style="width: 80px; height: 80px; border-radius: 50%; background: linear-gradient(135deg, #10b981, #0891b2); display: flex; align-items: center; justify-content: center; margin: 0 auto;">
+              <i class="bi bi-check-circle" style="font-size: 2.5rem; color: #fff;"></i>
+            </div>
+          </div>
+          <p class="text-uppercase small fw-semibold mb-2" style="color: var(--accent-primary-light);">Your Recommendation</p>
+          <h1 class="display-5 fw-bold mb-2"><%= result.title %></h1>
+          <div class="mb-3">
+            <div class="progress" style="height: 8px; max-width: 300px; margin: 0 auto; background: var(--border);">
+              <div class="progress-bar" role="progressbar" style="width: <%= (score / maxScore) * 100 %>%" aria-valuenow="<%= score %>" aria-valuemin="0" aria-valuemax="<%= maxScore %>"></div>
+            </div>
+            <small class="text-muted">Match score: <%= score %>/<%= maxScore %></small>
+          </div>
+          <p class="lead text-muted mb-4"><%= result.description %></p>
+          <div class="d-flex flex-wrap gap-3 justify-content-center">
+            <a href="/category/<%= result.category %>" class="btn btn-primary btn-lg">
+              <i class="bi bi-arrow-right"></i> View Courses
+            </a>
+            <a href="/contact" class="btn btn-outline btn-lg">
+              <i class="bi bi-chat-dots"></i> Enquire Now
+            </a>
+            <a href="/quiz" class="btn btn-outline-secondary btn-lg">
+              <i class="bi bi-arrow-repeat"></i> Retake Quiz
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

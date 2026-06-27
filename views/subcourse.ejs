@@ -93,11 +93,14 @@
 
           <!-- CTA Buttons -->
           <div class="d-flex flex-column flex-sm-row gap-3 mb-3">
-            <a href="#enquiry" class="btn btn-primary btn-lg px-4">
-              <i class="bi bi-envelope"></i> Enquire about this course
+            <a href="/booking/<%= course.id %>" target="_blank" rel="noreferrer" class="btn btn-success btn-lg px-4">
+              <i class="bi bi-whatsapp"></i> Book on WhatsApp
             </a>
-            <a href="/contact" class="btn btn-outline-secondary btn-lg px-4">
-              <i class="bi bi-question-circle"></i> Ask a question
+            <a href="#enquiry" class="btn btn-primary btn-lg px-4">
+              <i class="bi bi-envelope"></i> Enquire
+            </a>
+            <a href="/course/<%= course.id %>/syllabus" class="btn btn-outline-secondary btn-lg px-4">
+              <i class="bi bi-journal-text"></i> Syllabus
             </a>
           </div>
           <div id="registerMessage"></div>
@@ -155,6 +158,44 @@
           <p class="small text-muted mb-0">Recognized credential</p>
         </div>
       </div>
+    </div>
+
+    <!-- Pricing & Comparison Table -->
+    <div class="row g-4 mb-5">
+      <div class="col-md-4">
+        <div class="info-card text-center p-4">
+          <i class="bi bi-clock-fill fs-2 mb-2" style="color: var(--accent-primary-light);"></i>
+          <h4 class="h6 fw-bold">Duration</h4>
+          <p class="h3 fw-bold mb-0" style="color: var(--accent-primary-light);"><%= course.duration || '4-8 weeks' %></p>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="info-card text-center p-4">
+          <i class="bi bi-cash-stack fs-2 mb-2" style="color: var(--accent-primary-light);"></i>
+          <h4 class="h6 fw-bold">Price</h4>
+          <p class="h3 fw-bold mb-0" style="color: var(--accent-primary-light);"><%= course.price || 'Contact us' %></p>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="info-card text-center p-4">
+          <i class="bi bi-bar-chart-fill fs-2 mb-2" style="color: var(--accent-primary-light);"></i>
+          <h4 class="h6 fw-bold">Level</h4>
+          <p class="h3 fw-bold mb-0" style="color: var(--accent-primary-light);"><%= course.skill_level || 'All Levels' %></p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Waitlist Section -->
+    <div class="p-4 mb-5 rounded-4 text-center" style="background: var(--bg-secondary); border: 1px solid var(--border);">
+      <h3 class="h5 fw-bold mb-2"><i class="bi bi-bell"></i> Not ready to enroll yet?</h3>
+      <p class="text-muted small mb-3">Join the waitlist and we will notify you when the next intake opens.</p>
+      <form id="waitlistForm" class="row g-2 justify-content-center" style="max-width: 600px; margin: 0 auto;">
+        <div class="col-md-4"><input type="text" id="wlName" class="form-control" placeholder="Your name" required></div>
+        <div class="col-md-4"><input type="email" id="wlEmail" class="form-control" placeholder="Your email" required></div>
+        <div class="col-md-3"><input type="tel" id="wlPhone" class="form-control" placeholder="Phone"></div>
+        <div class="col-md-1"><button type="submit" class="btn btn-primary w-100"><i class="bi bi-bell"></i></button></div>
+      </form>
+      <div id="wlMessage" class="mt-2 small"></div>
     </div>
   </div>
 </section>
@@ -254,6 +295,30 @@ document.addEventListener('DOMContentLoaded', function() {
   var courseId = '<%= course.id %>';
   loadReviews(courseId);
   loadWishlistStatus(courseId);
+
+  // Waitlist form
+  var wlForm = document.getElementById('waitlistForm');
+  var wlMsg = document.getElementById('wlMessage');
+  if (wlForm) {
+    wlForm.addEventListener('submit', async function(e) {
+      e.preventDefault();
+      var name = document.getElementById('wlName').value.trim();
+      var email = document.getElementById('wlEmail').value.trim();
+      var phone = document.getElementById('wlPhone').value.trim();
+      try {
+        var res = await fetch('/api/course/' + courseId + '/waitlist', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name, email, phone })
+        });
+        var data = await res.json();
+        wlMsg.innerHTML = '<span style="color: var(--accent-primary-light);">' + (data.message || 'Added to waitlist!') + '</span>';
+        wlForm.reset();
+      } catch(e) {
+        wlMsg.innerHTML = '<span class="text-danger">Failed to join waitlist.</span>';
+      }
+    });
+  }
 
   // Wishlist toggle
   document.querySelector('.wishlist-btn')?.addEventListener('click', async function() {

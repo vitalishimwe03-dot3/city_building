@@ -64,6 +64,7 @@ async function init() {
     await runSqlFile('seed.sql');
     await runSqlFile('admin-seed.sql');
     await runMigrations();
+    try { await runSqlFile('migration_005.sql'); } catch (_) {}
     var db = pool.getDb();
     if (db) {
       var data = db.export();

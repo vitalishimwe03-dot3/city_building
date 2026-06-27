@@ -1,0 +1,58 @@
+<%- include('partials/ads', { slot: 'topBanner' }) %>
+
+<section class="py-5">
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-12 col-lg-8">
+        <div class="p-5" style="background: linear-gradient(135deg, var(--bg-card), var(--bg-secondary)); border-radius: 20px; border: 1px solid var(--border);">
+          <div class="text-center mb-4">
+            <div style="width: 80px; height: 80px; border-radius: 50%; background: linear-gradient(135deg, #f59e0b, #0891b2); display: flex; align-items: center; justify-content: center; margin: 0 auto;">
+              <i class="bi bi-mortarboard-fill" style="font-size: 2.5rem; color: #fff;"></i>
+            </div>
+          </div>
+          <p class="text-uppercase small fw-semibold text-center mb-2" style="color: var(--accent-primary-light);">Free Training</p>
+          <h1 class="display-5 fw-bold text-center mb-2">Free 7-Day Mini Course</h1>
+          <p class="lead text-muted text-center mb-4">Get started with daily email lessons. Choose your track and build practical skills in just one week.</p>
+
+          <% if (success) { %>
+            <div class="alert alert-success text-center"><i class="bi bi-check-circle me-2"></i> <%= success %></div>
+          <% } %>
+          <% if (error) { %>
+            <div class="alert alert-warning text-center"><i class="bi bi-exclamation-circle me-2"></i> <%= error %></div>
+          <% } %>
+
+          <form method="POST" action="/free-course/signup" class="row g-3">
+            <div class="col-md-6">
+              <input type="text" class="form-control form-control-lg" name="name" placeholder="Your full name" required>
+            </div>
+            <div class="col-md-6">
+              <input type="email" class="form-control form-control-lg" name="email" placeholder="Your email address" required>
+            </div>
+            <div class="col-md-6">
+              <input type="tel" class="form-control form-control-lg" name="phone" placeholder="Phone (optional)">
+            </div>
+            <div class="col-md-6">
+              <select class="form-control form-control-lg" name="course_interest">
+                <option value="">I am interested in...</option>
+                <option value="AutoCAD">AutoCAD</option>
+                <option value="Revit">Revit</option>
+                <option value="ETABS">ETABS</option>
+                <option value="Lumion">Lumion</option>
+                <option value="Civil 3D">Civil 3D</option>
+                <option value="Not sure">Not sure yet</option>
+              </select>
+            </div>
+            <div class="col-12">
+              <button type="submit" class="btn btn-primary btn-lg w-100">
+                <i class="bi bi-send"></i> Send Me Free Lessons
+              </button>
+            </div>
+          </form>
+          <div class="text-center mt-4">
+            <small class="text-muted">No spam. Unsubscribe anytime. One email per day for 7 days.</small>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

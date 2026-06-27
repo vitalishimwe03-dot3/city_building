@@ -1,0 +1,34 @@
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <div><h4 style="margin:0;font-weight:700;"><i class="bi bi-bell"></i> Course Waitlist</h4><small style="color:var(--text-muted);">Students waiting for course enrollment to open</small></div>
+</div>
+<div class="admin-card-modern">
+  <% if (!entries || entries.length === 0) { %>
+    <div class="empty-state"><i class="bi bi-bell"></i><h5>No waitlist entries</h5><p>No students have joined any course waitlists yet.</p></div>
+  <% } else { %>
+    <div class="table-responsive">
+      <table class="table-custom">
+        <thead><tr><th>Name</th><th>Email</th><th>Phone</th><th>Course</th><th>Notified</th><th>Date</th><th>Actions</th></tr></thead>
+        <tbody>
+          <% entries.forEach(function(e) { %>
+            <tr>
+              <td><strong><%= e.name %></strong></td>
+              <td><%= e.email %></td>
+              <td><%= e.phone || '-' %></td>
+              <td><small><%= e.course_name || '-' %></small></td>
+              <td><span class="badge-custom <%= e.notified ? 'success' : 'warning' %>"><%= e.notified ? 'Notified' : 'Pending' %></span></td>
+              <td><small><%= new Date(e.created_at).toLocaleDateString() %></small></td>
+              <td>
+                <div class="action-btns">
+                  <% if (!e.notified) { %>
+                    <form action="/admin/waitlist/<%= e.id %>/notify" method="POST" style="display:inline;"><input type="hidden" name="_csrf" value="<%= csrfToken %>"><button type="submit" class="btn btn-sm-custom btn-edit-custom"><i class="bi bi-check"></i> Mark Notified</button></form>
+                  <% } %>
+                  <form action="/admin/waitlist/<%= e.id %>/delete" method="POST" style="display:inline;" onsubmit="return confirm('Delete this entry?')"><input type="hidden" name="_csrf" value="<%= csrfToken %>"><button type="submit" class="btn btn-sm-custom btn-delete-custom"><i class="bi bi-trash"></i></button></form>
+                </div>
+              </td>
+            </tr>
+          <% }); %>
+        </tbody>
+      </table>
+    </div>
+  <% } %>
+</div>

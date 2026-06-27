@@ -1,0 +1,91 @@
+<%- include('partials/ads', { slot: 'topBanner' }) %>
+
+<section class="py-5">
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-12 col-lg-10">
+        <a href="/course/<%= course.id %>" class="btn btn-sm btn-outline-secondary mb-4"><i class="bi bi-arrow-left"></i> Back to <%= course.name %></a>
+        <div class="p-4 p-lg-5" style="background: var(--bg-card); border-radius: 20px; border: 1px solid var(--border);">
+          <div class="text-center mb-5">
+            <p class="text-uppercase small fw-semibold mb-2" style="color: var(--accent-primary-light);">Course Syllabus</p>
+            <h1 class="display-5 fw-bold mb-2"><%= course.name %></h1>
+            <p class="lead text-muted"><%= course.description || 'Professional software training course' %></p>
+            <div class="d-flex flex-wrap gap-2 justify-content-center mt-3">
+              <span class="badge bg-info text-white"><%= course.category_name || '' %></span>
+              <% if (course.sub_category) { %><span class="badge" style="background: var(--accent-primary-light); color: #fff;"><%= course.sub_category %></span><% } %>
+              <span class="badge bg-secondary"><%= course.duration || '4-8 weeks' %></span>
+              <span class="badge bg-success"><%= course.skill_level || 'All Levels' %></span>
+            </div>
+          </div>
+
+          <div class="row g-4 mb-5">
+            <div class="col-md-3 col-6">
+              <div class="text-center p-3 rounded-3" style="background: var(--bg-secondary);">
+                <i class="bi bi-clock" style="font-size: 1.5rem; color: var(--accent-primary-light);"></i>
+                <h4 class="h6 fw-bold mt-2 mb-0"><%= course.duration || '4-8 weeks' %></h4>
+                <small class="text-muted">Duration</small>
+              </div>
+            </div>
+            <div class="col-md-3 col-6">
+              <div class="text-center p-3 rounded-3" style="background: var(--bg-secondary);">
+                <i class="bi bi-bar-chart" style="font-size: 1.5rem; color: var(--accent-primary-light);"></i>
+                <h4 class="h6 fw-bold mt-2 mb-0"><%= course.skill_level || 'All Levels' %></h4>
+                <small class="text-muted">Skill Level</small>
+              </div>
+            </div>
+            <div class="col-md-3 col-6">
+              <div class="text-center p-3 rounded-3" style="background: var(--bg-secondary);">
+                <i class="bi bi-cash" style="font-size: 1.5rem; color: var(--accent-primary-light);"></i>
+                <h4 class="h6 fw-bold mt-2 mb-0"><%= course.price || 'Contact us' %></h4>
+                <small class="text-muted">Price</small>
+              </div>
+            </div>
+            <div class="col-md-3 col-6">
+              <div class="text-center p-3 rounded-3" style="background: var(--bg-secondary);">
+                <i class="bi bi-award" style="font-size: 1.5rem; color: var(--accent-primary-light);"></i>
+                <h4 class="h6 fw-bold mt-2 mb-0">Certificate</h4>
+                <small class="text-muted">On Completion</small>
+              </div>
+            </div>
+          </div>
+
+          <h2 class="h4 fw-bold mb-3">What You Will Learn</h2>
+          <ul class="list-unstyled mb-4">
+            <li class="mb-2"><i class="bi bi-check-circle-fill me-2" style="color: var(--accent-primary-light);"></i> Practical tool workflows used in the profession</li>
+            <li class="mb-2"><i class="bi bi-check-circle-fill me-2" style="color: var(--accent-primary-light);"></i> Real workspace scenarios for quick skill application</li>
+            <li class="mb-2"><i class="bi bi-check-circle-fill me-2" style="color: var(--accent-primary-light);"></i> Internship preparation and portfolio-ready projects</li>
+            <li class="mb-2"><i class="bi bi-check-circle-fill me-2" style="color: var(--accent-primary-light);"></i> Industry standards and best practices</li>
+          </ul>
+
+          <h2 class="h4 fw-bold mb-3">Course Content</h2>
+          <div class="mb-4">
+            <div class="p-3 mb-2 rounded-3" style="background: var(--bg-secondary); border-left: 4px solid var(--accent-primary-light);">
+              <strong>Module 1:</strong> Introduction & Interface — Get familiar with the software environment and basic tools.
+            </div>
+            <div class="p-3 mb-2 rounded-3" style="background: var(--bg-secondary); border-left: 4px solid var(--accent-primary-light);">
+              <strong>Module 2:</strong> Core Skills — Build foundational skills with guided exercises and real-world examples.
+            </div>
+            <div class="p-3 mb-2 rounded-3" style="background: var(--bg-secondary); border-left: 4px solid var(--accent-primary-light);">
+              <strong>Module 3:</strong> Advanced Techniques — Master advanced features and optimize your workflow.
+            </div>
+            <div class="p-3 mb-2 rounded-3" style="background: var(--bg-secondary); border-left: 4px solid var(--accent-primary-light);">
+              <strong>Module 4:</strong> Final Project — Apply everything you have learned to complete a portfolio-ready project.
+            </div>
+          </div>
+
+          <div class="d-flex flex-wrap gap-3 justify-content-center mt-4">
+            <a href="/course/<%= course.id %>" class="btn btn-primary btn-lg">
+              <i class="bi bi-info-circle"></i> Course Details
+            </a>
+            <a href="https://wa.me/250789257758?text=Hello%20City%20Building!%20I%27m%20interested%20in%20the%20<%= encodeURIComponent(course.name) %>%20course.%20Can%20you%20provide%20details%20on%20pricing%20and%20enrollment?" target="_blank" rel="noreferrer" class="btn btn-success btn-lg">
+              <i class="bi bi-whatsapp"></i> Enquire on WhatsApp
+            </a>
+            <button onclick="window.print()" class="btn btn-outline-secondary btn-lg">
+              <i class="bi bi-printer"></i> Print / Save PDF
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

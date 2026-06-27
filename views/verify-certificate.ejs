@@ -1,0 +1,55 @@
+<%- include('partials/ads', { slot: 'topBanner' }) %>
+
+<section class="py-5">
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-12 col-lg-8">
+        <div class="text-center mb-5">
+          <p class="text-uppercase small fw-semibold mb-2" style="color: var(--accent-primary-light);">Verification</p>
+          <h1 class="display-5 fw-bold mb-3">Verify a Certificate</h1>
+          <p class="lead text-muted">Enter the certificate code from a City Building Engineering credential to verify its authenticity.</p>
+        </div>
+
+        <div class="p-4 p-lg-5" style="background: var(--bg-card); border-radius: 20px; border: 1px solid var(--border);">
+          <form method="POST" action="/verify-certificate">
+            <div class="mb-4">
+              <label for="code" class="form-label fw-semibold">Certificate Code</label>
+              <input type="text" class="form-control form-control-lg text-center" id="code" name="code" value="<%= code %>" placeholder="e.g., CBE-2026-0001" style="font-size: 1.3rem; letter-spacing: 2px; text-transform: uppercase;" required>
+            </div>
+            <button type="submit" class="btn btn-primary btn-lg w-100">
+              <i class="bi bi-shield-check"></i> Verify Certificate
+            </button>
+          </form>
+
+          <% if (error) { %>
+            <div class="alert alert-danger mt-4 mb-0">
+              <i class="bi bi-x-circle me-2"></i> <%= error %>
+            </div>
+          <% } %>
+
+          <% if (result) { %>
+            <div class="mt-4 p-4" style="background: rgba(16,185,129,0.08); border: 2px solid #10b981; border-radius: 16px;">
+              <div class="text-center mb-3">
+                <div style="width: 64px; height: 64px; border-radius: 50%; background: #10b981; display: flex; align-items: center; justify-content: center; margin: 0 auto;">
+                  <i class="bi bi-patch-check-fill" style="font-size: 2rem; color: #fff;"></i>
+                </div>
+              </div>
+              <h3 class="h4 fw-bold text-center text-success mb-3">✓ Certificate Verified</h3>
+              <div class="row g-3">
+                <div class="col-sm-6"><strong>Student Name:</strong><br><%= result.student_name %></div>
+                <div class="col-sm-6"><strong>Course:</strong><br><%= result.course_name %></div>
+                <div class="col-sm-6"><strong>Certificate Code:</strong><br><%= result.certificate_code %></div>
+                <div class="col-sm-6"><strong>Completion Date:</strong><br><%= result.completion_date ? new Date(result.completion_date).toLocaleDateString() : 'N/A' %></div>
+                <div class="col-sm-6"><strong>Issued:</strong><br><%= new Date(result.issued_at).toLocaleDateString() %></div>
+                <div class="col-sm-6"><strong>Status:</strong><br><span class="badge bg-success">Valid</span></div>
+              </div>
+              <div class="text-center mt-3">
+                <small class="text-muted">This certificate was issued by City Building Engineering Company Ltd, Kigali, Rwanda.</small>
+              </div>
+            </div>
+          <% } %>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

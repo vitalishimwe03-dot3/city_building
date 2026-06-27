@@ -368,4 +368,34 @@ router.get('/testimonials', async (req, res, next) => {
   }
 });
 
+// ====== COURSE WAITLIST ======
+
+router.post('/course/:id/waitlist', async (req, res, next) => {
+  try {
+    const { name, email, phone } = req.body;
+    if (!name || !email) {
+      return res.status(400).json({ error: 'Name and email are required.' });
+    }
+    const [[existing]] = await pool.query('SELECT id FROM course_waitlist WHERE email = ? AND subcourse_id = ?', [email, req.params.id]);
+    if (existing) {
+      return res.json({ success: true, message: 'You are already on the waitlist for this course!' });
+    }
+    await pool.query('INSERT INTO course_waitlist (subcourse_id, name, email, phone) VALUES (?, ?, ?, ?)', [req.params.id, name, email, phone || '']);
+    res.json({ success: true, message: 'You have been added to the waitlist. We will notify you when enrollment opens!' });
+  } catch (err) {
+    next(err);
+  }
+});
+
+// ====== STUDENT PROJECT GALLERY API ======
+
+router.get('/gallery', async (req, res, next) => {
+  try {
+    const [projects] = await pool.query("SELECT * FROM gallery_projects WHERE is_active = 1 ORDER BY sort_order ASC, created_at DESC");
+    res.json(projects || []);
+  } catch (err) {
+    next(err);
+  }
+});
+
 module.exports = router;

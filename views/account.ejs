@@ -72,6 +72,50 @@
                   </div>
                 </div>
 
+                <!-- Learning Path Visualization -->
+                <div class="mb-4 p-4 rounded-4" style="background: var(--bg-secondary); border: 1px solid var(--border);">
+                  <h5 class="fw-bold mb-3"><i class="bi bi-map"></i> Your Learning Journey</h5>
+                  <div class="learning-path d-flex flex-wrap gap-2 align-items-center" id="learningPath">
+                    <div class="path-step completed">
+                      <div class="step-icon"><i class="bi bi-person-check"></i></div>
+                      <div class="step-label">Signed Up</div>
+                    </div>
+                    <div class="path-connector completed"></div>
+                    <div class="path-step" id="pathEnroll">
+                      <div class="step-icon"><i class="bi bi-journal-plus"></i></div>
+                      <div class="step-label">Enrolled</div>
+                    </div>
+                    <div class="path-connector" id="connEnroll"></div>
+                    <div class="path-step" id="pathProgress">
+                      <div class="step-icon"><i class="bi bi-graph-up"></i></div>
+                      <div class="step-label">In Progress</div>
+                    </div>
+                    <div class="path-connector" id="connProgress"></div>
+                    <div class="path-step" id="pathComplete">
+                      <div class="step-icon"><i class="bi bi-trophy"></i></div>
+                      <div class="step-label">Complete</div>
+                    </div>
+                    <div class="path-connector" id="connCert"></div>
+                    <div class="path-step" id="pathCert">
+                      <div class="step-icon"><i class="bi bi-award"></i></div>
+                      <div class="step-label">Certified</div>
+                    </div>
+                  </div>
+                </div>
+                <style>
+                .learning-path { justify-content: center; }
+                .path-step { text-align: center; min-width: 80px; }
+                .path-step .step-icon { width: 48px; height: 48px; border-radius: 50%; background: var(--bg-card); border: 2px solid var(--border); display: flex; align-items: center; justify-content: center; margin: 0 auto 6px; font-size: 1.2rem; color: var(--text-muted); transition: all 0.3s; }
+                .path-step.completed .step-icon { background: linear-gradient(135deg, #10b981, #0891b2); border-color: #10b981; color: #fff; }
+                .path-step.active .step-icon { background: linear-gradient(135deg, #0891b2, #06b6d4); border-color: #0891b2; color: #fff; box-shadow: 0 0 0 4px rgba(8,145,178,0.2); }
+                .path-step .step-label { font-size: 11px; font-weight: 600; color: var(--text-muted); }
+                .path-step.completed .step-label { color: #10b981; }
+                .path-step.active .step-label { color: #0891b2; }
+                .path-connector { width: 40px; height: 2px; background: var(--border); margin-bottom: 24px; }
+                .path-connector.completed { background: linear-gradient(90deg, #10b981, #0891b2); }
+                @media (max-width: 600px) { .path-connector { width: 16px; } .path-step { min-width: 60px; } .path-step .step-icon { width: 40px; height: 40px; font-size: 1rem; } }
+                </style>
+
                 <div class="row g-3" id="progressOverview">
                   <div class="col-12">
                     <h5 class="fw-bold mb-3"><i class="bi bi-graph-up"></i> Learning Progress</h5>
@@ -340,6 +384,9 @@ async function loadProgress() {
     const courses = await res.json();
     if (loading) loading.style.display = 'none';
 
+    // Update learning path
+    updateLearningPath(courses);
+
     const existingCards = container.querySelectorAll('.progress-card-wrap');
     existingCards.forEach(el => el.remove());
 
@@ -488,6 +535,51 @@ async function loadWishlist() {
     console.error('Failed to load wishlist:', e);
     container.innerHTML = '<div class="alert alert-danger">Failed to load wishlist.</div>';
   }
+}
+
+function updateLearningPath(courses) {
+  var enrolled = courses && courses.length > 0;
+  var inProgress = enrolled && courses.some(function(c) {
+    return c.total_modules > 0 && c.completed_modules > 0 && c.completed_modules < c.total_modules;
+  });
+  var completed = enrolled && courses.every(function(c) {
+    return c.total_modules > 0 && c.completed_modules === c.total_modules;
+  });
+  var anyCompleted = enrolled && courses.some(function(c) {
+    return c.total_modules > 0 && c.completed_modules === c.total_modules;
+  });
+  var pathIds = [
+    { el: 'pathEnroll', conn: 'connEnroll', active: enrolled },
+    { el: 'pathProgress', conn: 'connProgress', active: inProgress || (enrolled && !completed) },
+    { el: 'pathComplete', conn: 'connCert', active: anyCompleted },
+    { el: 'pathCert', conn: null, active: anyCompleted }
+  ];
+  pathIds.forEach(function(p) {
+    var el = document.getElementById(p.el);
+    if (p.active) {
+      el.classList.add('completed');
+    } else if (!el.classList.contains('completed')) {
+      // Check if previous step is completed — if so, this step is "active" (next up)
+      var prev = pathIds.reduce(function(acc, cur) {
+        if (cur.el === p.el) return acc;
+        acc.push(cur);
+        return acc;
+      }, []);
+      var prevDone = prev.every(function(pp) {
+        var ppEl = document.getElementById(pp.el);
+        return ppEl && ppEl.classList.contains('completed');
+      });
+      if (prevDone && enrolled) {
+        el.classList.add('active');
+      }
+    }
+    if (p.conn) {
+      var connEl = document.getElementById(p.conn);
+      if (connEl && el.classList.contains('completed')) {
+        connEl.classList.add('completed');
+      }
+    }
+  });
 }
 
 function escHtml(str) {

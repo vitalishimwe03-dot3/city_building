@@ -710,4 +710,172 @@ router.post('/settings/change-password', async (req, res, next) => {
   }
 });
 
+// ========== GALLERY PROJECTS MANAGEMENT ==========
+
+router.get('/gallery', async (req, res, next) => {
+  try {
+    const [projects] = await pool.query('SELECT * FROM gallery_projects ORDER BY sort_order ASC, created_at DESC');
+    res.render('admin/gallery/index', { title: 'Project Gallery', projects: projects || [] });
+  } catch (err) { next(err); }
+});
+
+router.get('/gallery/create', (req, res) => {
+  res.render('admin/gallery/form', { title: 'Add Project', project: null, error: null });
+});
+
+router.post('/gallery', upload.single('image'), async (req, res, next) => {
+  try {
+    const { student_name, course_name, project_title, description, is_featured, sort_order } = req.body;
+    if (!student_name || !project_title) {
+      return res.status(400).render('admin/gallery/form', { title: 'Add Project', project: null, error: 'Student name and project title are required.' });
+    }
+    const imagePath = req.file ? '/uploads/' + req.file.filename : '';
+    await pool.query(
+      'INSERT INTO gallery_projects (student_name, course_name, project_title, description, image_path, is_featured, sort_order) VALUES (?, ?, ?, ?, ?, ?, ?)',
+      [student_name, course_name || '', project_title, description || '', imagePath, is_featured === 'on' ? 1 : 0, parseInt(sort_order) || 0]
+    );
+    res.redirect('/admin/gallery');
+  } catch (err) { next(err); }
+});
+
+router.get('/gallery/:id/edit', async (req, res, next) => {
+  try {
+    const [[project]] = await pool.query('SELECT * FROM gallery_projects WHERE id = ?', [req.params.id]);
+    if (!project) return res.status(404).render('404', { title: 'Not found', message: 'Project not found' });
+    res.render('admin/gallery/form', { title: 'Edit Project', project, error: null });
+  } catch (err) { next(err); }
+});
+
+router.post('/gallery/:id', upload.single('image'), async (req, res, next) => {
+  try {
+    const { student_name, course_name, project_title, description, is_featured, is_active, sort_order } = req.body;
+    let sql = 'UPDATE gallery_projects SET student_name=?, course_name=?, project_title=?, description=?, is_featured=?, is_active=?, sort_order=?, updated_at=CURRENT_TIMESTAMP';
+    const params = [student_name, course_name || '', project_title, description || '', is_featured === 'on' ? 1 : 0, is_active === 'on' ? 1 : 0, parseInt(sort_order) || 0];
+    if (req.file) {
+      sql += ', image_path=?';
+      params.push('/uploads/' + req.file.filename);
+    }
+    sql += ' WHERE id=?';
+    params.push(req.params.id);
+    await pool.query(sql, params);
+    res.redirect('/admin/gallery');
+  } catch (err) { next(err); }
+});
+
+router.post('/gallery/:id/delete', async (req, res, next) => {
+  try {
+    await pool.query('DELETE FROM gallery_projects WHERE id = ?', [req.params.id]);
+    res.redirect('/admin/gallery');
+  } catch (err) { next(err); }
+});
+
+router.post('/gallery/:id/toggle', async (req, res, next) => {
+  try {
+    const [[p]] = await pool.query('SELECT is_active FROM gallery_projects WHERE id = ?', [req.params.id]);
+    if (p) await pool.query('UPDATE gallery_projects SET is_active = ? WHERE id = ?', [p.is_active ? 0 : 1, req.params.id]);
+    res.redirect('/admin/gallery');
+  } catch (err) { next(err); }
+});
+
+// ========== ALUMNI MANAGEMENT ==========
+
+router.get('/alumni', async (req, res, next) => {
+  try {
+    const [alumni] = await pool.query('SELECT * FROM alumni ORDER BY sort_order ASC, created_at DESC');
+    res.render('admin/alumni/index', { title: 'Alumni Directory', alumni: alumni || [] });
+  } catch (err) { next(err); }
+});
+
+router.get('/alumni/create', (req, res) => {
+  res.render('admin/alumni/form', { title: 'Add Alumni', alum: null, error: null });
+});
+
+router.post('/alumni', async (req, res, next) => {
+  try {
+    const { student_name, course_name, employer, job_title, location, city, country, linkedin_url, testimonial, is_featured, sort_order } = req.body;
+    if (!student_name) return res.status(400).render('admin/alumni/form', { title: 'Add Alumni', alum: null, error: 'Student name is required.' });
+    await pool.query(
+      'INSERT INTO alumni (student_name, course_name, employer, job_title, location, city, country, linkedin_url, testimonial, is_featured, sort_order) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+      [student_name, course_name || '', employer || '', job_title || '', location || '', city || 'Kigali', country || 'Rwanda', linkedin_url || '', testimonial || '', is_featured === 'on' ? 1 : 0, parseInt(sort_order) || 0]
+    );
+    res.redirect('/admin/alumni');
+  } catch (err) { next(err); }
+});
+
+router.get('/alumni/:id/edit', async (req, res, next) => {
+  try {
+    const [[alum]] = await pool.query('SELECT * FROM alumni WHERE id = ?', [req.params.id]);
+    if (!alum) return res.status(404).render('404', { title: 'Not found', message: 'Alumni not found' });
+    res.render('admin/alumni/form', { title: 'Edit Alumni', alum, error: null });
+  } catch (err) { next(err); }
+});
+
+router.post('/alumni/:id', async (req, res, next) => {
+  try {
+    const { student_name, course_name, employer, job_title, location, city, country, linkedin_url, testimonial, is_featured, is_active, sort_order } = req.body;
+    await pool.query(
+      'UPDATE alumni SET student_name=?, course_name=?, employer=?, job_title=?, location=?, city=?, country=?, linkedin_url=?, testimonial=?, is_featured=?, is_active=?, sort_order=?, updated_at=CURRENT_TIMESTAMP WHERE id=?',
+      [student_name, course_name || '', employer || '', job_title || '', location || '', city || 'Kigali', country || 'Rwanda', linkedin_url || '', testimonial || '', is_featured === 'on' ? 1 : 0, is_active === 'on' ? 1 : 0, parseInt(sort_order) || 0, req.params.id]
+    );
+    res.redirect('/admin/alumni');
+  } catch (err) { next(err); }
+});
+
+router.post('/alumni/:id/delete', async (req, res, next) => {
+  try { await pool.query('DELETE FROM alumni WHERE id = ?', [req.params.id]); res.redirect('/admin/alumni'); } catch (err) { next(err); }
+});
+
+router.post('/alumni/:id/toggle', async (req, res, next) => {
+  try {
+    const [[a]] = await pool.query('SELECT is_active FROM alumni WHERE id = ?', [req.params.id]);
+    if (a) await pool.query('UPDATE alumni SET is_active = ? WHERE id = ?', [a.is_active ? 0 : 1, req.params.id]);
+    res.redirect('/admin/alumni');
+  } catch (err) { next(err); }
+});
+
+// ========== COURSE WAITLIST MANAGEMENT ==========
+
+router.get('/waitlist', async (req, res, next) => {
+  try {
+    const [entries] = await pool.query(
+      `SELECT w.*, s.name as course_name FROM course_waitlist w LEFT JOIN subcourses s ON w.subcourse_id = s.id ORDER BY w.created_at DESC`
+    );
+    res.render('admin/waitlist/index', { title: 'Course Waitlist', entries: entries || [] });
+  } catch (err) { next(err); }
+});
+
+router.post('/waitlist/:id/notify', async (req, res, next) => {
+  try {
+    await pool.query('UPDATE course_waitlist SET notified = 1 WHERE id = ?', [req.params.id]);
+    res.redirect('/admin/waitlist');
+  } catch (err) { next(err); }
+});
+
+router.post('/waitlist/:id/delete', async (req, res, next) => {
+  try { await pool.query('DELETE FROM course_waitlist WHERE id = ?', [req.params.id]); res.redirect('/admin/waitlist'); } catch (err) { next(err); }
+});
+
+// ========== MINI-COURSE SIGNUPS MANAGEMENT ==========
+
+router.get('/mini-course', async (req, res, next) => {
+  try {
+    const [signups] = await pool.query('SELECT * FROM mini_course_signups ORDER BY created_at DESC');
+    res.render('admin/mini-course/index', { title: 'Mini-Course Signups', signups: signups || [] });
+  } catch (err) { next(err); }
+});
+
+router.post('/mini-course/:id/lesson', async (req, res, next) => {
+  try {
+    const { lesson } = req.body;
+    if (lesson === '1') await pool.query('UPDATE mini_course_signups SET sent_lesson_1 = 1 WHERE id = ?', [req.params.id]);
+    if (lesson === '2') await pool.query('UPDATE mini_course_signups SET sent_lesson_2 = 1 WHERE id = ?', [req.params.id]);
+    if (lesson === '3') await pool.query('UPDATE mini_course_signups SET sent_lesson_3 = 1 WHERE id = ?', [req.params.id]);
+    res.redirect('/admin/mini-course');
+  } catch (err) { next(err); }
+});
+
+router.post('/mini-course/:id/delete', async (req, res, next) => {
+  try { await pool.query('DELETE FROM mini_course_signups WHERE id = ?', [req.params.id]); res.redirect('/admin/mini-course'); } catch (err) { next(err); }
+});
+
 module.exports = router;

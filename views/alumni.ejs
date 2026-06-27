@@ -1,0 +1,52 @@
+<%- include('partials/ads', { slot: 'topBanner' }) %>
+
+<section class="py-5">
+  <div class="container">
+    <div class="text-center mb-5">
+      <p class="text-uppercase small fw-semibold mb-2" style="color: var(--accent-primary-light);">Our Graduates</p>
+      <h1 class="display-5 fw-bold mb-3">Where Our Alumni Work</h1>
+      <p class="lead text-muted mx-auto" style="max-width: 650px;">City Building Engineering graduates are working at top engineering firms, construction companies, and design studios across Rwanda and beyond.</p>
+    </div>
+    <% if (typeof alumni !== 'undefined' && alumni && alumni.length > 0) { %>
+      <div class="row g-4">
+        <% alumni.forEach(function(a) { %>
+          <div class="col-sm-6 col-lg-4">
+            <div class="card h-100 border-0" style="background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px;">
+              <div class="card-body p-4 d-flex flex-column">
+                <div class="d-flex align-items-center gap-3 mb-3">
+                  <div style="width: 56px; height: 56px; border-radius: 50%; background: linear-gradient(135deg, var(--accent), var(--accent-light)); display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 700; font-size: 1.4rem; flex-shrink: 0;">
+                    <%= a.student_name.charAt(0).toUpperCase() %>
+                  </div>
+                  <div>
+                    <h3 class="h6 fw-bold mb-0"><%= a.student_name %></h3>
+                    <% if (a.job_title) { %><small class="text-muted"><%= a.job_title %></small><% } %>
+                  </div>
+                </div>
+                <% if (a.employer) { %>
+                  <p class="small mb-1"><i class="bi bi-building me-1" style="color: var(--accent-primary-light);"></i> <strong><%= a.employer %></strong></p>
+                <% } %>
+                <% if (a.location || a.city) { %>
+                  <p class="small text-muted mb-1"><i class="bi bi-geo-alt me-1"></i> <%= a.city || a.location %><%= a.country && a.country !== 'Rwanda' ? ', ' + a.country : '' %></p>
+                <% } %>
+                <% if (a.course_name) { %>
+                  <p class="small text-muted mb-2"><i class="bi bi-mortarboard me-1"></i> <%= a.course_name %></p>
+                <% } %>
+                <% if (a.testimonial) { %>
+                  <p class="small fst-italic text-muted mt-auto mb-2 pt-2" style="border-top: 1px solid var(--border-light);">"<%= a.testimonial %>"</p>
+                <% } %>
+                <% if (a.linkedin_url) { %>
+                  <a href="<%= a.linkedin_url %>" target="_blank" rel="noreferrer" class="btn btn-sm btn-outline-primary mt-2"><i class="bi bi-linkedin"></i> LinkedIn</a>
+                <% } %>
+              </div>
+            </div>
+          </div>
+        <% }); %>
+      </div>
+    <% } else { %>
+      <div class="text-center py-5 text-muted">
+        <i class="bi bi-people" style="font-size: 3rem; display: block; margin-bottom: 1rem; opacity: 0.4;"></i>
+        <p>Alumni directory coming soon. Graduates, <a href="/contact">share your story</a>!</p>
+      </div>
+    <% } %>
+  </div>
+</section>

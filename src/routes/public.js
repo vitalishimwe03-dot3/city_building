@@ -269,4 +269,179 @@ router.post('/certificate/contact', async (req, res, next) => {
   }
 });
 
+// ====== WHATSAPP BOOKING FLOW ======
+
+function getWhatsAppLink(courseName, message) {
+  const text = message || `Hello City Building! I'm interested in the ${courseName} course. Can you provide details on pricing, schedule, and enrollment?`;
+  return `https://wa.me/250789257758?text=${encodeURIComponent(text)}`;
+}
+
+router.get('/booking/:id', async (req, res, next) => {
+  try {
+    const [[course]] = await pool.query('SELECT name FROM subcourses WHERE id=?', [req.params.id]);
+    const name = course?.name || 'your courses';
+    res.redirect(getWhatsAppLink(name));
+  } catch (_) {
+    res.redirect(getWhatsAppLink('your courses'));
+  }
+});
+
+// ====== STUDENT PROJECT GALLERY ======
+
+router.get('/gallery', async (req, res, next) => {
+  try {
+    const [projects] = await pool.query("SELECT * FROM gallery_projects WHERE is_active = 1 ORDER BY sort_order ASC, created_at DESC");
+    res.render('gallery', {
+      title: 'Student Project Gallery - City Building Engineering',
+      metaDescription: 'Browse student projects from City Building Engineering training courses in Kigali, Rwanda. See real work from Revit, AutoCAD, ETABS, Lumion and more.',
+      projects: projects || [],
+      breadcrumbs: [{ name: 'Home', url: `${req.protocol}://${req.get('host')}/` }, { name: 'Gallery', url: `${req.protocol}://${req.get('host')}/gallery` }]
+    });
+  } catch (err) {
+    res.render('gallery', { title: 'Student Gallery', projects: [], metaDescription: 'Browse student projects.', breadcrumbs: [] });
+  }
+});
+
+// ====== ALUMNI DIRECTORY ======
+
+router.get('/alumni', async (req, res, next) => {
+  try {
+    const [alumni] = await pool.query("SELECT * FROM alumni WHERE is_active = 1 ORDER BY sort_order ASC, created_at DESC");
+    res.render('alumni', {
+      title: 'Our Alumni - City Building Engineering',
+      metaDescription: 'Meet our alumni from City Building Engineering training programs in Kigali, Rwanda. See where our graduates are working.',
+      alumni: alumni || [],
+      breadcrumbs: [{ name: 'Home', url: `${req.protocol}://${req.get('host')}/` }, { name: 'Alumni', url: `${req.protocol}://${req.get('host')}/alumni` }]
+    });
+  } catch (err) {
+    res.render('alumni', { title: 'Our Alumni', alumni: [], metaDescription: 'Meet our alumni.', breadcrumbs: [] });
+  }
+});
+
+// ====== "WHICH COURSE FITS YOU?" QUIZ ======
+
+const quizQuestions = [
+  { question: 'What is your current background?', options: ['Architecture student', 'Engineering student', 'Working professional', 'Career changer', 'Recent graduate'], scores: [0, 1, 2, 3, 1] },
+  { question: 'What interests you most?', options: ['Designing buildings', 'Structural analysis', '3D visualization', 'Infrastructure & roads', 'Water systems'], scores: [0, 1, 2, 3, 4] },
+  { question: 'What software experience do you have?', options: ['None, I am a beginner', 'Basic CAD knowledge', 'Some BIM experience', 'Intermediate level', 'Advanced user'], scores: [0, 1, 2, 3, 4] },
+  { question: 'What is your preferred learning format?', options: ['In-person hands-on', 'Online with support', 'Blended learning', 'Weekend classes', 'Intensive bootcamp'], scores: [0, 1, 2, 3, 4] },
+  { question: 'What is your goal?', options: ['Get a job', 'Upgrade skills', 'Start a business', 'Get certified', 'Internship placement'], scores: [0, 1, 2, 3, 4] }
+];
+
+const quizResults = [
+  { minScore: 0, maxScore: 4, title: 'Architecture & Design Track', description: 'You would thrive in our Architecture track. Start with AutoCAD basics, then progress to Revit, ArchiCAD, and SketchUp for complete BIM proficiency.', category: 'architecture' },
+  { minScore: 5, maxScore: 8, title: 'Structural Engineering Track', description: 'Your profile matches our Structural Engineering path. Begin with ETABS or ProtaStructure and advance through CSI Safe, Detailer, and Bridge modules.', category: 'structural-engineering' },
+  { minScore: 9, maxScore: 12, title: 'Visualization & Rendering Track', description: 'You are a visual thinker. Our Lumion, Twinmotion, Enscape, and V-Ray courses will turn your designs into stunning visualizations.', category: 'visualization-rendering' },
+  { minScore: 13, maxScore: 16, title: 'Civil & Water Engineering Track', description: 'Infrastructure is your calling. Start with Civil 3D and ArcGIS, then specialize in WaterCAD and WaterGEMS for water engineering.', category: 'civil-engineering' },
+  { minScore: 17, maxScore: 20, title: 'Comprehensive Training Path', description: 'You want it all. Start with our Foundations course covering multiple software, then specialize based on your interests.', category: 'training-services' }
+];
+
+router.get('/quiz', (req, res) => {
+  res.render('quiz', {
+    title: 'Which Course Fits You? - City Building Engineering',
+    metaDescription: 'Take our 2-minute quiz to find the perfect software training course for your career goals at City Building Engineering in Kigali, Rwanda.',
+    questions: quizQuestions
+  });
+});
+
+router.post('/quiz/result', (req, res) => {
+  try {
+    const answers = req.body.answers;
+    if (!answers || !Array.isArray(answers)) return res.redirect('/quiz');
+    let totalScore = 0;
+    answers.forEach((ans, i) => {
+      if (i < quizQuestions.length && quizQuestions[i].scores[parseInt(ans)]) {
+        totalScore += quizQuestions[i].scores[parseInt(ans)];
+      }
+    });
+    const result = quizResults.find(r => totalScore >= r.minScore && totalScore <= r.maxScore) || quizResults[0];
+    res.render('quiz-result', {
+      title: 'Your Course Recommendation - City Building Engineering',
+      metaDescription: 'See which City Building Engineering course fits you best based on your quiz answers.',
+      result,
+      score: totalScore,
+      maxScore: 20
+    });
+  } catch (err) {
+    res.redirect('/quiz');
+  }
+});
+
+// ====== CERTIFICATE VERIFICATION PORTAL ======
+
+router.get('/verify-certificate', (req, res) => {
+  const { code } = req.query;
+  res.render('verify-certificate', {
+    title: 'Verify Certificate - City Building Engineering',
+    metaDescription: 'Verify a City Building Engineering certificate. Enter the certificate code to confirm authenticity.',
+    code: code || '',
+    result: null,
+    error: null
+  });
+});
+
+router.post('/verify-certificate', async (req, res, next) => {
+  try {
+    const { code } = req.body;
+    if (!code || code.trim().length < 4) {
+      return res.render('verify-certificate', { title: 'Verify Certificate', metaDescription: '', code: code || '', result: null, error: 'Please enter a valid certificate code.' });
+    }
+    const [[cert]] = await pool.query('SELECT * FROM certificate_verifications WHERE certificate_code = ? AND is_valid = 1', [code.trim().toUpperCase()]);
+    if (!cert) {
+      return res.render('verify-certificate', { title: 'Verify Certificate', metaDescription: '', code, result: null, error: 'Certificate not found or has been invalidated. Please contact City Building Engineering for verification.' });
+    }
+    res.render('verify-certificate', { title: 'Certificate Verified', metaDescription: '', code, result: cert, error: null });
+  } catch (err) {
+    next(err);
+  }
+});
+
+// ====== FREE MINI-COURSE SIGNUP ======
+
+router.get('/free-course', (req, res) => {
+  res.render('free-course', {
+    title: 'Free 7-Day Mini Course - City Building Engineering',
+    metaDescription: 'Sign up for a free 7-day mini course from City Building Engineering. Learn AutoCAD, Revit, or ETABS basics with daily email lessons.',
+    success: null,
+    error: null
+  });
+});
+
+router.post('/free-course/signup', async (req, res, next) => {
+  try {
+    const { name, email, phone, course_interest } = req.body;
+    if (!name || !email) {
+      return res.render('free-course', { title: 'Free Mini Course', metaDescription: '', success: null, error: 'Name and email are required.' });
+    }
+    await pool.query(
+      'INSERT OR IGNORE INTO mini_course_signups (name, email, phone, course_interest) VALUES (?, ?, ?, ?)',
+      [name, email, phone || '', course_interest || '']
+    );
+    res.render('free-course', { title: 'Free Mini Course', metaDescription: '', success: 'Welcome! Check your email for your first lesson.', error: null });
+  } catch (err) {
+    res.render('free-course', { title: 'Free Mini Course', metaDescription: '', success: null, error: 'This email is already registered.' });
+  }
+});
+
+// ====== COURSE SYLLABUS DOWNLOAD ======
+
+router.get('/course/:id/syllabus', async (req, res, next) => {
+  try {
+    const [[course]] = await pool.query('SELECT s.*, c.name as category_name FROM subcourses s JOIN categories c ON s.category_id=c.id WHERE s.id=?', [req.params.id]);
+    const fallback = course ? null : findFallbackSubcourse(req.params.id);
+    const c = course || fallback;
+    if (!c) return res.status(404).render('404', { title: 'Not found', message: 'Course not found' });
+    const category = course ? null : findFallbackCategory(fallback.category_slug);
+    const courseData = course || { ...fallback, category_name: category?.name || fallback.category_name };
+    res.render('syllabus', {
+      course: courseData,
+      title: `${courseData.name} Syllabus - City Building Engineering`,
+      metaDescription: `Download the ${courseData.name} course syllabus. Full curriculum, duration, and learning outcomes.`,
+      breadcrumbs: [{ name: 'Home', url: `${req.protocol}://${req.get('host')}/` }, { name: courseData.category_name, url: `${req.protocol}://${req.get('host')}/category/${courseData.category_slug}` }, { name: courseData.name, url: `${req.protocol}://${req.get('host')}/course/${courseData.id}` }, { name: 'Syllabus', url: `${req.protocol}://${req.get('host')}/course/${courseData.id}/syllabus` }]
+    });
+  } catch (err) {
+    next(err);
+  }
+});
+
 module.exports = router;
