@@ -93,6 +93,69 @@ function sessionTimeout(req, res, next) {
   next();
 }
 
+// ========== FORGOT / RESET PASSWORD (no auth required) ==========
+
+router.get('/forgot-password', (req, res) => {
+  res.render('admin/forgot-password', { title: 'Admin Forgot Password', layout: false, error: null });
+});
+
+router.post('/forgot-password', adminForgotPasswordLimiter, async (req, res, next) => {
+  try {
+    const { email } = req.body;
+    if (!email) {
+      return res.status(400).render('admin/forgot-password', { title: 'Admin Forgot Password', layout: false, error: 'Email address is required.' });
+    }
+    const resetData = await User.requestPasswordReset(email);
+    if (!resetData) {
+      return res.render('admin/forgot-password-sent', { title: 'Password Reset Sent', layout: false, email, message: 'If an admin account exists with this email, you will receive a password reset link.' });
+    }
+    const baseUrl = `${req.protocol}://${req.get('host')}`;
+    sendAdminPasswordResetEmail(resetData.user, resetData.token, baseUrl).catch(e => {
+      console.error('Failed to send admin password reset email:', e);
+    });
+    res.render('admin/forgot-password-sent', { title: 'Password Reset Sent', layout: false, email, message: 'If an admin account exists with this email, you will receive a password reset link.' });
+  } catch (err) {
+    next(err);
+  }
+});
+
+router.get('/reset-password', (req, res) => {
+  const { token } = req.query;
+  if (!token) {
+    return res.status(400).render('404', { title: 'Invalid Link', message: 'No password reset token provided.' });
+  }
+  res.render('admin/reset-password', { title: 'Reset Password', layout: false, token, error: null });
+});
+
+router.post('/reset-password', async (req, res, next) => {
+  try {
+    const { token, password, confirmPassword } = req.body;
+    if (!token || !password || password !== confirmPassword) {
+      return res.status(400).render('admin/reset-password', { title: 'Reset Password', layout: false, token, error: 'Password mismatch or token missing.' });
+    }
+    const strengthErrors = validatePasswordStrength(password);
+    if (strengthErrors.length > 0) {
+      return res.status(400).render('admin/reset-password', { title: 'Reset Password', layout: false, token, error: 'Password must include: ' + strengthErrors.join(', ') + '.' });
+    }
+    const user = await User.resetPasswordWithToken(token, password);
+    if (!user) {
+      return res.status(400).render('404', { title: 'Invalid or Expired Link', message: 'The password reset link is invalid or has expired.' });
+    }
+    res.render('admin/password-reset-success', { title: 'Password Reset Successful', layout: false, message: 'Your password has been reset successfully. You can now login with your new password.' });
+  } catch (err) {
+    next(err);
+  }
+});
+
+router.get('/init-db', async (req, res, next) => {
+  try {
+    await initDb.init();
+    res.send('DB init ran successfully.');
+  } catch (err) {
+    next(err);
+  }
+});
+
 // Shared layout middleware for all authenticated pages
 router.use(isAdminAuthenticated, csrfProtection, sessionTimeout, setAdminPage);
 
@@ -642,69 +705,6 @@ router.post('/settings/change-password', async (req, res, next) => {
     );
     // Force session re-login after password change
     req.session.destroy(() => { res.redirect('/login'); });
-  } catch (err) {
-    next(err);
-  }
-});
-
-// ========== FORGOT / RESET PASSWORD (no auth required) ==========
-
-router.get('/forgot-password', (req, res) => {
-  res.render('admin/forgot-password', { title: 'Admin Forgot Password', layout: false, error: null });
-});
-
-router.post('/forgot-password', adminForgotPasswordLimiter, async (req, res, next) => {
-  try {
-    const { email } = req.body;
-    if (!email) {
-      return res.status(400).render('admin/forgot-password', { title: 'Admin Forgot Password', layout: false, error: 'Email address is required.' });
-    }
-    const resetData = await User.requestPasswordReset(email);
-    if (!resetData) {
-      return res.render('admin/forgot-password-sent', { title: 'Password Reset Sent', layout: false, email, message: 'If an admin account exists with this email, you will receive a password reset link.' });
-    }
-    const baseUrl = `${req.protocol}://${req.get('host')}`;
-    sendAdminPasswordResetEmail(resetData.user, resetData.token, baseUrl).catch(e => {
-      console.error('Failed to send admin password reset email:', e);
-    });
-    res.render('admin/forgot-password-sent', { title: 'Password Reset Sent', layout: false, email, message: 'If an admin account exists with this email, you will receive a password reset link.' });
-  } catch (err) {
-    next(err);
-  }
-});
-
-router.get('/reset-password', (req, res) => {
-  const { token } = req.query;
-  if (!token) {
-    return res.status(400).render('404', { title: 'Invalid Link', message: 'No password reset token provided.' });
-  }
-  res.render('admin/reset-password', { title: 'Reset Password', layout: false, token, error: null });
-});
-
-router.post('/reset-password', async (req, res, next) => {
-  try {
-    const { token, password, confirmPassword } = req.body;
-    if (!token || !password || password !== confirmPassword) {
-      return res.status(400).render('admin/reset-password', { title: 'Reset Password', layout: false, token, error: 'Password mismatch or token missing.' });
-    }
-    const strengthErrors = validatePasswordStrength(password);
-    if (strengthErrors.length > 0) {
-      return res.status(400).render('admin/reset-password', { title: 'Reset Password', layout: false, token, error: 'Password must include: ' + strengthErrors.join(', ') + '.' });
-    }
-    const user = await User.resetPasswordWithToken(token, password);
-    if (!user) {
-      return res.status(400).render('404', { title: 'Invalid or Expired Link', message: 'The password reset link is invalid or has expired.' });
-    }
-    res.render('admin/password-reset-success', { title: 'Password Reset Successful', layout: false, message: 'Your password has been reset successfully. You can now login with your new password.' });
-  } catch (err) {
-    next(err);
-  }
-});
-
-router.get('/init-db', async (req, res, next) => {
-  try {
-    await initDb.init();
-    res.send('DB init ran successfully.');
   } catch (err) {
     next(err);
   }

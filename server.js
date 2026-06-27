@@ -13,7 +13,7 @@ const logger = require('./src/logger');
 require('dotenv').config();
 
 const app = express();
-app.use(passport.initialize());
+app.set('trust proxy', 1);
 
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
@@ -52,6 +52,8 @@ app.use(session({
     maxAge: 4 * 60 * 60 * 1000
   }
 }));
+
+app.use(passport.initialize());
 
 app.use(setAdminLocals);
 app.use(localizationMiddleware);
